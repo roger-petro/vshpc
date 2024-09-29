@@ -1,0 +1,430 @@
+{
+    "name": "reshpc",
+    "displayName": "HPC Reservoir Simulation Support Suite",
+    "description": "Reservoir HPC Control Center for Launching and Managing Flow and Geomechanics Simulations",
+    "publisher": "rogerio-cunha",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.92.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "workspaceContains:**/(.dat|.gdt|.geo|.DATA|.xml)"
+    ],
+    "icon": "images/icon.png",
+    "main": "./out/extension.js",
+    "contributes": {
+        "walkthroughs": [
+            {
+                "id": "reshpc.welcome",
+                "title": "Starting with resHPC",
+                "description": "Abaixo estão as etapas mínimas de configuração que devem ser executadas na extensão para torná-la operacional",
+                "steps": [
+                    {
+                        "id": "reshpc.configureaccount",
+                        "title": "Configurar o account",
+                        "description": "Configure o account para submeter jobs nos scripts\n[Mudar a configuração](command:reshpc.walkChangeAccount)",
+                        "media": {
+                            "image": "images/config_account.png",
+                            "altText": "account"
+                        }
+                    },
+                    {
+                        "id": "reshpc.configuresolver",
+                        "title": "Configurar o solver",
+                        "description": "Configure o solver utilizado nas simulações\n[Mudar a configuração](command:reshpc.walkChangeSolver)",
+                        "media": {
+                            "image": "images/config_solver.png",
+                            "altText": "solver"
+                        }
+                    },
+                    {
+                        "id": "reshpc.configureall",
+                        "title": "Acessar as demais configurações",
+                        "description": "Veja as demais configurações disponíveis\n[Acessar a configuração](command:reshpc.walkOpenConfig)",
+                        "media": {
+                            "image": "images/config_all.png",
+                            "altText": "config"
+                        }
+                    },
+                    {
+                        "id": "reshpc.configuretest",
+                        "title": "Testar se a configuração está correta",
+                        "description": "Por fim, as configurações podem ser testadas usando a paleta de comandos do VSCODE, na opção HPC: Verificar Configurações\n[Testar a configuração agora](command:reshpc.checkSettings)",
+                        "media": {
+                            "image": "images/config_test.png",
+                            "altText": "config"
+                        }
+                    },
+                    {
+                        "id": "reshpc.whatsnew",
+                        "title": "Veja as novidades",
+                        "description": "Veja as novidades da versão",
+                        "media": {
+                            "markdown": "NEW.md"
+                        }
+                    },
+                    {
+                        "id": "reshpc.readmanual",
+                        "title": "Leia a documentação",
+                        "description": "Leia o README detalhado da extensão para maiores detalhes\n[Acesse a documentação](command:reshpc.walkOpenReadme)",
+                        "media": {
+                            "image": "images/config_readme.png",
+                            "altText": "readme"
+                        }
+                    }
+                ]
+            }
+        ],
+        "commands": [
+            {
+                "command": "reshpc.showWelcome",
+                "title": "Boas Vindas",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.OpenConfig",
+                "title": "Configuração",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.jobSubmit",
+                "title": "Submeter Job com Git",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.jobSubmitHash",
+                "title": "Submeter Job com Git informando o hash",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.jobSubmitAll",
+                "title": "Submeter Jobs com Git (todos os modelos na pasta atual)",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.jobSubmitDirect",
+                "title": "Submeter Job (sem git)",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.jobSubmitDirectCheck",
+                "title": "Verificar sintaxe (checkonly)",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.jobSubmitDirectOneStep",
+                "title": "Submeter Job (onestep)",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.jobsMgmt",
+                "title": "Gerenciar Jobs",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.jobCheckSSH",
+                "title": "Testar o SSH",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.checkSettings",
+                "title": "Verificar a configuração",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.jobEnterPassword",
+                "title": "Entrar com a senha SSH",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.jobMock",
+                "title": "Enviar Job de teste",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.version",
+                "title": "Versão do ResHPC",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.logs",
+                "title": "Ver os Logs",
+                "category": "ResHPC"
+            }
+        ],
+        "submenus": [
+            {
+                "id": "reshpc.submenu",
+                "label": "ResHPC comandos"
+            }
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "reshpc.showWelcome"
+                },
+                {
+                    "command": "reshpc.OpenConfig"
+                },
+                {
+                    "command": "reshpc.jobSubmit"
+                },
+                {
+                    "command": "reshpc.jobSubmitHash"
+                },
+                {
+                    "command": "reshpc.jobSubmitAll",
+                    "when": "false"
+                },
+                {
+                    "command": "reshpc.jobsMgmt"
+                },
+                {
+                    "command": "reshpc.jobCheckSSH"
+                },
+                {
+                    "command": "reshpc.checkSettings"
+                },
+                {
+                    "command": "reshpc.version"
+                },
+                {
+                    "command": "reshpc.logs"
+                },
+                {
+                    "command": "reshpc.jobEnterPassword"
+                }
+            ],
+            "editor/context": [
+                {
+                    "submenu": "reshpc.submenu",
+                    "group": "navigation"
+                }
+            ],
+            "editor/title/context": [
+                {
+                    "submenu": "reshpc.submenu",
+                    "group": "navigation"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "submenu": "reshpc.submenu",
+                    "group": "navigation"
+                }
+            ],
+            "reshpc.submenu": [
+                {
+                    "command": "reshpc.jobSubmit",
+                    "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
+                    "group": "0_reshpc@1"
+                },
+                {
+                    "command": "reshpc.jobSubmitHash",
+                    "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
+                    "group": "0_reshpc@2"
+                },
+                {
+                    "command": "reshpc.jobSubmitDirect",
+                    "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
+                    "group": "0_reshpc@3"
+                },
+                {
+                    "command": "reshpc.jobSubmitAll",
+                    "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
+                    "group": "0_reshpc@4"
+                },
+                {
+                    "command": "reshpc.jobSubmitDirectCheck",
+                    "when": "resourceExtname =~ /.dat/i",
+                    "group": "0_reshpc@5"
+                },
+                {
+                    "command": "reshpc.jobSubmitDirectOneStep",
+                    "when": "resourceExtname =~ /.dat/i",
+                    "group": "0_reshpc@6"
+                },
+                {
+                    "command": "reshpc.jobsMgmt",
+                    "group": "0_reshpc@11"
+                },
+                {
+                    "command": "reshpc.OpenConfig",
+                    "group": "0_reshpc@12"
+                }
+            ]
+        },
+        "configuration": {
+            "type": "object",
+            "title": "ResHPC",
+            "properties": {
+                "reshpc.connection.cluster": {
+                    "type": "string",
+                    "markdownDescription": "Head Node do Cluster para submeter jobs (SLURM).",
+                    "scope": "application",
+                    "order": 0
+                },
+                "reshpc.configuration.customConfigURI": {
+                    "type": "string",
+                    "markdownDescription": "File (with path) of a json `Customc Config`",
+                    "scope": "application",
+                    "order": 0
+                },
+                "reshpc.scheduler.SlurmAccount": {
+                    "type": "string",
+                    "markdownDescription": "Nome do `account` para submissão. Deve ser configurado aqui ou no 'Custom Config'"
+                },
+                "reshpc.scheduler.slurm": {
+                    "type": "string",
+                    "markdownDescription": "Opções extras para serem passadas ao SLURM (por ex, selecionar a fila/partição: -p pre ou --comment=\"comentário com aspas\"). Prefira configura na `TAB` Workspace.",
+                    "default": ""
+                },
+                "reshpc.connection.user": {
+                    "type": "string",
+                    "markdownDescription": "Usuário (chave) que fará o ssh (e de submissão).",
+                    "scope": "application"
+                },
+                "reshpc.connection.password": {
+                    "type": "string",
+                    "markdownDescription": "Senha para acesso via ssh, use o comando `resHPC:Entrar com a senha SSH` no VSCode para ajustar este valor de forma criptografada.",
+                    "readOnly": true,
+                    "scope": "application"
+                },
+                "reshpc.connection.privRsaKey": {
+                    "type": "string",
+                    "markdownDescription": "Opcional à senha, informe o caminho para chave RSA privada para acesso SSH. Em geral, C:\\users\\CHAVE\\\\.ssh\\id_rsa (não é a .pub!).",
+                    "scope": "application"
+                },
+                "reshpc.path.WindowsUnix": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "markdownDescription": "Relação `de-para` entre o caminho e Windows e o caminho Unix visto pelo Cluster.",
+                    "scope": "application"
+                },
+                "reshpc.path.destination": {
+                    "type": "string",
+                    "markdownDescription": "Pasta absoluta ou relativa, no formato Windows, indicando o destino para onde serão realizados os clones e as simulações quando usando simulações com clone. Veja o README.md para exemplos. Qualquer valor diferente de ..\\ e .\\ (pasta pai e atual) implicará em não poder haver um mesmo job rodando para o modelo. Prefira configurar este item na `TAB` workspace.",
+                    "default": "..\\"
+                },
+                "reshpc.path.folderFormat": {
+                    "order": 0,
+                    "type": "string",
+                    "default": "projectName_hash",
+                    "enum": [
+                        "YYYY.MM.DD_hash_projectName",
+                        "YYYY.MM.DD_projectName_hash",
+                        "YYYY.MM.DD_tag_hash_projectName",
+                        "YYYY.MM.DD_projectName_tag_hash",
+                        "YYYY.MM.DD_projectName_hash_tag",
+                        "projectName_hash",
+                        "projectName_tag_hash",
+                        "projectName_YYYY.MM.DD_hash",
+                        "projectName_YYYY.MM.DD_tag_hash",
+                        "projectName_YYYY.MM.DD_hash_tag"
+                    ],
+                    "markdownDescription": "Define o formato da pasta de saída para o clone. Tags com combinação de números, `'V','v','.' '_' e '-'` são preferencialmente escolhidas (exemplos v1.0.1, V-1). Se não achar um tag, '0' é colocado no lugar.",
+                    "scope": "application"
+                },
+                "reshpc.solver.type.name": {
+                    "type": "string",
+                    "enum": [
+                        "GEM",
+                        "GEM_SBR",
+                        "IMEX",
+                        "STARS",
+                        "GeomecBR",
+                        "iGeo",
+                        "Eclipse",
+                        "OPM",
+                        "GEOSX"
+                    ],
+                    "default": "GEM",
+                    "markdownDescription": "Nome do simulador. Prefira configurar este item na `TAB` workspace."
+                },
+                "reshpc.solver.type.version": {
+                    "type": "string",
+                    "markdownDescription": "Versão do solver de simulação a depender do simulador escolhido (p. ex.: 2019.12, 2018.11, v6.0, etc). Veja exemplos no README. Prefira configurar este item na `TAB` Workspace."
+                },
+                "reshpc.solver.resources.cores": {
+                    "type": "number",
+                    "default": 1,
+                    "minimum": 1,
+                    "markdownDescription": "Numero de cores usados na simulação (--cpus-per-task). Prefira configurar este item na `TAB` Workspace."
+                },
+                "reshpc.solver.resources.ntasksPerNode": {
+                    "type": "number",
+                    "default": 1,
+                    "minimum": 1,
+                    "markdownDescription": "Numero de tarefas por nó (--ntasks-per-node). Nota: total de processos MPI (-np) = nodes * ntasks-per-node, quando usado MPI. Prefira configurar este item na `TAB` Workspace."
+                },
+                "reshpc.solver.resources.nodes": {
+                    "type": "number",
+                    "default": 1,
+                    "minimum": 1,
+                    "markdownDescription": "Numero de nós usados na simulação (--nodes). Prefira configurar este item na `TAB` Workspace."
+                },
+                "reshpc.solver.resources.mpiExtras": {
+                    "type": "string",
+                    "default": "",
+                    "markdownDescription": "Opções extras para serem passadas ao mpirun. Prefira configurar este item na `TAB` Workspace."
+                },
+                "reshpc.solver.ExtraParams": {
+                    "type": "string",
+                    "markdownDescription": "Opções extras para serem passadas para o solver. Para o CMG, `-wait e -parasol` estarão sempre inclusos e também `-doms -log -log2 e -cputime` serão inclusos caso o campo esteja em branco. Prefira configurar este item na `TAB` Workspace.",
+                    "default": ""
+                },
+                "reshpc.solver.solverConfigFile": {
+                    "type": "string",
+                    "markdownDescription": "Opcional. Local onde reside a configuração extra do Solver. Caso esteja numa subpasta do projeto, use subpasta/<arquivo> (barra no formato unix). O default é carregado do CustomConfig."
+                }
+            }
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile && npm run lint",
+        "lint": "eslint src",
+        "test": "vscode-test"
+    },
+    "devDependencies": {
+        "@types/mocha": "^10.0.7",
+        "@types/node": "20.x",
+        "@types/pubsub-js": "^1.8.6",
+        "@types/sprintf-js": "^1.1.4",
+        "@types/ssh2": "^1.15.1",
+        "@types/vscode": "^1.92.0",
+        "@typescript-eslint/eslint-plugin": "^8.3.0",
+        "@typescript-eslint/parser": "^8.3.0",
+        "@vscode/test-cli": "^0.0.10",
+        "@vscode/test-electron": "^2.4.1",
+        "@vscode/vsce": "^3.1.0",
+        "eslint": "^9.9.1",
+        "serve-static": "^1.16.2",
+        "typescript": "^5.5.4"
+    },
+    "dependencies": {
+        "axios": "^1.7.7",
+        "cors": "^2.8.5",
+        "crypto": "^1.0.1",
+        "express": "^4.21.0",
+        "flatted": "^3.3.1",
+        "http-proxy-middleware": "^3.0.2",
+        "iconv-lite": "^0.6.3",
+        "math": "0.0.3",
+        "mongodb": "^6.9.0",
+        "morgan": "^1.10.0",
+        "path": "^0.12.7",
+        "pubsub-js": "^1.9.4",
+        "simple-git": "^3.27.0",
+        "sprintf-js": "^1.1.3",
+        "ssh2": "^1.16.0",
+        "ssh2-sftp-client": "^11.0.0"
+    }
+}
