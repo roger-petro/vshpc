@@ -77,7 +77,7 @@ export class JobsPanel {
                     enableCommandUris: true,
                     retainContextWhenHidden: true,
                     // Restrict the webview to only load resources from the `out` and `src/webview-ui/public/build` directories
-                    localResourceRoots: [Uri.joinPath(extensionUri, "out"), Uri.joinPath(extensionUri,"dist")],
+                    localResourceRoots: [Uri.joinPath(extensionUri, "media"), Uri.joinPath(extensionUri,"webview")],
                 }
             );
 
@@ -119,7 +119,7 @@ export class JobsPanel {
      */
     private _getWebviewContent(webview: Webview, extensionUri: Uri) {
         // The CSS file from the Svelte build output
-        const stylesUri = getUri(webview, extensionUri, ["dist", "assets", "index.css"]);
+        const stylesUri = getUri(webview, extensionUri, ["media", "assets", "index.css"]);
         // The JS file from the Svelte build output
 
 
@@ -128,8 +128,9 @@ export class JobsPanel {
         let scriptUri = null;
         const isProduction = this.context.extensionMode === ExtensionMode.Production;
         if (isProduction) {
-            scriptUri = getUri(webview, extensionUri, ["dist", "index.js"]);
+            scriptUri = getUri(webview, extensionUri, ["media", "index.js"]);
         } else {
+            console.log("Modo de desenvolvimento");
             scriptUri = "http://localhost:5173/src/main.ts";
         }
         /* proxy */
@@ -146,7 +147,7 @@ export class JobsPanel {
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <meta http-equiv="Content-Security-Policy" content="default-src ${webview.cspSource};
-            connect-src ${webview.cspSource}  http://localhost:${proxyPort} https://cdn.bokeh.org ws://localhost:5173;
+            connect-src ${webview.cspSource}  http://localhost:${proxyPort} ws://localhost:5173;
             style-src 'unsafe-inline' ${webview.cspSource};
             script-src 'unsafe-inline' ${webview.cspSource}  http://localhost:5173;">
           <meta name="histSize" content="${this.settings.webviewHistSize}" />
@@ -156,7 +157,7 @@ export class JobsPanel {
           <meta name="proxyPort" content="${proxyPort}" />
           <meta name="route" content="vshpc.jobsviewer" />
           ${ isProduction? `<link rel="stylesheet" type="text/css" href="${stylesUri}"/>`:''}
-          <script defer ${isProduction?'': `type="module"`} src="${scriptUri}"></script>
+          <script defer ${isProduction? '': `type="module"`} src="${scriptUri}"></script>
         </head>
         <body>
         <div id="app"></div>
@@ -213,6 +214,7 @@ export class JobsPanel {
                         break;
                     case "openUrlLink":
                         console.log('Vou tentar achar ' + Uri.parse(message.args));
+                        commands.executeCommand('simpleBrowser.show', encodeURI(this.settings.customConfig.settings.userSearchSite + message.args));
                         env.openExternal(Uri.parse(message.args));
                         break;
                     case "openSystemFolder":

@@ -1,0 +1,204 @@
+
+main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items:center;
+    padding: 0rem;
+    font-family: var(--vscode-font-family);
+    font-size: var(--vscode-font-size);
+    font-weight: var(--vscode-font-weight);
+    width: 99%;
+
+}
+.grid1 {
+    display: grid;
+    grid-template-columns: 30px 90px 60px 100px 100px 80px 80px 150px 1fr 170px;
+
+}
+
+.grid2 {
+    display: grid;
+    grid-template-columns: 90px 60px 100px 100px 80px 150px 1fr 170px ;
+
+}
+
+.grid3 {
+    display: grid;
+    grid-template-columns: 30px 70px 140px 50px 90px 1fr 150px 150px 310px ;
+
+}
+
+.grid1-header {
+    border-bottom: solid;
+    border-width: 2px;
+    border-color: var(--vscode-notebook-cellBorderColor);
+    font-weight: bold;
+
+}
+
+.grid1-column {
+    border-bottom: solid;
+    border-right: solid;
+    padding-left: 5px;
+    border-width: 1px;
+    border-color: var(--vscode-notebook-cellBorderColor);
+}
+main > * {
+    margin: 0.3rem 0;
+}
+.pageTop {
+    border-radius: 3px;
+    background-color:var(--vscode-disabledForeground);
+    padding: 10px;
+}
+.textTop {
+    
+    font-size: var(--vscode-font-size);
+    font-family: var(--vscode-font-family);
+
+}
+
+.title {
+    font-weight: bold;
+    font-size: 16px;
+}
+.wrapper {
+    display:grid;
+    grid-template-columns: 200px 0.8fr;
+    width: 100%;
+}
+
+.first-line {
+    grid-row: 1;
+    grid-column-start: 1;
+    grid-column-end: 8;
+}
+.second-line {
+    grid-row: 2;
+    grid-column-start: 1;
+    grid-column-end: 8;
+    align-items: center;
+    height: 1.5em;
+}
+.third-line {
+    grid-row: 3;
+    grid-column-start: 1;
+    grid-column-end: 8;
+    align-items: center;
+    height: 1.2em;
+}
+
+.g-left {
+    grid-row: 3;
+    grid-column: 1;
+    border-right: 1px var(--vscode-disabledForeground) solid;
+    border-top: 1px var(--vscode-disabledForeground) solid;
+}
+.g-right {
+    grid-row: 3;
+    grid-column-start: 2;
+    grid-column-end: 8;
+    border-top: 1px var(--vscode-disabledForeground) solid;
+    padding-left: 10px;
+}
+
+.smallgrid {
+    display: grid;
+    grid-template-columns: 0.4f 0.4fr 0.3f;
+}
+
+
+fieldset {
+    font-family: var(--vscode-font-family);
+    color: var(--vscode-secondary-foreground);
+    width:auto;
+}
+
+button {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border-radius: 3px;
+    text-align: center;
+    border: var(--vscode-focusBorder);
+    color: var(--vscode-button-foreground);
+    background: var(--vscode-button-background);
+    font-size: var(--vscode-font-size);
+    font-family: var(--vscode-font-family);
+}
+
+button.green {
+    background: green;
+    color: white;
+}
+
+button:hover {
+    cursor: pointer;
+    background: var(--vscode-button-hoverBackground);
+}
+
+.btn-page-number {
+    width: 40px;
+}
+
+.button_sized_1 {
+    width: 130px;
+}
+a {
+    color: var(--vscode-button-background)
+}
+a:hover {
+    cursor: pointer;
+    font-weight: bold;
+}
+button:focus {
+    outline-color: var(--vscode-focusBorder);
+}
+
+
+.badge {
+    background-color: var(--vscode-disabledForeground);
+    padding: 4px 8px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+
+input:not([type="checkbox"]){
+    border-radius: 3px;
+    border: none;
+    color: var(--vscode-input-foreground);
+    outline-color: var(--vscode-input-border);
+    background-color: var(--vscode-input-background);
+    padding: 2px;
+    font-size: var(--vscode-font-size);
+    font-family: var(--vscode-font-family);
+}
+
+
+.selectBox {
+    border-radius: 3px;
+    padding: 2px;
+    border:1px var(--vscode-disabledForeground) solid;
+    outline:none;
+    font-size: var(--vscode-font-size);
+    font-family: var(--vscode-font-family);
+}
+
+.text {
+    font-size: var(--vscode-font-size);
+    font-family: var(--vscode-font-family);
+}
+
+
+
+fieldset {
+    border-radius: 5px;
+    padding: 7px;
+}
+
+button:disabled {
+    background: var(--vscode-disabledForeground)
+}
