@@ -23,7 +23,7 @@ const sleep = (time: number) => {
  */
 export function dismiss(message: string = "Please wait....", callback: Function, timeout=10000, labelString = "Detalhe") {
     //const commandId = "vshpc.undo";
-    const commandId  = 'vshpc.exec-' + Math.ceil(Math.random() * (9999 - 1000) + 1000);
+    const commandId  = 'rogerio-cunha.vshpc.exec-' + Math.ceil(Math.random() * (9999 - 1000) + 1000);
     let customCancellationToken: vscode.CancellationTokenSource | null = null;
     const disp = vscode.commands.registerCommand(commandId, () => {
         callback();

@@ -7,7 +7,7 @@
         "type": "git",
         "url": "https://github.com/roger-petro/vshpc.git"
       },
-    "version": "0.0.4",
+    "version": "0.0.5",
     "engines": {
         "vscode": "^1.92.0"
     },
@@ -304,7 +304,7 @@
 
                     "vshpc.connection.cluster": {
                         "type": "string",
-                        "markdownDescription": "Head Node do Cluster para submeter jobs (SLURM).",
+                        "markdownDescription": "Head Node do Cluster para submeter jobs (SLURM). Faça a [carga das configurações iniciais ao menos uma vez.](command:rogerio-cunha.vshpc.loadCustomConfiguration)",
                         "scope": "application",
                         "order": 1
                     },
@@ -316,7 +316,7 @@
                     },
                     "vshpc.connection.password": {
                         "type": "string",
-                        "markdownDescription": "Senha para acesso via ssh, use o [`vsHPC:Entrar com a senha SSH`](command:vshpc.jobEnterPassword) no VSCode para ajustar este valor de forma criptografada.",
+                        "markdownDescription": "Senha para acesso via ssh, use o [`vsHPC:Entrar com a senha SSH`](command:rogerio-cunha.vshpc.jobEnterPassword) no VSCode para ajustar este valor de forma criptografada.",
                         "readOnly": true,
                         "scope": "application",
                         "order": 3
@@ -337,7 +337,7 @@
                         "additionalProperties": {
                             "type": "string"
                         },
-                        "markdownDescription": "Relação `de-para` entre o caminho e Windows e o caminho Unix visto pelo Cluster.",
+                        "markdownDescription": "Relação `de-para` entre o caminho e Windows e o caminho Unix visto pelo Cluster. [Carregue uma configuração customizada](command:rogerio-cunha.vshpc.loadCustomConfiguration) para obter valores default.",
                         "scope": "application",
                         "order": 5
                     },
@@ -413,7 +413,7 @@
                     "vshpc.solver.name": {
                         "type": "string",
                         "default": "",
-                        "markdownDescription": "Nome do simulador. Use o comando de [seleção de simuladores](command:rogerio-cunha.vshpc.selectSimulName). Caso o simulador desejado não apareça [carregue uma configuração customizada](command:rogerio-cunha.vshpc.loadCustomConfiguration) Prefira configurar este item na `TAB` workspace.",
+                        "markdownDescription": "Nome do simulador. Use o comando de [seleção de simuladores](command:rogerio-cunha.vshpc.selectSimulName). Caso a lista de simuladores não apareça, [carregue uma configuração customizada](command:rogerio-cunha.vshpc.loadCustomConfiguration) Prefira configurar este item na `TAB` workspace.",
                         "order": 9
                     },
                     "vshpc.solver.version": {
