@@ -142,8 +142,6 @@ export async function submit(model: string, settings: SettingsType, option: Subm
         scriptURI: "",
         profile: 'source /etc/profile',
         logFile: '', //usado pelo solverbr
-        solverConfigFile: '', // usualmente configurado para o solverBR, mas pode ser usado para qq solver que precise de um arquivo de config usando este parse 
-        // por isso do evaluatePath (que agora aceita um path com parâmetro)
 
         //usado para logar no mongodb
         user: settings.user,
@@ -270,33 +268,7 @@ export async function submit(model: string, settings: SettingsType, option: Subm
     params.scriptURI = scriptDest;
     params.logFile = params.chdir + '/' + path.parse(model).name + '.log'; //usado pelo solverBR
 
-    params.solverConfigFile =  path.join(remotePath, 'configSBR.json')
-        .split(path.sep)
-        .join(path['posix'].sep)
-        .replace(/^[a-zA-Z]:/, '');
 
-    if (simulator.defaultSolverConfigFile) {
-        if (simulator.defaultSolverConfigFile.substring(0,1) === '/' ) {
-                params.solverConfigFile = simulator.defaultSolverConfigFile;
-        } else {
-            if (simulator.defaultSolverConfigFile) {
-                let solverConfig = simulator.defaultSolverConfigFile;
-                solverConfig = path.join(remotePath, solverConfig);
-                params.solverConfigFile = solverConfig.split(path.sep).join(path['posix'].sep).replace(/^[a-zA-Z]:/, '');
-            }
-        }
-        if (! await checkRemoteFile(settings,params.solverConfigFile)) {
-            PubSub.publish(LogOpt.vshpc,`> jobSubmit: SolverBR.json não encontrado no destino esperado`);
-            PubSub.publish(LogOpt.vshpc,`> jobSubmit: Local esperado ${params.solverConfigFile}`);
-            return {success: false, message: 'SolverBR.json não encontrado no destino esperado' };
-        }
-    }
-
-    if (simulator.name === "opm") {
-        params.solverVersion = settings.solverVersion.trim().replaceAll('_','-');
-        let ret = params.solverVersion.match(/^.*(\d\d\d\d\.\d\d)$/);
-        params.solverVersion = ret ? 'opm-' + ret[1]: `opm-${simulator.defaultSolverVersion}`;
-    }
 
     //parâmetros que são eventualmente consumidos pelos templates json
     params.modelBaseName = path.parse(params.modelURI).name;

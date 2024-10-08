@@ -1,12 +1,10 @@
 import * as vscode from 'vscode';
 import * as PubSub from 'pubsub-js';
-import * as path from 'path';
-import * as fs from 'fs';
-import { SettingsType, LogOpt, Simulator, CustomConfig, CustomError, FolderFormats } from './types';
 
-const CUSTOM_CONFIG_NAME = 'reshpc.json';
+import { SettingsType, LogOpt, Simulator, CustomConfig, FolderFormats } from './types';
 
 import { decrypt } from './crypto';
+import { getCustomConfig } from './customconfig';
 
 let settings: SettingsType = {
 	user: "",
@@ -27,7 +25,6 @@ let settings: SettingsType = {
 	ntasksPerNode: 1,
 	mpiExtras: "",
 	workdir: "",
-	solverConfigFile: "",
 	customConfigURI: "",
 	webviewHistSize: 10,
 	webviewJobsSize: 10,
@@ -99,12 +96,12 @@ export function getSettings(): SettingsType {
 	return settings;
 };
 
-export function loadSettings(context: vscode.ExtensionContext): SettingsType {
+export async function loadSettings(context: vscode.ExtensionContext): Promise<SettingsType> {
 	let ret: string | undefined;
 
 	try {
 
-		settings.customConfig = getCustomConfig(context) as CustomConfig;
+		settings.customConfig = await getCustomConfig(context) as CustomConfig;
 
 
 		let user = process.env.USERNAME;
@@ -157,9 +154,9 @@ export function loadSettings(context: vscode.ExtensionContext): SettingsType {
 			settings.folderFormat = (FolderFormats as Record<string, string>)[settings.folderFormat];
 		} else { settings.folderFormat = "%(projectName)s_%(hash)s"; }
 
-		settings.solverVersion = vscode.workspace.getConfiguration("reshpc").get("solver.type.version", "").trim();
+		settings.solverVersion = vscode.workspace.getConfiguration("reshpc").get("solver.version", "").trim();
 
-		settings.solverName = vscode.workspace.getConfiguration("reshpc").get("solver.type.name", "").trim();
+		settings.solverName = vscode.workspace.getConfiguration("reshpc").get("solver.name", "").trim();
 
 
 		if (Object.keys(settings.customConfig.settings.solverNames).includes(settings.solverName)) {
@@ -170,27 +167,27 @@ export function loadSettings(context: vscode.ExtensionContext): SettingsType {
 
 		let simulator = settings.customConfig.simulators.find((item) => item.solvers.find(sol => sol === settings.solverName)) as Simulator;
 
-		settings.account = vscode.workspace.getConfiguration("reshpc").get("scheduler.SlurmAccount", "");
-		if (settings.account==="") {
-			settings.account = settings.customConfig.settings.defaultSlurmAccount;
-		}
-		settings.account = settings.account
-			.replace('-P ', '')
-			.replace('-A ', '')
-			.replace('--account ', '')
-			.replace('-p ', '')
-			.replace('--projeto', '')
-			.replace('- ', '')
-			.trim();
+		// settings.account = vscode.workspace.getConfiguration("reshpc").get("scheduler.SlurmAccount", "");
+		// if (settings.account==="") {
+		// 	settings.account = settings.customConfig.settings.defaultSlurmAccount;
+		// }
+		// settings.account = settings.account
+		// 	.replace('-P ', '')
+		// 	.replace('-A ', '')
+		// 	.replace('--account ', '')
+		// 	.replace('-p ', '')
+		// 	.replace('--projeto', '')
+		// 	.replace('- ', '')
+		// 	.trim();
 
 		settings.slurm = vscode.workspace.getConfiguration("reshpc").get("scheduler.slurm", "").trim();
 
-		if (settings.account === "") {
-			settings.account = getAccount(settings.slurm);
-			if (settings.account) {
-				settings.slurm=removeAccountParameter(settings.slurm);
-			}
-		}
+		//if (settings.account === "") {
+		settings.account = getAccount(settings.slurm);
+			// if (settings.account) {
+			// 	settings.slurm=removeAccountParameter(settings.slurm);
+			// }
+		//}
 
 		settings.sbatch = simulator.sbatch.trim() || "/usr/bin/sbatch";
 
@@ -210,11 +207,7 @@ export function loadSettings(context: vscode.ExtensionContext): SettingsType {
 			}
 		}
 
-		settings.solverConfigFile = vscode.workspace.getConfiguration("reshpc").get("solver.solverConfigFile", "").trim();
-		if (settings.solverConfigFile === "") {
-			settings.solverConfigFile = simulator.defaultSolverConfigFile;
-			PubSub.publish(LogOpt.vshpc, `> getSettings: valor do solverConfigFile ajustado para o default ${simulator.defaultSolverConfigFile}, por estar vazio`);
-		}
+
 
 		if (settings.slurm === "") {
 			if (simulator && (simulator.name === 'gem_sbr' || simulator.name === 'cmg')) {
@@ -338,31 +331,3 @@ export function checkSubmitSettings(): boolean {
 };
 
 
-/**
- * Carrega do arquivo de descrito em CUSTOM_CONFIG_NAME
- * @returns CustomConfig
- */
-function getCustomConfig(context: vscode.ExtensionContext) {
-
-	let uri = vscode.workspace.getConfiguration("reshpc").get("configuration.customConfigURI", "").trim();
-
-	if (!uri || !fs.existsSync(uri)) {
-		uri = path.join(require('os').homedir(), CUSTOM_CONFIG_NAME);
-		if (!fs.existsSync(uri)) {
-			uri = path.join(context.extensionPath, CUSTOM_CONFIG_NAME);
-			if (!fs.existsSync(uri)) {
-				vscode.window.showErrorMessage(`${CUSTOM_CONFIG_NAME} não encontrado.`);
-				throw new CustomError('Custom config não foi econtrado nos locais de procura');
-			}
-		}
-	}
-	let rawData = '';
-	try {
-		rawData = fs.readFileSync(uri, 'utf-8');
-		PubSub.publish(LogOpt.vshpc, `> ${CUSTOM_CONFIG_NAME} carregado da origem ${uri}`);
-	} catch (error: any) {
-		vscode.window.showErrorMessage(`Erro ao carregar ${uri}: ` + error.message);
-		throw new CustomError('Custom config não foi econtrado');
-	}
-	return JSON.parse(rawData) as CustomConfig;
-}

@@ -29,7 +29,7 @@ export type SettingsType = {
     'mpiExtras'       : string,
     'solverNodes'     : number,
     'workdir'		  : string,
-    'solverConfigFile': string,
+
     'customConfigURI'       : string,
     'webviewHistSize' : number,
     'webviewJobsSize' : number,

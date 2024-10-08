@@ -160,7 +160,7 @@ function print(key :string, value: any) : string {
             newKey = 'Versão do simulador (solverVersion)';
             break;
         case 'account' :
-            newKey = 'Conta (--account)';
+            newKey = 'Account (extraído da opção `slurm`. veja abaixo.)';
             break;
         case 'solverCores' :
             newKey = 'Número de cores (solverCores)';
@@ -170,6 +170,8 @@ function print(key :string, value: any) : string {
             break;
         case 'workdir' :
             newKey = 'Pasta de trabalho atual (workdir)';
+        case 'customConfig':
+            return 'customConfig: Não apresentado';
     }
     if (value === '') {
         value = 'Não preenchido';
@@ -183,5 +185,6 @@ function print(key :string, value: any) : string {
     if (value === true) {
         value = 'Sim';
     }
+
     return `${newKey}: ${value}`;
 }

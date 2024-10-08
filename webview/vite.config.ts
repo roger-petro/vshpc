@@ -1,11 +1,6 @@
 import { defineConfig, loadEnv } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 
-// // https://vitejs.dev/config/
-// export default defineConfig({
-//   plugins: [svelte()],
-// })
-
 
 /**
  * generalAssets é um middleware feito
@@ -44,7 +39,16 @@ export default defineConfig(({ mode }) => {
       outDir: '../media',
 
       rollupOptions: {
-
+        onwarn: (warning, handler) => {
+          const { code, frame } = warning;
+          if (code === "anchor-is-valid" || code === "a11y-autofocus") {
+            return;
+          }
+          if (code === "css-unused-selector") {
+            return;
+          }
+          handler(warning);
+        },
         output: {
           entryFileNames: '[name].js',
           assetFileNames: 'assets/[name][extname]',

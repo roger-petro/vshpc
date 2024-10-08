@@ -1,6 +1,6 @@
 {
     "name": "reshpc",
-    "displayName": "HPC Reservoir Simulation Support Suite",
+    "displayName": "vsHPC Simulation Center",
     "description": "Reservoir HPC Control Center for Launching and Managing Flow and Geomechanics Simulations",
     "publisher": "rogerio-cunha",
     "version": "0.0.1",
@@ -11,7 +11,8 @@
         "Other"
     ],
     "activationEvents": [
-        "workspaceContains:**/(.dat|.gdt|.geo|.DATA|.xml)"
+        "workspaceContains:**/(.dat|.gdt|.geo|.DATA|.xml)",
+        "onStartupFinished"
     ],
     "icon": "images/icon.png",
     "main": "./out/extension.js",
@@ -23,9 +24,9 @@
                 "description": "Abaixo estão as etapas mínimas de configuração que devem ser executadas na extensão para torná-la operacional",
                 "steps": [
                     {
-                        "id": "reshpc.configureaccount",
+                        "id": "reshpc.configureSlurm",
                         "title": "Configurar o account",
-                        "description": "Configure o account para submeter jobs nos scripts\n[Mudar a configuração](command:reshpc.walkChangeAccount)",
+                        "description": "Configure as opções do [SLURM](command:reshpc.walkChangeSlurm), inclusive o account (-A account)",
                         "media": {
                             "image": "images/config_account.png",
                             "altText": "account"
@@ -153,6 +154,21 @@
                 "command": "reshpc.logs",
                 "title": "Ver os Logs",
                 "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.loadCustomConfiguration",
+                "title": "Carregar Configurações Customizadas",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.selectSimulName",
+                "title": "Selecionar Simulador",
+                "category": "ResHPC"
+            },
+            {
+                "command": "reshpc.selectSimulVersion",
+                "title": "Selecionar Versão do Simulador",
+                "category": "ResHPC"
             }
         ],
         "submenus": [
@@ -196,6 +212,15 @@
                 },
                 {
                     "command": "reshpc.jobEnterPassword"
+                },
+                {
+                    "command": "reshpc.loadCustomConfiguration"
+                },
+                {
+                    "command": "reshpc.selectSimulName"
+                },
+                {
+                    "command": "reshpc.selectSimulVersion"
                 }
             ],
             "editor/context": [
@@ -257,133 +282,140 @@
                 }
             ]
         },
-        "configuration": {
-            "type": "object",
-            "title": "ResHPC",
-            "properties": {
-                "reshpc.connection.cluster": {
-                    "type": "string",
-                    "markdownDescription": "Head Node do Cluster para submeter jobs (SLURM).",
-                    "scope": "application",
-                    "order": 0
-                },
-                "reshpc.configuration.customConfigURI": {
-                    "type": "string",
-                    "markdownDescription": "File (with path) of a json `Customc Config`",
-                    "scope": "application",
-                    "order": 0
-                },
-                "reshpc.scheduler.SlurmAccount": {
-                    "type": "string",
-                    "markdownDescription": "Nome do `account` para submissão. Deve ser configurado aqui ou no 'Custom Config'"
-                },
-                "reshpc.scheduler.slurm": {
-                    "type": "string",
-                    "markdownDescription": "Opções extras para serem passadas ao SLURM (por ex, selecionar a fila/partição: -p pre ou --comment=\"comentário com aspas\"). Prefira configura na `TAB` Workspace.",
-                    "default": ""
-                },
-                "reshpc.connection.user": {
-                    "type": "string",
-                    "markdownDescription": "Usuário (chave) que fará o ssh (e de submissão).",
-                    "scope": "application"
-                },
-                "reshpc.connection.password": {
-                    "type": "string",
-                    "markdownDescription": "Senha para acesso via ssh, use o comando `resHPC:Entrar com a senha SSH` no VSCode para ajustar este valor de forma criptografada.",
-                    "readOnly": true,
-                    "scope": "application"
-                },
-                "reshpc.connection.privRsaKey": {
-                    "type": "string",
-                    "markdownDescription": "Opcional à senha, informe o caminho para chave RSA privada para acesso SSH. Em geral, C:\\users\\CHAVE\\\\.ssh\\id_rsa (não é a .pub!).",
-                    "scope": "application"
-                },
-                "reshpc.path.WindowsUnix": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
+        "configuration": [
+            {
+                "title": "HPC Connection",
+                "properties": {
+
+                    "reshpc.connection.cluster": {
+                        "type": "string",
+                        "markdownDescription": "Head Node do Cluster para submeter jobs (SLURM).",
+                        "scope": "application",
+                        "order": 1
                     },
-                    "markdownDescription": "Relação `de-para` entre o caminho e Windows e o caminho Unix visto pelo Cluster.",
-                    "scope": "application"
-                },
-                "reshpc.path.destination": {
-                    "type": "string",
-                    "markdownDescription": "Pasta absoluta ou relativa, no formato Windows, indicando o destino para onde serão realizados os clones e as simulações quando usando simulações com clone. Veja o README.md para exemplos. Qualquer valor diferente de ..\\ e .\\ (pasta pai e atual) implicará em não poder haver um mesmo job rodando para o modelo. Prefira configurar este item na `TAB` workspace.",
-                    "default": "..\\"
-                },
-                "reshpc.path.folderFormat": {
-                    "order": 0,
-                    "type": "string",
-                    "default": "projectName_hash",
-                    "enum": [
-                        "YYYY.MM.DD_hash_projectName",
-                        "YYYY.MM.DD_projectName_hash",
-                        "YYYY.MM.DD_tag_hash_projectName",
-                        "YYYY.MM.DD_projectName_tag_hash",
-                        "YYYY.MM.DD_projectName_hash_tag",
-                        "projectName_hash",
-                        "projectName_tag_hash",
-                        "projectName_YYYY.MM.DD_hash",
-                        "projectName_YYYY.MM.DD_tag_hash",
-                        "projectName_YYYY.MM.DD_hash_tag"
-                    ],
-                    "markdownDescription": "Define o formato da pasta de saída para o clone. Tags com combinação de números, `'V','v','.' '_' e '-'` são preferencialmente escolhidas (exemplos v1.0.1, V-1). Se não achar um tag, '0' é colocado no lugar.",
-                    "scope": "application"
-                },
-                "reshpc.solver.type.name": {
-                    "type": "string",
-                    "enum": [
-                        "GEM",
-                        "GEM_SBR",
-                        "IMEX",
-                        "STARS",
-                        "GeomecBR",
-                        "iGeo",
-                        "Eclipse",
-                        "OPM",
-                        "GEOSX"
-                    ],
-                    "default": "GEM",
-                    "markdownDescription": "Nome do simulador. Prefira configurar este item na `TAB` workspace."
-                },
-                "reshpc.solver.type.version": {
-                    "type": "string",
-                    "markdownDescription": "Versão do solver de simulação a depender do simulador escolhido (p. ex.: 2019.12, 2018.11, v6.0, etc). Veja exemplos no README. Prefira configurar este item na `TAB` Workspace."
-                },
-                "reshpc.solver.resources.cores": {
-                    "type": "number",
-                    "default": 1,
-                    "minimum": 1,
-                    "markdownDescription": "Numero de cores usados na simulação (--cpus-per-task). Prefira configurar este item na `TAB` Workspace."
-                },
-                "reshpc.solver.resources.ntasksPerNode": {
-                    "type": "number",
-                    "default": 1,
-                    "minimum": 1,
-                    "markdownDescription": "Numero de tarefas por nó (--ntasks-per-node). Nota: total de processos MPI (-np) = nodes * ntasks-per-node, quando usado MPI. Prefira configurar este item na `TAB` Workspace."
-                },
-                "reshpc.solver.resources.nodes": {
-                    "type": "number",
-                    "default": 1,
-                    "minimum": 1,
-                    "markdownDescription": "Numero de nós usados na simulação (--nodes). Prefira configurar este item na `TAB` Workspace."
-                },
-                "reshpc.solver.resources.mpiExtras": {
-                    "type": "string",
-                    "default": "",
-                    "markdownDescription": "Opções extras para serem passadas ao mpirun. Prefira configurar este item na `TAB` Workspace."
-                },
-                "reshpc.solver.ExtraParams": {
-                    "type": "string",
-                    "markdownDescription": "Opções extras para serem passadas para o solver. Para o CMG, `-wait e -parasol` estarão sempre inclusos e também `-doms -log -log2 e -cputime` serão inclusos caso o campo esteja em branco. Prefira configurar este item na `TAB` Workspace.",
-                    "default": ""
-                },
-                "reshpc.solver.solverConfigFile": {
-                    "type": "string",
-                    "markdownDescription": "Opcional. Local onde reside a configuração extra do Solver. Caso esteja numa subpasta do projeto, use subpasta/<arquivo> (barra no formato unix). O default é carregado do CustomConfig."
+                    "reshpc.connection.user": {
+                        "type": "string",
+                        "markdownDescription": "Usuário (chave) que fará o ssh (e de submissão).",
+                        "scope": "application",
+                        "order": 2
+                    },
+                    "reshpc.connection.password": {
+                        "type": "string",
+                        "markdownDescription": "Senha para acesso via ssh, use o [`resHPC:Entrar com a senha SSH`](command:reshpc.jobEnterPassword) no VSCode para ajustar este valor de forma criptografada.",
+                        "readOnly": true,
+                        "scope": "application",
+                        "order": 3
+                    },
+                    "reshpc.connection.privRsaKey": {
+                        "type": "string",
+                        "markdownDescription": "Opcional à senha, informe o caminho para chave RSA privada para acesso SSH. Em geral, C:\\users\\CHAVE\\\\.ssh\\id_rsa (não é a .pub!).",
+                        "scope": "application",
+                        "order": 4
+                    }
+                }
+            },
+            {
+                "title": "File and Folders",
+                "properties": {
+                    "reshpc.path.WindowsUnix": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string"
+                        },
+                        "markdownDescription": "Relação `de-para` entre o caminho e Windows e o caminho Unix visto pelo Cluster.",
+                        "scope": "application",
+                        "order": 5
+                    },
+                    "reshpc.path.destination": {
+                        "type": "string",
+                        "markdownDescription": "Pasta absoluta ou relativa, no formato Windows, indicando o destino para onde serão realizados os clones e as simulações quando usando simulações com clone. Veja o README.md para exemplos. Qualquer valor diferente de ..\\ e .\\ (pasta pai e atual) implicará em não poder haver um mesmo job rodando para o modelo. Prefira configurar este item na `TAB` workspace.",
+                        "default": "..\\",
+                        "order": 6
+                    },
+                    "reshpc.path.folderFormat": {
+                        "type": "string",
+                        "default": "projectName_hash",
+                        "enum": [
+                            "YYYY.MM.DD_hash_projectName",
+                            "YYYY.MM.DD_projectName_hash",
+                            "YYYY.MM.DD_tag_hash_projectName",
+                            "YYYY.MM.DD_projectName_tag_hash",
+                            "YYYY.MM.DD_projectName_hash_tag",
+                            "projectName_hash",
+                            "projectName_tag_hash",
+                            "projectName_YYYY.MM.DD_hash",
+                            "projectName_YYYY.MM.DD_tag_hash",
+                            "projectName_YYYY.MM.DD_hash_tag"
+                        ],
+                        "markdownDescription": "Define o formato da pasta de saída para o clone. Tags com combinação de números, `'V','v','.' '_' e '-'` são preferencialmente escolhidas (exemplos v1.0.1, V-1). Se não achar um tag, '0' é colocado no lugar.",
+                        "scope": "application",
+                        "order": 7
+                    }
+                }
+            },
+            {
+                "title": "Slurm",
+                "properties": {
+                    "reshpc.scheduler.slurm": {
+                        "type": "string",
+                        "markdownDescription": "Opções extras para serem passadas ao SLURM inclusive **ACCOUNT** (p. ex., -A account, fila/partição: -p glb). Prefira configura na `TAB` Workspace.",
+                        "default": "",
+                        "order": 8
+                    },
+                    "reshpc.scheduler.cores": {
+                        "type": "number",
+                        "default": 1,
+                        "minimum": 1,
+                        "markdownDescription": "Numero de cores usados na simulação (--cpus-per-task). Prefira configurar este item na `TAB` Workspace.",
+                        "order": 11
+                    },
+                    "reshpc.scheduler.ntasksPerNode": {
+                        "type": "number",
+                        "default": 1,
+                        "minimum": 1,
+                        "markdownDescription": "Numero de tarefas por nó (--ntasks-per-node). Nota: total de processos MPI (-np) = nodes * ntasks-per-node, quando usado MPI. Prefira configurar este item na `TAB` Workspace.",
+                        "order": 12
+                    },
+                    "reshpc.scheduler.nodes": {
+                        "type": "number",
+                        "default": 1,
+                        "minimum": 1,
+                        "markdownDescription": "Numero de nós usados na simulação (--nodes). Prefira configurar este item na `TAB` Workspace.",
+                        "order": 13
+                    },
+                    "reshpc.scheduler.mpiExtras": {
+                        "type": "string",
+                        "default": "",
+                        "markdownDescription": "Opções extras para serem passadas ao mpirun. Prefira configurar este item na `TAB` Workspace.",
+                        "order": 14
+                    }
+                }
+            },
+
+            {
+                "title": "Solver",
+                "properties": {
+                    "reshpc.solver.name": {
+                        "type": "string",
+                        "default": "",
+                        "markdownDescription": "Nome do simulador. Use o comando de [seleção de simuladores](command:reshpc.selectSimulName). Caso o simulador desejado não apareça [carregue uma configuração customizada](command:reshpc.loadCustomConfiguration) Prefira configurar este item na `TAB` workspace.",
+                        "order": 9
+                    },
+                    "reshpc.solver.version": {
+                        "type": "string",
+                        "markdownDescription": "Versão do solver de simulação a depender do simulador escolhido (p. ex.: 2019.12, 2018.11, v6.0, etc). Veja exemplos no README, ou selecione uma [ versões da lista, de acordo com o simulador](command:reshpc.selectSimulVersion). Prefira configurar este item na `TAB` Workspace.",
+                        "order": 10
+                    },
+
+                    "reshpc.solver.ExtraParams": {
+                        "type": "string",
+                        "markdownDescription": "Opções extras para serem passadas para o solver. Para o CMG, `-wait e -parasol` estarão sempre inclusos e também `-doms -log -log2 e -cputime` serão inclusos caso o campo esteja em branco. Prefira configurar este item na `TAB` Workspace.",
+                        "default": "",
+                        "order": 15
+                    }
                 }
             }
-        }
+        ]
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",

@@ -19,11 +19,12 @@ import { JobsPanel } from "./panels/jobsPanel";
 const PKG = require('../package.json');
 import { getCurrentHash } from './git';
 import { dismiss } from './dismissable';
+import { customConfigLoad } from './customconfig';
 
 let currentJobs : JobArrayType[] = [];
 
 
-function activate(context: vscode.ExtensionContext) {
+async function activate(context: vscode.ExtensionContext) {
 	const vshpcLog = vscode.window.createOutputChannel("vsHPC Log");
 	createMessageHub(vshpcLog);
 	PubSub.publish(LogOpt.vshpc,'> activate: Extensão "vshpc" está ativa!');
@@ -51,7 +52,9 @@ function activate(context: vscode.ExtensionContext) {
 		setWorkDir(undefined);
 	}
 
-	const settings = loadSettings(context);
+	customConfigLoad(context);
+
+	const settings = await loadSettings(context);
 
 	vscode.workspace.onDidOpenTextDocument(e => {
 		if (e.uri && e.uri.scheme==='file') {
@@ -118,14 +121,14 @@ function activate(context: vscode.ExtensionContext) {
 	);
 
 	context.subscriptions.push(
-		vscode.commands.registerCommand("reshpc.walkChangeAccount", () => {
-			vscode.commands.executeCommand(`workbench.action.openSettings`, `reshpc.scheduler.project`);
+		vscode.commands.registerCommand("reshpc.walkChangeSlurm", () => {
+			vscode.commands.executeCommand(`workbench.action.openSettings`, `reshpc.scheduler`);
 		})
 	);
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand("reshpc.walkChangeSolver", () => {
-			vscode.commands.executeCommand('workbench.action.openSettings', 'reshpc.solver.type');
+			vscode.commands.executeCommand('workbench.action.openSettings', 'reshpc.solver');
 		})
 	);
 
@@ -364,7 +367,7 @@ function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 		if (settings.account.length === 0) {
-			PubSub.publish(LogOpt.toast,`É necessário definir o account primeiro nas configurações`);
+			PubSub.publish(LogOpt.toast,`É necessário definir o account primeiro nas configurações do SLURM`);
 			return;
 		}
 		const nonce = Math.floor(1000000 + Math.random() * 9000000);
@@ -422,6 +425,9 @@ function activate(context: vscode.ExtensionContext) {
         vshpcLog.show();  // Exibe o canal de saída no painel Output
     }));
 
+	let selectSimulVersion = vscode.commands.registerCommand('reshpc.selectSimulVersion', function() {
+
+	});
 
 	context.subscriptions.push(jobSubmit);
 	context.subscriptions.push(jobSubmitHash);
@@ -435,6 +441,8 @@ function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(jobEnterPassword);
 	context.subscriptions.push(jobMock);
 	context.subscriptions.push(curVersion);
+	context.subscriptions.push(selectSimulVersion);
+
 }
 
 function deactivate() {}

@@ -252,12 +252,12 @@ export function checkOptions(params: {models:string[], hash?: string}) {
 	}
 	if (!settings.solverName || settings.solverName.length===0) {
 		PubSub.publish(LogOpt.toast_error,`Deve ser especificado o solver para rodar a simulação`);
-		vscode.commands.executeCommand(`workbench.action.openSettings`, `reshpc.solver.type.name`);
+		vscode.commands.executeCommand(`workbench.action.openSettings`, `reshpc.solver.name`);
 		return false;
 	}
 	if (!settings.solverVersion || settings.solverVersion.length===0) {
 		PubSub.publish(LogOpt.toast_error,`Deve ser especificado a versão do solver para rodar a simulação`);
-		vscode.commands.executeCommand(`workbench.action.openSettings`, `reshpc.solver.type.version`);
+		vscode.commands.executeCommand(`workbench.action.openSettings`, `reshpc.solver.version`);
 		return false;
 	}
 	if (settings.cluster.search(/^[\w\._-]+$/)===-1) {
