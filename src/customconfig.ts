@@ -1,20 +1,20 @@
 import * as vscode from 'vscode';
-
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { LogOpt, CustomConfig, CustomError } from './types';
+import { LogOpt, CustomConfig, CustomError, Simulator } from './types';
 
-const CUSTOM_CONFIG_NAME = 'reshpc.json';
+const CUSTOM_CONFIG_NAME = 'vshpc.json';
+const API_ID="vshpc";
 
 /**
  * Cria o comando que irá carregar o customconfig e salvar
  * no globalstorage do usuário. Usualmente em:
- * C:\Users\XXXX\AppData\Roaming\Code\User\globalStorage\rogerio-cunha.reshpc
+ * C:\Users\XXXX\AppData\Roaming\Code\User\globalStorage\rogerio-cunha.vshpc
  * @param context
  */
-export function customConfigLoad(context: vscode.ExtensionContext) {
-    const loadCustomConfig = vscode.commands.registerCommand('reshpc.loadCustomConfiguration', async () => {
+export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
+    const loadCustomConfig = vscode.commands.registerCommand('vshpc.loadCustomConfiguration', async () => {
         try {
             const lastConfigUriString = context.globalState.get<string>('lastConfigUri');
             const lastConfigUri = lastConfigUriString ? vscode.Uri.parse(lastConfigUriString) : undefined;
@@ -40,7 +40,7 @@ export function customConfigLoad(context: vscode.ExtensionContext) {
             const storagePath = context.globalStorageUri;
             await vscode.workspace.fs.createDirectory(storagePath);
 
-            const configFileUri = vscode.Uri.joinPath(storagePath, 'customConfig.json');
+            const configFileUri = vscode.Uri.joinPath(storagePath, CUSTOM_CONFIG_NAME);
             await vscode.workspace.fs.writeFile(configFileUri, Buffer.from(JSON.stringify(customConfig, null, 2), 'utf-8'));
 
             // Armazenar o último caminho usado
@@ -53,10 +53,10 @@ export function customConfigLoad(context: vscode.ExtensionContext) {
     });
 
     // Comando para selecionar o simulador
-    const selectSimulNameDisposable = vscode.commands.registerCommand('reshpc.selectSimulName', async () => {
+    const selectSimulNameDisposable = vscode.commands.registerCommand('vshpc.selectSimulName', async () => {
         try {
             // Carregar o customConfig
-            const customConfig = await getCustomConfig(context);
+            const customConfig = await getCustomConfig(context) as CustomConfig;
             if (!customConfig) {
                 vscode.window.showErrorMessage('Configurações personalizadas não carregadas. Por favor, execute o comando "Carregar Configuração Personalizada" primeiro.');
                 return;
@@ -83,7 +83,7 @@ export function customConfigLoad(context: vscode.ExtensionContext) {
             }
 
             // Obter o nome interno correspondente ao displayName selecionado
-            const selectedInternalName = selectedDisplayName; //solverNames[selectedDisplayName];
+            //solverNames[selectedDisplayName];
 
             const scopeOptions = [
                 { label: 'Global (Usuário)', target: vscode.ConfigurationTarget.Global },
@@ -102,13 +102,24 @@ export function customConfigLoad(context: vscode.ExtensionContext) {
 
             const target = scopeOptions.find(option => option.label === selectedScope)?.target || vscode.ConfigurationTarget.Global;
 
-            // Atualizar a configuração 'reshpc.solver.name' com o valor selecionado
-            const config = vscode.workspace.getConfiguration('reshpc.solver');
-            await config.update('name', selectedInternalName, target);
+            // Atualizar a configuração 'vshpc.solver.name' com o valor selecionado se mudou o valor
 
-            vscode.window.showInformationMessage(`Simulador '${selectedDisplayName}' selecionado com sucesso.`);
-        } catch (error: any) {
-            vscode.window.showErrorMessage('Erro ao selecionar o simulador: ' + error.message);
+            const curSimulator = vscode.workspace.getConfiguration('vshpc.solver').get('name',"");
+            if (curSimulator!==selectedDisplayName){
+                await vscode.workspace.getConfiguration('vshpc.solver').update('name', selectedDisplayName, target);
+                const simulator = customConfig.simulators.find(item=>item.solvers.find(sol=> sol === solverNames[selectedDisplayName])) as Simulator;
+                if (simulator) {
+                    await vscode.workspace.getConfiguration('vshpc.solver').update('version', simulator.defaultSolverVersion, target);
+                    await vscode.workspace.getConfiguration('vshpc.solver').update('ExtraParams', simulator.defaultSolverExtras, target);
+                } else {
+                    vscode.window.showErrorMessage('Erro ao indentificar o simulador nas configurações customizadas: ');
+                }
+                vscode.window.showInformationMessage(`Simulador '${selectedDisplayName}' selecionado com sucesso.`);
+            }
+
+        } catch (error) {
+            const msg = error instanceof Error ? error.message : String(error);
+            vscode.window.showErrorMessage('Erro ao selecionar o simulador: ' + msg);
         }
     });
 
@@ -120,24 +131,25 @@ export function customConfigLoad(context: vscode.ExtensionContext) {
 
 export async function getCustomConfig(context: vscode.ExtensionContext): Promise<any> {
     try {
-        const configFileUri = vscode.Uri.joinPath(context.globalStorageUri, 'customConfig.json');
+        const configFileUri = vscode.Uri.joinPath(context.globalStorageUri, CUSTOM_CONFIG_NAME);
         const fileContent = await vscode.workspace.fs.readFile(configFileUri);
         const customConfig = JSON.parse(Buffer.from(fileContent).toString('utf-8'));
         return customConfig;
     } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
-        vscode.window.showErrorMessage('Erro ao ler as configurações personalizadas: ' + msg);
+        vscode.window.showErrorMessage('Erro ao ler as configurações personalizadas. Você precisa carregá-las. Fale com o administrador/mantendor da aplicação');
         return null;
     }
 }
 
 /**
- * Carrega do arquivo de descrito em CUSTOM_CONFIG_NAME
+ * Carrega do arquivo de descrito em CUSTOM_CONFIG_NAME, caso futuramente queira ler direto
+ * do arquivo ao invés de salvar no globalStorage
  * @returns CustomConfig
  */
 export function getCustomConfigDirect(context: vscode.ExtensionContext) {
 
-    let uri = vscode.workspace.getConfiguration("reshpc").get("configuration.customConfigURI", "").trim();
+    let uri = vscode.workspace.getConfiguration(API_ID).get("configuration.customConfigURI", "").trim();
 
     if (!uri || !fs.existsSync(uri)) {
         uri = path.join(require('os').homedir(), CUSTOM_CONFIG_NAME);

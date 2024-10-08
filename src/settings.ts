@@ -6,6 +6,9 @@ import { SettingsType, LogOpt, Simulator, CustomConfig, FolderFormats } from './
 import { decrypt } from './crypto';
 import { getCustomConfig } from './customconfig';
 
+
+const APP_ID="vshpc";
+
 let settings: SettingsType = {
 	user: "",
 	passwd: "",
@@ -108,45 +111,45 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
 		if (user === undefined) {
 			user = "";
 		}
-		settings.user = vscode.workspace.getConfiguration("reshpc").get("connection.user", "").trim().toLowerCase();
+		settings.user = vscode.workspace.getConfiguration(APP_ID).get("connection.user", "").trim().toLowerCase();
 		if (!settings.user || settings.user === "") {
 			settings.user = user.toLowerCase();
-			vscode.workspace.getConfiguration("reshpc").update("connection.user", settings.user, true);
+			vscode.workspace.getConfiguration(APP_ID).update("connection.user", settings.user, true);
 		}
 		if (user.length < 3) {
 			PubSub.publish(LogOpt.vshpc, "> getSettings: configuração do usuário está errada ou indefinida");
 		}
-		settings.passwd = vscode.workspace.getConfiguration("reshpc").get("connection.password", "").trim();
+		settings.passwd = vscode.workspace.getConfiguration(APP_ID).get("connection.password", "").trim();
 
-		settings.privRsaKey = vscode.workspace.getConfiguration("reshpc").get("connection.privRsaKey", "").trim();
+		settings.privRsaKey = vscode.workspace.getConfiguration(APP_ID).get("connection.privRsaKey", "").trim();
 		if (settings.privRsaKey === "") {
 			settings.privRsaKey = settings.customConfig.settings.defaultPrivRSAKey.replace("{user}", settings.user);
-			vscode.workspace.getConfiguration("reshpc").update("connection.privRsaKey", settings.privRsaKey, true);
+			vscode.workspace.getConfiguration(APP_ID).update("connection.privRsaKey", settings.privRsaKey, true);
 		}
 
 		if (settings.passwd === "" && settings.privRsaKey === "") {
 			PubSub.publish(LogOpt.vshpc, "> getSettings: Ou é necessário password ou chave RSA privada");
 		}
 
-		settings.cluster = vscode.workspace.getConfiguration("reshpc").get("connection.cluster", "").trim();
+		settings.cluster = vscode.workspace.getConfiguration(APP_ID).get("connection.cluster", "").trim();
 		if (!settings.cluster || settings.cluster === "") {
 			settings.cluster = settings.customConfig.settings.defaultCluster;
-			vscode.workspace.getConfiguration("reshpc").update("connection.cluster", settings.cluster, true);
+			vscode.workspace.getConfiguration(APP_ID).update("connection.cluster", settings.cluster, true);
 		}
 
-		settings.windowsUnix = vscode.workspace.getConfiguration("reshpc").get("path.WindowsUnix", {});
+		settings.windowsUnix = vscode.workspace.getConfiguration(APP_ID).get("path.WindowsUnix", {});
 		if (Object.keys(settings.windowsUnix).length === 0) {
 			settings.windowsUnix = settings.customConfig.settings.defaultWindowsUnix;
-			vscode.workspace.getConfiguration("reshpc").update("path.WindowsUnix", settings.windowsUnix, true);
+			vscode.workspace.getConfiguration(APP_ID).update("path.WindowsUnix", settings.windowsUnix, true);
 		}
 
-		settings.destination = vscode.workspace.getConfiguration("reshpc").get("path.destination", "");
+		settings.destination = vscode.workspace.getConfiguration(APP_ID).get("path.destination", "");
 		if (!settings.destination || settings.destination === "") {
 			settings.destination = "..\\";
-			vscode.workspace.getConfiguration("reshpc").update("connection.destination", settings.destination, true);
+			vscode.workspace.getConfiguration(APP_ID).update("connection.destination", settings.destination, true);
 		}
 
-		settings.folderFormat = vscode.workspace.getConfiguration("reshpc").get("path.folderFormat", "");
+		settings.folderFormat = vscode.workspace.getConfiguration(APP_ID).get("path.folderFormat", "");
 		if (settings.folderFormat === "") {
 			settings.folderFormat = settings.customConfig.settings.defaultFolderFormat;
 		}
@@ -154,9 +157,9 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
 			settings.folderFormat = (FolderFormats as Record<string, string>)[settings.folderFormat];
 		} else { settings.folderFormat = "%(projectName)s_%(hash)s"; }
 
-		settings.solverVersion = vscode.workspace.getConfiguration("reshpc").get("solver.version", "").trim();
+		settings.solverVersion = vscode.workspace.getConfiguration(APP_ID).get("solver.version", "").trim();
 
-		settings.solverName = vscode.workspace.getConfiguration("reshpc").get("solver.name", "").trim();
+		settings.solverName = vscode.workspace.getConfiguration(APP_ID).get("solver.name", "").trim();
 
 
 		if (Object.keys(settings.customConfig.settings.solverNames).includes(settings.solverName)) {
@@ -167,7 +170,7 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
 
 		let simulator = settings.customConfig.simulators.find((item) => item.solvers.find(sol => sol === settings.solverName)) as Simulator;
 
-		// settings.account = vscode.workspace.getConfiguration("reshpc").get("scheduler.SlurmAccount", "");
+		// settings.account = vscode.workspace.getConfiguration(APP_ID).get("scheduler.SlurmAccount", "");
 		// if (settings.account==="") {
 		// 	settings.account = settings.customConfig.settings.defaultSlurmAccount;
 		// }
@@ -180,7 +183,7 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
 		// 	.replace('- ', '')
 		// 	.trim();
 
-		settings.slurm = vscode.workspace.getConfiguration("reshpc").get("scheduler.slurm", "").trim();
+		settings.slurm = vscode.workspace.getConfiguration(APP_ID).get("scheduler.slurm", "").trim();
 
 		//if (settings.account === "") {
 		settings.account = getAccount(settings.slurm);
@@ -191,7 +194,7 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
 
 		settings.sbatch = simulator.sbatch.trim() || "/usr/bin/sbatch";
 
-		settings.solverExtras = vscode.workspace.getConfiguration("reshpc").get("solver.ExtraParams", "").trim();
+		settings.solverExtras = vscode.workspace.getConfiguration(APP_ID).get("solver.ExtraParams", "").trim();
 
 		if (!settings.solverExtras || settings.solverExtras === "") {
 			if (simulator && settings.solverExtras === '') {
@@ -219,14 +222,14 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
 		// while (settings.solverBRConfig.length > 0 && (settings.solverBRConfig[0] === '.' || settings.solverBRConfig[0] === '/')) {
 		// 	settings.solverBRConfig = settings.solverBRConfig.substring(1);
 		// }
-		settings.solverCores = vscode.workspace.getConfiguration("reshpc").get("solver.resources.cores", 1);
-		settings.solverNodes = vscode.workspace.getConfiguration("reshpc").get("solver.resources.nodes", 1);
-		settings.ntasksPerNode = vscode.workspace.getConfiguration("reshpc").get("solver.resources.ntasksPerNode", 1);
-		settings.mpiExtras = vscode.workspace.getConfiguration("reshpc").get("solver.resources.mpiExtras", "");
+		settings.solverCores = vscode.workspace.getConfiguration(APP_ID).get("solver.resources.cores", 1);
+		settings.solverNodes = vscode.workspace.getConfiguration(APP_ID).get("solver.resources.nodes", 1);
+		settings.ntasksPerNode = vscode.workspace.getConfiguration(APP_ID).get("solver.resources.ntasksPerNode", 1);
+		settings.mpiExtras = vscode.workspace.getConfiguration(APP_ID).get("solver.resources.mpiExtras", "");
 
-		settings.customConfigURI = vscode.workspace.getConfiguration("reshpc").get("report.customConfigURI", "").trim();
-		settings.webviewHistSize = Number(vscode.workspace.getConfiguration("reshpc").get("webview.histSize", "20").trim());
-		settings.webviewJobsSize = Number(vscode.workspace.getConfiguration("reshpc").get("webview.jobsSize", "20").trim());
+		settings.customConfigURI = vscode.workspace.getConfiguration(APP_ID).get("report.customConfigURI", "").trim();
+		settings.webviewHistSize = Number(vscode.workspace.getConfiguration(APP_ID).get("webview.histSize", "20").trim());
+		settings.webviewJobsSize = Number(vscode.workspace.getConfiguration(APP_ID).get("webview.jobsSize", "20").trim());
 		let verErro = false;
 		switch (simulator.name) {
 			case 'cmg':

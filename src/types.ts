@@ -149,7 +149,7 @@ export type WorkspaceModelFolder = {
 // }
 
 /**
- * configuração do reshpc.json
+ * configuração do vshpc.json
  * quanto aos simuladores
  */
 export type Simulator = {
@@ -159,7 +159,6 @@ export type Simulator = {
     defaultSlurm: string;
     solvers: string[];
     ext: string;
-    defaultSolverConfigFile: string;
     progressScript: string;
     scriptDirPrefix: string;
     sbatch: string,
@@ -168,7 +167,7 @@ export type Simulator = {
 };
 
 /**
- * configuração do reshpc.json
+ * configuração do vshpc.json
  */
 export type CustomConfig = {
     settings: {

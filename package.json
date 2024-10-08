@@ -1,5 +1,5 @@
 {
-    "name": "reshpc",
+    "name": "vshpc",
     "displayName": "vsHPC Simulation Center",
     "description": "Reservoir HPC Control Center for Launching and Managing Flow and Geomechanics Simulations",
     "publisher": "rogerio-cunha",
@@ -19,48 +19,58 @@
     "contributes": {
         "walkthroughs": [
             {
-                "id": "reshpc.welcome",
-                "title": "Starting with resHPC",
+                "id": "vshpc.welcome",
+                "title": "Começando com o vsHPC, versão da loja",
                 "description": "Abaixo estão as etapas mínimas de configuração que devem ser executadas na extensão para torná-la operacional",
                 "steps": [
                     {
-                        "id": "reshpc.configureSlurm",
-                        "title": "Configurar o account",
-                        "description": "Configure as opções do [SLURM](command:reshpc.walkChangeSlurm), inclusive o account (-A account)",
+                        "id": "vshpc.configure_loadcustom",
+                        "title": "Carregar as configurações iniciais",
+                        "description": "Carregue as configurações iniciais da sua empresa. Seu administrador ou mantenedor da aplicação deve lhe fornecer um arquivo de configuração inicial para ser carregado\n[Carregar configuração inicial](command:vshpc.loadCustomConfiguration)",
                         "media": {
-                            "image": "images/config_account.png",
-                            "altText": "account"
+                            "image": "images/icon.png",
+                            "altText": "Load Custom"
+                        }
+
+                    },
+                    {
+                        "id": "vshpc.configure_slurm",
+                        "title": "Configurar opções extras do SLURM inclusive o account",
+                        "description": "Configure as opções do SLURM, inclusive o account (-A account)\n[SLURM](command:vshpc.walkChangeSlurm)",
+                        "media": {
+                            "image": "images/icon.png",
+                            "altText": "Slurm"
                         }
                     },
                     {
-                        "id": "reshpc.configuresolver",
+                        "id": "vshpc.configure_solver",
                         "title": "Configurar o solver",
-                        "description": "Configure o solver utilizado nas simulações\n[Mudar a configuração](command:reshpc.walkChangeSolver)",
+                        "description": "Configure o solver utilizado nas simulações\n[Mudar a configuração](command:vshpc.walkChangeSolver)",
                         "media": {
-                            "image": "images/config_solver.png",
-                            "altText": "solver"
+                            "image": "images/icon.png",
+                            "altText": "Solver"
                         }
                     },
                     {
-                        "id": "reshpc.configureall",
+                        "id": "vshpc.configure_all",
                         "title": "Acessar as demais configurações",
-                        "description": "Veja as demais configurações disponíveis\n[Acessar a configuração](command:reshpc.walkOpenConfig)",
+                        "description": "Veja as demais configurações disponíveis\n[Acessar a configuração](command:vshpc.walkOpenConfig)",
                         "media": {
-                            "image": "images/config_all.png",
-                            "altText": "config"
+                            "image": "images/icon.png",
+                            "altText": "Configure All"
                         }
                     },
                     {
-                        "id": "reshpc.configuretest",
+                        "id": "vshpc.configure_test",
                         "title": "Testar se a configuração está correta",
-                        "description": "Por fim, as configurações podem ser testadas usando a paleta de comandos do VSCODE, na opção HPC: Verificar Configurações\n[Testar a configuração agora](command:reshpc.checkSettings)",
+                        "description": "Por fim, as configurações podem ser testadas usando a paleta de comandos do VSCODE, na opção HPC: Verificar Configurações\n[Testar a configuração agora](command:vshpc.checkSettings)",
                         "media": {
-                            "image": "images/config_test.png",
-                            "altText": "config"
+                            "image": "images/icon.png",
+                            "altText": "Test configuration"
                         }
                     },
                     {
-                        "id": "reshpc.whatsnew",
+                        "id": "vshpc.whats_new",
                         "title": "Veja as novidades",
                         "description": "Veja as novidades da versão",
                         "media": {
@@ -68,12 +78,12 @@
                         }
                     },
                     {
-                        "id": "reshpc.readmanual",
+                        "id": "vshpc.read_manual",
                         "title": "Leia a documentação",
-                        "description": "Leia o README detalhado da extensão para maiores detalhes\n[Acesse a documentação](command:reshpc.walkOpenReadme)",
+                        "description": "Leia o README detalhado da extensão para maiores detalhes\n[Acesse a documentação](command:vshpc.walkOpenReadme)",
                         "media": {
-                            "image": "images/config_readme.png",
-                            "altText": "readme"
+                            "image": "images/icon.png",
+                            "altText": "Read Manual"
                         }
                     }
                 ]
@@ -81,204 +91,204 @@
         ],
         "commands": [
             {
-                "command": "reshpc.showWelcome",
+                "command": "vshpc.showWelcome",
                 "title": "Boas Vindas",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.OpenConfig",
+                "command": "vshpc.OpenConfig",
                 "title": "Configuração",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.jobSubmit",
+                "command": "vshpc.jobSubmit",
                 "title": "Submeter Job com Git",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.jobSubmitHash",
+                "command": "vshpc.jobSubmitHash",
                 "title": "Submeter Job com Git informando o hash",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.jobSubmitAll",
+                "command": "vshpc.jobSubmitAll",
                 "title": "Submeter Jobs com Git (todos os modelos na pasta atual)",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.jobSubmitDirect",
+                "command": "vshpc.jobSubmitDirect",
                 "title": "Submeter Job (sem git)",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.jobSubmitDirectCheck",
+                "command": "vshpc.jobSubmitDirectCheck",
                 "title": "Verificar sintaxe (checkonly)",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.jobSubmitDirectOneStep",
+                "command": "vshpc.jobSubmitDirectOneStep",
                 "title": "Submeter Job (onestep)",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.jobsMgmt",
+                "command": "vshpc.jobsMgmt",
                 "title": "Gerenciar Jobs",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.jobCheckSSH",
+                "command": "vshpc.jobCheckSSH",
                 "title": "Testar o SSH",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.checkSettings",
+                "command": "vshpc.checkSettings",
                 "title": "Verificar a configuração",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.jobEnterPassword",
+                "command": "vshpc.jobEnterPassword",
                 "title": "Entrar com a senha SSH",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.jobMock",
+                "command": "vshpc.jobMock",
                 "title": "Enviar Job de teste",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.version",
-                "title": "Versão do ResHPC",
-                "category": "ResHPC"
+                "command": "vshpc.version",
+                "title": "Versão do vsHPC",
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.logs",
+                "command": "vshpc.logs",
                 "title": "Ver os Logs",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.loadCustomConfiguration",
+                "command": "vshpc.loadCustomConfiguration",
                 "title": "Carregar Configurações Customizadas",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.selectSimulName",
+                "command": "vshpc.selectSimulName",
                 "title": "Selecionar Simulador",
-                "category": "ResHPC"
+                "category": "vsHPC"
             },
             {
-                "command": "reshpc.selectSimulVersion",
+                "command": "vshpc.selectSimulVersion",
                 "title": "Selecionar Versão do Simulador",
-                "category": "ResHPC"
+                "category": "vsHPC"
             }
         ],
         "submenus": [
             {
-                "id": "reshpc.submenu",
-                "label": "ResHPC comandos"
+                "id": "vshpc.submenu",
+                "label": "vsHPC comandos"
             }
         ],
         "menus": {
             "commandPalette": [
                 {
-                    "command": "reshpc.showWelcome"
+                    "command": "vshpc.showWelcome"
                 },
                 {
-                    "command": "reshpc.OpenConfig"
+                    "command": "vshpc.OpenConfig"
                 },
                 {
-                    "command": "reshpc.jobSubmit"
+                    "command": "vshpc.jobSubmit"
                 },
                 {
-                    "command": "reshpc.jobSubmitHash"
+                    "command": "vshpc.jobSubmitHash"
                 },
                 {
-                    "command": "reshpc.jobSubmitAll",
+                    "command": "vshpc.jobSubmitAll",
                     "when": "false"
                 },
                 {
-                    "command": "reshpc.jobsMgmt"
+                    "command": "vshpc.jobsMgmt"
                 },
                 {
-                    "command": "reshpc.jobCheckSSH"
+                    "command": "vshpc.jobCheckSSH"
                 },
                 {
-                    "command": "reshpc.checkSettings"
+                    "command": "vshpc.checkSettings"
                 },
                 {
-                    "command": "reshpc.version"
+                    "command": "vshpc.version"
                 },
                 {
-                    "command": "reshpc.logs"
+                    "command": "vshpc.logs"
                 },
                 {
-                    "command": "reshpc.jobEnterPassword"
+                    "command": "vshpc.jobEnterPassword"
                 },
                 {
-                    "command": "reshpc.loadCustomConfiguration"
+                    "command": "vshpc.loadCustomConfiguration"
                 },
                 {
-                    "command": "reshpc.selectSimulName"
+                    "command": "vshpc.selectSimulName"
                 },
                 {
-                    "command": "reshpc.selectSimulVersion"
+                    "command": "vshpc.selectSimulVersion"
                 }
             ],
             "editor/context": [
                 {
-                    "submenu": "reshpc.submenu",
+                    "submenu": "vshpc.submenu",
                     "group": "navigation"
                 }
             ],
             "editor/title/context": [
                 {
-                    "submenu": "reshpc.submenu",
+                    "submenu": "vshpc.submenu",
                     "group": "navigation"
                 }
             ],
             "explorer/context": [
                 {
-                    "submenu": "reshpc.submenu",
+                    "submenu": "vshpc.submenu",
                     "group": "navigation"
                 }
             ],
-            "reshpc.submenu": [
+            "vshpc.submenu": [
                 {
-                    "command": "reshpc.jobSubmit",
+                    "command": "vshpc.jobSubmit",
                     "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
-                    "group": "0_reshpc@1"
+                    "group": "0_vshpc@1"
                 },
                 {
-                    "command": "reshpc.jobSubmitHash",
+                    "command": "vshpc.jobSubmitHash",
                     "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
-                    "group": "0_reshpc@2"
+                    "group": "0_vshpc@2"
                 },
                 {
-                    "command": "reshpc.jobSubmitDirect",
+                    "command": "vshpc.jobSubmitDirect",
                     "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
-                    "group": "0_reshpc@3"
+                    "group": "0_vshpc@3"
                 },
                 {
-                    "command": "reshpc.jobSubmitAll",
+                    "command": "vshpc.jobSubmitAll",
                     "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
-                    "group": "0_reshpc@4"
+                    "group": "0_vshpc@4"
                 },
                 {
-                    "command": "reshpc.jobSubmitDirectCheck",
+                    "command": "vshpc.jobSubmitDirectCheck",
                     "when": "resourceExtname =~ /.dat/i",
-                    "group": "0_reshpc@5"
+                    "group": "0_vshpc@5"
                 },
                 {
-                    "command": "reshpc.jobSubmitDirectOneStep",
+                    "command": "vshpc.jobSubmitDirectOneStep",
                     "when": "resourceExtname =~ /.dat/i",
-                    "group": "0_reshpc@6"
+                    "group": "0_vshpc@6"
                 },
                 {
-                    "command": "reshpc.jobsMgmt",
-                    "group": "0_reshpc@11"
+                    "command": "vshpc.jobsMgmt",
+                    "group": "0_vshpc@11"
                 },
                 {
-                    "command": "reshpc.OpenConfig",
-                    "group": "0_reshpc@12"
+                    "command": "vshpc.OpenConfig",
+                    "group": "0_vshpc@12"
                 }
             ]
         },
@@ -287,26 +297,26 @@
                 "title": "HPC Connection",
                 "properties": {
 
-                    "reshpc.connection.cluster": {
+                    "vshpc.connection.cluster": {
                         "type": "string",
                         "markdownDescription": "Head Node do Cluster para submeter jobs (SLURM).",
                         "scope": "application",
                         "order": 1
                     },
-                    "reshpc.connection.user": {
+                    "vshpc.connection.user": {
                         "type": "string",
                         "markdownDescription": "Usuário (chave) que fará o ssh (e de submissão).",
                         "scope": "application",
                         "order": 2
                     },
-                    "reshpc.connection.password": {
+                    "vshpc.connection.password": {
                         "type": "string",
-                        "markdownDescription": "Senha para acesso via ssh, use o [`resHPC:Entrar com a senha SSH`](command:reshpc.jobEnterPassword) no VSCode para ajustar este valor de forma criptografada.",
+                        "markdownDescription": "Senha para acesso via ssh, use o [`vsHPC:Entrar com a senha SSH`](command:vshpc.jobEnterPassword) no VSCode para ajustar este valor de forma criptografada.",
                         "readOnly": true,
                         "scope": "application",
                         "order": 3
                     },
-                    "reshpc.connection.privRsaKey": {
+                    "vshpc.connection.privRsaKey": {
                         "type": "string",
                         "markdownDescription": "Opcional à senha, informe o caminho para chave RSA privada para acesso SSH. Em geral, C:\\users\\CHAVE\\\\.ssh\\id_rsa (não é a .pub!).",
                         "scope": "application",
@@ -317,7 +327,7 @@
             {
                 "title": "File and Folders",
                 "properties": {
-                    "reshpc.path.WindowsUnix": {
+                    "vshpc.path.WindowsUnix": {
                         "type": "object",
                         "additionalProperties": {
                             "type": "string"
@@ -326,13 +336,13 @@
                         "scope": "application",
                         "order": 5
                     },
-                    "reshpc.path.destination": {
+                    "vshpc.path.destination": {
                         "type": "string",
-                        "markdownDescription": "Pasta absoluta ou relativa, no formato Windows, indicando o destino para onde serão realizados os clones e as simulações quando usando simulações com clone. Veja o README.md para exemplos. Qualquer valor diferente de ..\\ e .\\ (pasta pai e atual) implicará em não poder haver um mesmo job rodando para o modelo. Prefira configurar este item na `TAB` workspace.",
+                        "markdownDescription": "Pasta absoluta ou relativa, no formato Windows, indicando o destino para onde serão realizados os clones e as simulações quando usando simulações com clone. Veja o README.md para exemplos. Qualquer valor diferente de ..\\ e .\\ (nível da pasta pai e nível atual) implicará em não poder haver um mesmo job rodando para o modelo. Prefira configurar este item na `TAB` workspace.",
                         "default": "..\\",
                         "order": 6
                     },
-                    "reshpc.path.folderFormat": {
+                    "vshpc.path.folderFormat": {
                         "type": "string",
                         "default": "projectName_hash",
                         "enum": [
@@ -356,34 +366,34 @@
             {
                 "title": "Slurm",
                 "properties": {
-                    "reshpc.scheduler.slurm": {
+                    "vshpc.scheduler.slurm": {
                         "type": "string",
                         "markdownDescription": "Opções extras para serem passadas ao SLURM inclusive **ACCOUNT** (p. ex., -A account, fila/partição: -p glb). Prefira configura na `TAB` Workspace.",
                         "default": "",
                         "order": 8
                     },
-                    "reshpc.scheduler.cores": {
+                    "vshpc.scheduler.cores": {
                         "type": "number",
                         "default": 1,
                         "minimum": 1,
                         "markdownDescription": "Numero de cores usados na simulação (--cpus-per-task). Prefira configurar este item na `TAB` Workspace.",
                         "order": 11
                     },
-                    "reshpc.scheduler.ntasksPerNode": {
+                    "vshpc.scheduler.ntasksPerNode": {
                         "type": "number",
                         "default": 1,
                         "minimum": 1,
                         "markdownDescription": "Numero de tarefas por nó (--ntasks-per-node). Nota: total de processos MPI (-np) = nodes * ntasks-per-node, quando usado MPI. Prefira configurar este item na `TAB` Workspace.",
                         "order": 12
                     },
-                    "reshpc.scheduler.nodes": {
+                    "vshpc.scheduler.nodes": {
                         "type": "number",
                         "default": 1,
                         "minimum": 1,
                         "markdownDescription": "Numero de nós usados na simulação (--nodes). Prefira configurar este item na `TAB` Workspace.",
                         "order": 13
                     },
-                    "reshpc.scheduler.mpiExtras": {
+                    "vshpc.scheduler.mpiExtras": {
                         "type": "string",
                         "default": "",
                         "markdownDescription": "Opções extras para serem passadas ao mpirun. Prefira configurar este item na `TAB` Workspace.",
@@ -395,21 +405,21 @@
             {
                 "title": "Solver",
                 "properties": {
-                    "reshpc.solver.name": {
+                    "vshpc.solver.name": {
                         "type": "string",
                         "default": "",
-                        "markdownDescription": "Nome do simulador. Use o comando de [seleção de simuladores](command:reshpc.selectSimulName). Caso o simulador desejado não apareça [carregue uma configuração customizada](command:reshpc.loadCustomConfiguration) Prefira configurar este item na `TAB` workspace.",
+                        "markdownDescription": "Nome do simulador. Use o comando de [seleção de simuladores](command:vshpc.selectSimulName). Caso o simulador desejado não apareça [carregue uma configuração customizada](command:vshpc.loadCustomConfiguration) Prefira configurar este item na `TAB` workspace.",
                         "order": 9
                     },
-                    "reshpc.solver.version": {
+                    "vshpc.solver.version": {
                         "type": "string",
-                        "markdownDescription": "Versão do solver de simulação a depender do simulador escolhido (p. ex.: 2019.12, 2018.11, v6.0, etc). Veja exemplos no README, ou selecione uma [ versões da lista, de acordo com o simulador](command:reshpc.selectSimulVersion). Prefira configurar este item na `TAB` Workspace.",
+                        "markdownDescription": "Versão do solver de simulação a depender do simulador escolhido (p. ex.: 2019.12, 2018.11, v6.0, etc). Veja exemplos no README. Prefira configurar este item na `TAB` Workspace.",
                         "order": 10
                     },
 
-                    "reshpc.solver.ExtraParams": {
+                    "vshpc.solver.ExtraParams": {
                         "type": "string",
-                        "markdownDescription": "Opções extras para serem passadas para o solver. Para o CMG, `-wait e -parasol` estarão sempre inclusos e também `-doms -log -log2 e -cputime` serão inclusos caso o campo esteja em branco. Prefira configurar este item na `TAB` Workspace.",
+                        "markdownDescription": "Opções extras para serem passadas para o solver escolhido. Prefira configurar este item na `TAB` Workspace.",
                         "default": "",
                         "order": 15
                     }

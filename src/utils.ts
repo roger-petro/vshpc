@@ -247,22 +247,22 @@ export function checkOptions(params: {models:string[], hash?: string}) {
 
 	if (!settings.account || settings.account.length===0) {
 		PubSub.publish(LogOpt.toast_error,`Account precisar ser ajustado na caixa de texto 'project' da configuração do vshpc`);
-		vscode.commands.executeCommand(`workbench.action.openSettings`, `reshpc.scheduler.project`);
+		vscode.commands.executeCommand(`workbench.action.openSettings`, `vshpc.scheduler.project`);
 		return false;
 	}
 	if (!settings.solverName || settings.solverName.length===0) {
 		PubSub.publish(LogOpt.toast_error,`Deve ser especificado o solver para rodar a simulação`);
-		vscode.commands.executeCommand(`workbench.action.openSettings`, `reshpc.solver.name`);
+		vscode.commands.executeCommand(`workbench.action.openSettings`, `vshpc.solver.name`);
 		return false;
 	}
 	if (!settings.solverVersion || settings.solverVersion.length===0) {
 		PubSub.publish(LogOpt.toast_error,`Deve ser especificado a versão do solver para rodar a simulação`);
-		vscode.commands.executeCommand(`workbench.action.openSettings`, `reshpc.solver.version`);
+		vscode.commands.executeCommand(`workbench.action.openSettings`, `vshpc.solver.version`);
 		return false;
 	}
 	if (settings.cluster.search(/^[\w\._-]+$/)===-1) {
 		PubSub.publish(LogOpt.toast_error,`Nome do cluster inconsistente`);
-		vscode.commands.executeCommand(`workbench.action.openSettings`, `reshpc.connection.cluster`);
+		vscode.commands.executeCommand(`workbench.action.openSettings`, `vshpc.connection.cluster`);
 		return false;
 	}
 	for (const model of params.models) {
@@ -278,7 +278,7 @@ export function checkOptions(params: {models:string[], hash?: string}) {
 
 		if(evaluatePath(settings,uri) === null) {
 			PubSub.publish(LogOpt.toast_error,`Configure antes o "de-para" de modo a acomodar o caminho ${model}`);
-			vscode.commands.executeCommand(`workbench.action.openSettings`, `reshpc.path.WindowsUnix`);
+			vscode.commands.executeCommand(`workbench.action.openSettings`, `vshpc.path.WindowsUnix`);
 			return false;
 		}
 	}
@@ -290,7 +290,7 @@ export function checkOptions(params: {models:string[], hash?: string}) {
 	}
 	if (settings.solverCores === 1) {
 		PubSub.publish(LogOpt.dismissable,{ message: `Sua simulação está rodando com apenas 1 core.`, callback: ()=>{
-			vscode.commands.executeCommand(`workbench.action.openSettings`, `reshpc.solver.resources.cores`);
+			vscode.commands.executeCommand(`workbench.action.openSettings`, `vshpc.solver.resources.cores`);
 		}});
 	}
 	return true;

@@ -1,6 +1,6 @@
-# reshpc README
+# vsHPC README
 
-This is the README for your extension "reshpc". After writing up a brief description, we recommend including the following sections.
+This is the README for your extension "vshpc". After writing up a brief description, we recommend including the following sections.
 
 ## Features
 
