@@ -1,11 +1,12 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as PubSub from 'pubsub-js';
 
-import { LogOpt, CustomConfig, CustomError, Simulator } from './types';
+import { LogOpt, CustomConfig, CustomError, Simulator, APP_NAME } from './types';
 
 const CUSTOM_CONFIG_NAME = 'vshpc.json';
-const API_ID="vshpc";
+
 
 /**
  * Cria o comando que irá carregar o customconfig e salvar
@@ -14,7 +15,7 @@ const API_ID="vshpc";
  * @param context
  */
 export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
-    const loadCustomConfig = vscode.commands.registerCommand('vshpc.loadCustomConfiguration', async () => {
+    const loadCustomConfig = vscode.commands.registerCommand('rogerio-cunha.vshpc.loadCustomConfiguration', async () => {
         try {
             const lastConfigUriString = context.globalState.get<string>('lastConfigUri');
             const lastConfigUri = lastConfigUriString ? vscode.Uri.parse(lastConfigUriString) : undefined;
@@ -53,7 +54,7 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
     });
 
     // Comando para selecionar o simulador
-    const selectSimulNameDisposable = vscode.commands.registerCommand('vshpc.selectSimulName', async () => {
+    const selectSimulNameDisposable = vscode.commands.registerCommand('rogerio-cunha.vshpc.selectSimulName', async () => {
         try {
             // Carregar o customConfig
             const customConfig = await getCustomConfig(context) as CustomConfig;
@@ -104,13 +105,13 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
 
             // Atualizar a configuração 'vshpc.solver.name' com o valor selecionado se mudou o valor
 
-            const curSimulator = vscode.workspace.getConfiguration('vshpc.solver').get('name',"");
+            const curSimulator = vscode.workspace.getConfiguration(APP_NAME).get('solver.name',"");
             if (curSimulator!==selectedDisplayName){
-                await vscode.workspace.getConfiguration('vshpc.solver').update('name', selectedDisplayName, target);
+                await vscode.workspace.getConfiguration(APP_NAME).update('solver.name', selectedDisplayName, target);
                 const simulator = customConfig.simulators.find(item=>item.solvers.find(sol=> sol === solverNames[selectedDisplayName])) as Simulator;
                 if (simulator) {
-                    await vscode.workspace.getConfiguration('vshpc.solver').update('version', simulator.defaultSolverVersion, target);
-                    await vscode.workspace.getConfiguration('vshpc.solver').update('ExtraParams', simulator.defaultSolverExtras, target);
+                    await vscode.workspace.getConfiguration(APP_NAME).update('solver.version', simulator.defaultSolverVersion, target);
+                    await vscode.workspace.getConfiguration(APP_NAME).update('solver.ExtraParams', simulator.defaultSolverExtras, target);
                 } else {
                     vscode.window.showErrorMessage('Erro ao indentificar o simulador nas configurações customizadas: ');
                 }
@@ -132,6 +133,7 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
 export async function getCustomConfig(context: vscode.ExtensionContext): Promise<any> {
     try {
         const configFileUri = vscode.Uri.joinPath(context.globalStorageUri, CUSTOM_CONFIG_NAME);
+        PubSub.publish(LogOpt.vshpc, `> O customconfig será lido de ${configFileUri}`);
         const fileContent = await vscode.workspace.fs.readFile(configFileUri);
         const customConfig = JSON.parse(Buffer.from(fileContent).toString('utf-8'));
         return customConfig;
@@ -149,7 +151,7 @@ export async function getCustomConfig(context: vscode.ExtensionContext): Promise
  */
 export function getCustomConfigDirect(context: vscode.ExtensionContext) {
 
-    let uri = vscode.workspace.getConfiguration(API_ID).get("configuration.customConfigURI", "").trim();
+    let uri = vscode.workspace.getConfiguration(APP_NAME).get("configuration.customConfigURI", "").trim();
 
     if (!uri || !fs.existsSync(uri)) {
         uri = path.join(require('os').homedir(), CUSTOM_CONFIG_NAME);

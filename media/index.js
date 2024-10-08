@@ -3304,14 +3304,14 @@ function create_if_block_3$1(ctx) {
       t6 = text("»");
       button0.disabled = button0_disabled_value = /*selectedRows*/
       ctx[4].findIndex(func_2) === -1;
-      attr(button0, "class", "svelte-d3gb8o");
+      attr(button0, "class", "svelte-1pay5si");
       button1.disabled = button1_disabled_value = /*page*/
       ctx[9] === 0;
-      attr(button1, "class", "svelte-d3gb8o");
+      attr(button1, "class", "svelte-1pay5si");
       button2.disabled = button2_disabled_value = /*page*/
       ctx[9] === /*pages*/
       ctx[10].length - 1;
-      attr(button2, "class", "svelte-d3gb8o");
+      attr(button2, "class", "svelte-1pay5si");
     },
     m(target, anchor) {
       if_block.m(target, anchor);
@@ -3432,7 +3432,7 @@ function create_else_block_1(ctx) {
     c() {
       button = element("button");
       button.textContent = "Desmarcar";
-      attr(button, "class", "button_sized_1 svelte-d3gb8o");
+      attr(button, "class", "button_sized_1 svelte-1pay5si");
     },
     m(target, anchor) {
       insert(target, button, anchor);
@@ -3464,7 +3464,7 @@ function create_if_block_5(ctx) {
     c() {
       button = element("button");
       button.textContent = "Selecionar Todos";
-      attr(button, "class", "button_sized_1 svelte-d3gb8o");
+      attr(button, "class", "button_sized_1 svelte-1pay5si");
     },
     m(target, anchor) {
       insert(target, button, anchor);
@@ -3512,7 +3512,7 @@ function create_if_block_4$1(ctx) {
       button = element("button");
       t = text(t_value);
       attr(button, "type", "button");
-      attr(button, "class", "btn-page-number svelte-d3gb8o");
+      attr(button, "class", "btn-page-number svelte-1pay5si");
     },
     m(target, anchor) {
       insert(target, button, anchor);
@@ -3595,7 +3595,7 @@ function create_if_block_2$1(ctx) {
       span = element("span");
       t0 = text("Total de páginas: ");
       t1 = text(t1_value);
-      attr(span, "class", "text svelte-d3gb8o");
+      attr(span, "class", "text svelte-1pay5si");
     },
     m(target, anchor) {
       insert(target, span, anchor);
@@ -3626,8 +3626,8 @@ function create_default_slot_1(ctx) {
       t = text("Datas iguais: ");
       input = element("input");
       attr(input, "type", "checkbox");
-      attr(input, "class", "svelte-d3gb8o");
-      attr(span, "class", "text svelte-d3gb8o");
+      attr(input, "class", "svelte-1pay5si");
+      attr(span, "class", "text svelte-1pay5si");
     },
     m(target, anchor) {
       insert(target, span, anchor);
@@ -3716,7 +3716,7 @@ function create_default_slot$1(ctx) {
     c() {
       button = element("button");
       button.textContent = "Progresso";
-      attr(button, "class", "svelte-d3gb8o");
+      attr(button, "class", "svelte-1pay5si");
     },
     m(target, anchor) {
       insert(target, button, anchor);
@@ -3764,8 +3764,8 @@ function create_else_block$3(ctx) {
       div = element("div");
       a = element("a");
       t = text(t_value);
-      attr(a, "class", "svelte-d3gb8o");
-      attr(div, "class", "grid1-column svelte-d3gb8o");
+      attr(a, "class", "svelte-1pay5si");
+      attr(div, "class", "grid1-column svelte-1pay5si");
     },
     m(target, anchor) {
       insert(target, div, anchor);
@@ -3817,8 +3817,8 @@ function create_if_block$3(ctx) {
       div = element("div");
       a = element("a");
       t = text(t_value);
-      attr(a, "class", "svelte-d3gb8o");
-      attr(div, "class", "grid1-column svelte-d3gb8o");
+      attr(a, "class", "svelte-1pay5si");
+      attr(div, "class", "grid1-column svelte-1pay5si");
     },
     m(target, anchor) {
       insert(target, div, anchor);
@@ -4053,18 +4053,18 @@ function create_each_block$1(key_1, ctx) {
       attr(input, "type", "checkbox");
       input.disabled = input_disabled_value = /*job*/
       ctx[55].user !== getMeta("user");
-      attr(input, "class", "svelte-d3gb8o");
-      attr(div0, "class", "grid1-column svelte-d3gb8o");
+      attr(input, "class", "svelte-1pay5si");
+      attr(div0, "class", "grid1-column svelte-1pay5si");
       attr(a0, "href", "/");
-      attr(a0, "class", "svelte-d3gb8o");
-      attr(div1, "class", "grid1-column svelte-d3gb8o");
+      attr(a0, "class", "svelte-1pay5si");
+      attr(div1, "class", "grid1-column svelte-1pay5si");
       attr(a1, "href", "/");
-      attr(a1, "class", "svelte-d3gb8o");
-      attr(div2, "class", "grid1-column svelte-d3gb8o");
-      attr(div3, "class", "grid1-column svelte-d3gb8o");
-      attr(div4, "class", "grid1-column svelte-d3gb8o");
-      attr(span, "class", "progress-text svelte-d3gb8o");
-      attr(div5, "class", "progress-bar svelte-d3gb8o");
+      attr(a1, "class", "svelte-1pay5si");
+      attr(div2, "class", "grid1-column svelte-1pay5si");
+      attr(div3, "class", "grid1-column svelte-1pay5si");
+      attr(div4, "class", "grid1-column svelte-1pay5si");
+      attr(span, "class", "progress-text svelte-1pay5si");
+      attr(div5, "class", "progress-bar svelte-1pay5si");
       set_style(
         div5,
         "width",
@@ -4090,13 +4090,13 @@ function create_each_block$1(key_1, ctx) {
           ]
         ) : 0 : 0) + "%"
       );
-      attr(div6, "class", "progress-cell svelte-d3gb8o");
-      attr(div7, "class", "grid1-column svelte-d3gb8o");
-      attr(div8, "class", "grid1-column svelte-d3gb8o");
-      attr(div9, "class", "grid1-column svelte-d3gb8o");
-      attr(a2, "class", "svelte-d3gb8o");
-      attr(a3, "class", "svelte-d3gb8o");
-      attr(div10, "class", "grid1-column svelte-d3gb8o");
+      attr(div6, "class", "progress-cell svelte-1pay5si");
+      attr(div7, "class", "grid1-column svelte-1pay5si");
+      attr(div8, "class", "grid1-column svelte-1pay5si");
+      attr(div9, "class", "grid1-column svelte-1pay5si");
+      attr(a2, "class", "svelte-1pay5si");
+      attr(a3, "class", "svelte-1pay5si");
+      attr(div10, "class", "grid1-column svelte-1pay5si");
       this.first = div0;
     },
     m(target, anchor) {
@@ -4546,41 +4546,41 @@ function create_fragment$3(ctx) {
         each_blocks[i].c();
       }
       attr(label0, "for", "user");
-      attr(label0, "class", "text svelte-d3gb8o");
+      attr(label0, "class", "text svelte-1pay5si");
       attr(input0, "placeholder", getMeta("user"));
-      attr(input0, "class", "v_i svelte-d3gb8o");
+      attr(input0, "class", "v_i svelte-1pay5si");
       attr(input0, "type", "text");
       attr(input0, "max", "4");
       attr(input0, "name", "user");
       set_style(input0, "width", "50px");
       attr(label1, "for", "user");
-      attr(label1, "class", "text svelte-d3gb8o");
-      attr(input1, "class", "v_i svelte-d3gb8o");
+      attr(label1, "class", "text svelte-1pay5si");
+      attr(input1, "class", "v_i svelte-1pay5si");
       attr(input1, "type", "text");
       attr(input1, "max", "16");
       attr(input1, "name", "user");
       set_style(input1, "width", "150px");
-      attr(button, "class", "button green svelte-d3gb8o");
-      attr(span, "class", "badge svelte-d3gb8o");
+      attr(button, "class", "button green svelte-1pay5si");
+      attr(span, "class", "badge svelte-1pay5si");
       attr(div0, "id", "top");
-      attr(div0, "class", "pageTop svelte-d3gb8o");
-      attr(div1, "class", "first-line svelte-d3gb8o");
+      attr(div0, "class", "pageTop svelte-1pay5si");
+      attr(div1, "class", "first-line svelte-1pay5si");
       html_tag.a = html_anchor;
-      attr(div2, "class", "second-line svelte-d3gb8o");
-      attr(div3, "class", "grid1-header svelte-d3gb8o");
-      attr(div4, "class", "grid1-header svelte-d3gb8o");
-      attr(div5, "class", "grid1-header svelte-d3gb8o");
-      attr(div6, "class", "grid1-header svelte-d3gb8o");
-      attr(div7, "class", "grid1-header svelte-d3gb8o");
-      attr(div8, "class", "grid1-header svelte-d3gb8o");
-      attr(div9, "class", "grid1-header svelte-d3gb8o");
-      attr(div10, "class", "grid1-header svelte-d3gb8o");
-      attr(div11, "class", "grid1-header svelte-d3gb8o");
-      attr(div12, "class", "grid1-header svelte-d3gb8o");
-      attr(div13, "class", "grid1 svelte-d3gb8o");
-      attr(div14, "class", "third-line svelte-d3gb8o");
-      attr(div15, "class", "wrapper svelte-d3gb8o");
-      attr(main, "class", "svelte-d3gb8o");
+      attr(div2, "class", "second-line svelte-1pay5si");
+      attr(div3, "class", "grid1-header svelte-1pay5si");
+      attr(div4, "class", "grid1-header svelte-1pay5si");
+      attr(div5, "class", "grid1-header svelte-1pay5si");
+      attr(div6, "class", "grid1-header svelte-1pay5si");
+      attr(div7, "class", "grid1-header svelte-1pay5si");
+      attr(div8, "class", "grid1-header svelte-1pay5si");
+      attr(div9, "class", "grid1-header svelte-1pay5si");
+      attr(div10, "class", "grid1-header svelte-1pay5si");
+      attr(div11, "class", "grid1-header svelte-1pay5si");
+      attr(div12, "class", "grid1-header svelte-1pay5si");
+      attr(div13, "class", "grid1 svelte-1pay5si");
+      attr(div14, "class", "third-line svelte-1pay5si");
+      attr(div15, "class", "wrapper svelte-1pay5si");
+      attr(main, "class", "svelte-1pay5si");
     },
     m(target, anchor) {
       insert(target, main, anchor);
@@ -7774,19 +7774,6 @@ class KibanaDataSource {
     }
   }
 }
-(async () => {
-  const kibana = new KibanaDataSource("", "atp-ro", 60, "COMPLETED");
-  let from = 0;
-  while (1) {
-    const resp = await kibana.getData(10, from * 10);
-    if (!resp || resp.hits.hits.length === 0) {
-      break;
-    }
-    resp && kibana.print(resp, from);
-    from += 1;
-  }
-  console.log(`Total de entradas: ${kibana._hitsTotal}`);
-})();
 function get_each_context(ctx, list, i) {
   const child_ctx = ctx.slice();
   child_ctx[43] = list[i];
@@ -7906,7 +7893,7 @@ function create_if_block_4(ctx) {
       t0 = text(t0_value);
       t1 = space();
       attr(button, "type", "button");
-      attr(button, "class", "btn-page-number svelte-12qzibs");
+      attr(button, "class", "btn-page-number svelte-1ugiaya");
     },
     m(target, anchor) {
       insert(target, button, anchor);
@@ -7989,7 +7976,7 @@ function create_if_block_2(ctx) {
         /*totalPages*/
         ctx[9]
       );
-      attr(span, "class", "text svelte-12qzibs");
+      attr(span, "class", "text svelte-1ugiaya");
     },
     m(target, anchor) {
       insert(target, span, anchor);
@@ -8069,7 +8056,7 @@ function create_else_block$2(ctx) {
     c() {
       div = element("div");
       t = text(t_value);
-      attr(div, "class", "grid1-column svelte-12qzibs");
+      attr(div, "class", "grid1-column svelte-1ugiaya");
     },
     m(target, anchor) {
       insert(target, div, anchor);
@@ -8111,8 +8098,8 @@ function create_if_block$2(ctx) {
       div = element("div");
       a = element("a");
       t = text(t_value);
-      attr(a, "class", "svelte-12qzibs");
-      attr(div, "class", "grid1-column svelte-12qzibs");
+      attr(a, "class", "svelte-1ugiaya");
+      attr(div, "class", "grid1-column svelte-1ugiaya");
     },
     m(target, anchor) {
       insert(target, div, anchor);
@@ -8286,18 +8273,18 @@ function create_each_block(key_1, ctx) {
       a3.textContent = "VSCode";
       t18 = space();
       attr(a0, "href", "/");
-      attr(a0, "class", "svelte-12qzibs");
-      attr(div0, "class", "grid1-column svelte-12qzibs");
+      attr(a0, "class", "svelte-1ugiaya");
+      attr(div0, "class", "grid1-column svelte-1ugiaya");
       attr(a1, "href", "/");
-      attr(a1, "class", "svelte-12qzibs");
-      attr(div1, "class", "grid1-column svelte-12qzibs");
-      attr(div2, "class", "grid1-column svelte-12qzibs");
-      attr(div3, "class", "grid1-column svelte-12qzibs");
-      attr(div4, "class", "grid1-column svelte-12qzibs");
-      attr(div5, "class", "grid1-column svelte-12qzibs");
-      attr(a2, "class", "svelte-12qzibs");
-      attr(a3, "class", "svelte-12qzibs");
-      attr(div6, "class", "grid1-column svelte-12qzibs");
+      attr(a1, "class", "svelte-1ugiaya");
+      attr(div1, "class", "grid1-column svelte-1ugiaya");
+      attr(div2, "class", "grid1-column svelte-1ugiaya");
+      attr(div3, "class", "grid1-column svelte-1ugiaya");
+      attr(div4, "class", "grid1-column svelte-1ugiaya");
+      attr(div5, "class", "grid1-column svelte-1ugiaya");
+      attr(a2, "class", "svelte-1ugiaya");
+      attr(a3, "class", "svelte-1ugiaya");
+      attr(div6, "class", "grid1-column svelte-1ugiaya");
       this.first = div0;
     },
     m(target, anchor) {
@@ -8660,23 +8647,23 @@ function create_fragment$2(ctx) {
         each_blocks[i].c();
       }
       attr(label0, "for", "user");
-      attr(label0, "class", "text svelte-12qzibs");
-      attr(input0, "class", "v_i svelte-12qzibs");
+      attr(label0, "class", "text svelte-1ugiaya");
+      attr(input0, "class", "v_i svelte-1ugiaya");
       attr(input0, "type", "text");
       attr(input0, "max", "4");
       attr(input0, "name", "user");
       set_style(input0, "width", "50px");
       attr(label1, "for", "user");
-      attr(label1, "class", "text svelte-12qzibs");
-      attr(input1, "class", "v_i svelte-12qzibs");
+      attr(label1, "class", "text svelte-1ugiaya");
+      attr(input1, "class", "v_i svelte-1ugiaya");
       attr(input1, "type", "text");
       attr(input1, "max", "16");
       attr(input1, "name", "user");
       set_style(input1, "width", "150px");
       attr(input2, "size", "12");
       attr(input2, "placeholder", "days");
-      attr(input2, "class", "svelte-12qzibs");
-      attr(label2, "class", "text svelte-12qzibs");
+      attr(input2, "class", "svelte-1ugiaya");
+      attr(label2, "class", "text svelte-1ugiaya");
       attr(span0, "class", "hint");
       attr(span0, "title", "Filtrar quantos dias desejados de histórico");
       option0.__value = "";
@@ -8699,26 +8686,26 @@ function create_fragment$2(ctx) {
       ));
       attr(span1, "class", "hint");
       attr(span1, "title", "Filtrar pelo tipo de resultado dos jobs");
-      attr(button0, "class", "svelte-12qzibs");
-      attr(button1, "class", "svelte-12qzibs");
-      attr(span2, "class", "badge svelte-12qzibs");
+      attr(button0, "class", "svelte-1ugiaya");
+      attr(button1, "class", "svelte-1ugiaya");
+      attr(span2, "class", "badge svelte-1ugiaya");
       attr(div0, "id", "top");
-      attr(div0, "class", "pageTop svelte-12qzibs");
-      attr(div1, "class", "first-line svelte-12qzibs");
+      attr(div0, "class", "pageTop svelte-1ugiaya");
+      attr(div1, "class", "first-line svelte-1ugiaya");
       html_tag.a = null;
-      attr(div2, "class", "second-line svelte-12qzibs");
-      attr(div3, "class", "grid1-header svelte-12qzibs");
-      attr(div4, "class", "grid1-header svelte-12qzibs");
-      attr(div5, "class", "grid1-header svelte-12qzibs");
-      attr(div6, "class", "grid1-header svelte-12qzibs");
-      attr(div7, "class", "grid1-header svelte-12qzibs");
-      attr(div8, "class", "grid1-header svelte-12qzibs");
-      attr(div9, "class", "grid1-header svelte-12qzibs");
-      attr(div10, "class", "grid1-header svelte-12qzibs");
-      attr(div11, "class", "grid2 svelte-12qzibs");
-      attr(div12, "class", "third-line svelte-12qzibs");
-      attr(div13, "class", "wrapper svelte-12qzibs");
-      attr(main, "class", "svelte-12qzibs");
+      attr(div2, "class", "second-line svelte-1ugiaya");
+      attr(div3, "class", "grid1-header svelte-1ugiaya");
+      attr(div4, "class", "grid1-header svelte-1ugiaya");
+      attr(div5, "class", "grid1-header svelte-1ugiaya");
+      attr(div6, "class", "grid1-header svelte-1ugiaya");
+      attr(div7, "class", "grid1-header svelte-1ugiaya");
+      attr(div8, "class", "grid1-header svelte-1ugiaya");
+      attr(div9, "class", "grid1-header svelte-1ugiaya");
+      attr(div10, "class", "grid1-header svelte-1ugiaya");
+      attr(div11, "class", "grid2 svelte-1ugiaya");
+      attr(div12, "class", "third-line svelte-1ugiaya");
+      attr(div13, "class", "wrapper svelte-1ugiaya");
+      attr(main, "class", "svelte-1ugiaya");
     },
     m(target, anchor) {
       insert(target, main, anchor);

@@ -166,18 +166,18 @@ export class KibanaDataSource {
  * É bom saber que o vite faz o papel de proxy para efeitos de teste,
  * quanto o proxy.ts não entre em cena, quando a extensão estiver em produção.
  */
-(async () => {
-    const kibana = new KibanaDataSource("",'atp-ro',60,"COMPLETED");
-    let from = 0;
-    while (1) {
-        const resp = await kibana.getData(10,from*10);
-        if (!resp || resp.hits.hits.length === 0) {
-            break;
-        }
-        resp && kibana.print(resp, from);
-        from+=1;
-    }
-    console.log(`Total de entradas: ${kibana._hitsTotal}`);
-}
-)();
+// (async () => {
+//     const kibana = new KibanaDataSource("",'atp-ro',60,"COMPLETED");
+//     let from = 0;
+//     while (1) {
+//         const resp = await kibana.getData(10,from*10);
+//         if (!resp || resp.hits.hits.length === 0) {
+//             break;
+//         }
+//         resp && kibana.print(resp, from);
+//         from+=1;
+//     }
+//     console.log(`Total de entradas: ${kibana._hitsTotal}`);
+// }
+// )();
 

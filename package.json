@@ -7,7 +7,7 @@
         "type": "git",
         "url": "https://github.com/roger-petro/vshpc.git"
       },
-    "version": "0.0.1",
+    "version": "0.0.4",
     "engines": {
         "vscode": "^1.92.0"
     },
@@ -23,14 +23,14 @@
     "contributes": {
         "walkthroughs": [
             {
-                "id": "vshpc.welcome",
+                "id": "rogerio-cunha.vshpc.welcome",
                 "title": "Começando com o vsHPC, versão da loja",
                 "description": "Abaixo estão as etapas mínimas de configuração que devem ser executadas na extensão para torná-la operacional",
                 "steps": [
                     {
-                        "id": "vshpc.configure_loadcustom",
+                        "id": "rogerio-cunha.vshpc.configure_loadcustom",
                         "title": "Carregar as configurações iniciais",
-                        "description": "Carregue as configurações iniciais da sua empresa. Seu administrador ou mantenedor da aplicação deve lhe fornecer um arquivo de configuração inicial para ser carregado\n[Carregar configuração inicial](command:vshpc.loadCustomConfiguration)",
+                        "description": "Carregue as configurações iniciais da sua empresa. Seu administrador ou mantenedor da aplicação deve lhe fornecer um arquivo de configuração inicial para ser carregado\n[Carregar configuração inicial](command:rogerio-cunha.vshpc.loadCustomConfiguration)",
                         "media": {
                             "image": "images/icon.png",
                             "altText": "Load Custom"
@@ -38,43 +38,43 @@
 
                     },
                     {
-                        "id": "vshpc.configure_slurm",
+                        "id": "rogerio-cunha.vshpc.configure_slurm",
                         "title": "Configurar opções extras do SLURM inclusive o account",
-                        "description": "Configure as opções do SLURM, inclusive o account (-A account)\n[SLURM](command:vshpc.walkChangeSlurm)",
+                        "description": "Configure as opções do SLURM, inclusive o account (-A account)\n[SLURM](command:rogerio-cunha.vshpc.walkChangeSlurm)",
                         "media": {
                             "image": "images/icon.png",
                             "altText": "Slurm"
                         }
                     },
                     {
-                        "id": "vshpc.configure_solver",
+                        "id": "rogerio-cunha.vshpc.configure_solver",
                         "title": "Configurar o solver",
-                        "description": "Configure o solver utilizado nas simulações\n[Mudar a configuração](command:vshpc.walkChangeSolver)",
+                        "description": "Configure o solver utilizado nas simulações\n[Mudar a configuração](command:rogerio-cunha.vshpc.walkChangeSolver)",
                         "media": {
                             "image": "images/icon.png",
                             "altText": "Solver"
                         }
                     },
                     {
-                        "id": "vshpc.configure_all",
+                        "id": "rogerio-cunha.vshpc.configure_all",
                         "title": "Acessar as demais configurações",
-                        "description": "Veja as demais configurações disponíveis\n[Acessar a configuração](command:vshpc.walkOpenConfig)",
+                        "description": "Veja as demais configurações disponíveis\n[Acessar a configuração](command:rogerio-cunha.vshpc.walkOpenConfig)",
                         "media": {
                             "image": "images/icon.png",
                             "altText": "Configure All"
                         }
                     },
                     {
-                        "id": "vshpc.configure_test",
+                        "id": "rogerio-cunha.vshpc.configure_test",
                         "title": "Testar se a configuração está correta",
-                        "description": "Por fim, as configurações podem ser testadas usando a paleta de comandos do VSCODE, na opção HPC: Verificar Configurações\n[Testar a configuração agora](command:vshpc.checkSettings)",
+                        "description": "Por fim, as configurações podem ser testadas usando a paleta de comandos do VSCODE, na opção HPC: Verificar Configurações\n[Testar a configuração agora](command:rogerio-cunha.vshpc.checkSettings)",
                         "media": {
                             "image": "images/icon.png",
                             "altText": "Test configuration"
                         }
                     },
                     {
-                        "id": "vshpc.whats_new",
+                        "id": "rogerio-cunha.vshpc.whats_new",
                         "title": "Veja as novidades",
                         "description": "Veja as novidades da versão",
                         "media": {
@@ -82,9 +82,9 @@
                         }
                     },
                     {
-                        "id": "vshpc.read_manual",
+                        "id": "rogerio-cunha.vshpc.read_manual",
                         "title": "Leia a documentação",
-                        "description": "Leia o README detalhado da extensão para maiores detalhes\n[Acesse a documentação](command:vshpc.walkOpenReadme)",
+                        "description": "Leia o README detalhado da extensão para maiores detalhes\n[Acesse a documentação](command:rogerio-cunha.vshpc.walkOpenReadme)",
                         "media": {
                             "image": "images/icon.png",
                             "altText": "Read Manual"
@@ -95,203 +95,204 @@
         ],
         "commands": [
             {
-                "command": "vshpc.showWelcome",
-                "title": "Boas Vindas",
+                "command": "rogerio-cunha.vshpc.showWelcome",
+                "title": "Painel de Boas Vindas",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.OpenConfig",
-                "title": "Configuração",
+                "command": "rogerio-cunha.vshpc.OpenConfig",
+                "title": "Abrir a Configuração",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.jobSubmit",
+                "command": "rogerio-cunha.vshpc.jobSubmit",
                 "title": "Submeter Job com Git",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.jobSubmitHash",
+                "command": "rogerio-cunha.vshpc.jobSubmitHash",
                 "title": "Submeter Job com Git informando o hash",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.jobSubmitAll",
+                "command": "rogerio-cunha.vshpc.jobSubmitAll",
                 "title": "Submeter Jobs com Git (todos os modelos na pasta atual)",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.jobSubmitDirect",
+                "command": "rogerio-cunha.vshpc.jobSubmitDirect",
                 "title": "Submeter Job (sem git)",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.jobSubmitDirectCheck",
+                "command": "rogerio-cunha.vshpc.jobSubmitDirectCheck",
                 "title": "Verificar sintaxe (checkonly)",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.jobSubmitDirectOneStep",
+                "command": "rogerio-cunha.vshpc.jobSubmitDirectOneStep",
                 "title": "Submeter Job (onestep)",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.jobsMgmt",
+                "command": "rogerio-cunha.vshpc.jobsMgmt",
                 "title": "Gerenciar Jobs",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.jobCheckSSH",
+                "command": "rogerio-cunha.vshpc.jobCheckSSH",
                 "title": "Testar o SSH",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.checkSettings",
-                "title": "Verificar a configuração",
+                "command": "rogerio-cunha.vshpc.checkSettings",
+                "title": "Testar a configuração",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.jobEnterPassword",
+                "command": "rogerio-cunha.vshpc.jobEnterPassword",
                 "title": "Entrar com a senha SSH",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.jobMock",
+                "command": "rogerio-cunha.vshpc.jobMock",
                 "title": "Enviar Job de teste",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.version",
+                "command": "rogerio-cunha.vshpc.version",
                 "title": "Versão do vsHPC",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.logs",
+                "command": "rogerio-cunha.vshpc.logs",
                 "title": "Ver os Logs",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.loadCustomConfiguration",
+                "command": "rogerio-cunha.vshpc.loadCustomConfiguration",
                 "title": "Carregar Configurações Customizadas",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.selectSimulName",
+                "command": "rogerio-cunha.vshpc.selectSimulName",
                 "title": "Selecionar Simulador",
                 "category": "vsHPC"
             },
             {
-                "command": "vshpc.selectSimulVersion",
+                "command": "rogerio-cunha.vshpc.selectSimulVersion",
                 "title": "Selecionar Versão do Simulador",
                 "category": "vsHPC"
             }
         ],
         "submenus": [
             {
-                "id": "vshpc.submenu",
+                "id": "rogerio-cunha.vshpc.submenu",
                 "label": "vsHPC comandos"
             }
         ],
         "menus": {
             "commandPalette": [
                 {
-                    "command": "vshpc.showWelcome"
+                    "command": "rogerio-cunha.vshpc.showWelcome"
                 },
                 {
-                    "command": "vshpc.OpenConfig"
+                    "command": "rogerio-cunha.vshpc.OpenConfig"
                 },
                 {
-                    "command": "vshpc.jobSubmit"
+                    "command": "rogerio-cunha.vshpc.jobSubmit"
                 },
                 {
-                    "command": "vshpc.jobSubmitHash"
+                    "command": "rogerio-cunha.vshpc.jobSubmitHash"
                 },
                 {
-                    "command": "vshpc.jobSubmitAll",
+                    "command": "rogerio-cunha.vshpc.jobSubmitAll",
                     "when": "false"
                 },
                 {
-                    "command": "vshpc.jobsMgmt"
+                    "command": "rogerio-cunha.vshpc.jobsMgmt"
                 },
                 {
-                    "command": "vshpc.jobCheckSSH"
+                    "command": "rogerio-cunha.vshpc.jobCheckSSH"
                 },
                 {
-                    "command": "vshpc.checkSettings"
+                    "command": "rogerio-cunha.vshpc.checkSettings"
                 },
                 {
-                    "command": "vshpc.version"
+                    "command": "rogerio-cunha.vshpc.version"
                 },
                 {
-                    "command": "vshpc.logs"
+                    "command": "rogerio-cunha.vshpc.logs"
                 },
                 {
-                    "command": "vshpc.jobEnterPassword"
+                    "command": "rogerio-cunha.vshpc.jobEnterPassword"
                 },
                 {
-                    "command": "vshpc.loadCustomConfiguration"
+                    "command": "rogerio-cunha.vshpc.loadCustomConfiguration"
                 },
                 {
-                    "command": "vshpc.selectSimulName"
+                    "command": "rogerio-cunha.vshpc.selectSimulName"
                 },
                 {
-                    "command": "vshpc.selectSimulVersion"
+                    "command": "rogerio-cunha.vshpc.selectSimulVersion",
+                    "when": "false"
                 }
             ],
             "editor/context": [
                 {
-                    "submenu": "vshpc.submenu",
+                    "submenu": "rogerio-cunha.vshpc.submenu",
                     "group": "navigation"
                 }
             ],
             "editor/title/context": [
                 {
-                    "submenu": "vshpc.submenu",
+                    "submenu": "rogerio-cunha.vshpc.submenu",
                     "group": "navigation"
                 }
             ],
             "explorer/context": [
                 {
-                    "submenu": "vshpc.submenu",
+                    "submenu": "rogerio-cunha.vshpc.submenu",
                     "group": "navigation"
                 }
             ],
-            "vshpc.submenu": [
+            "rogerio-cunha.vshpc.submenu": [
                 {
-                    "command": "vshpc.jobSubmit",
+                    "command": "rogerio-cunha.vshpc.jobSubmit",
                     "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
                     "group": "0_vshpc@1"
                 },
                 {
-                    "command": "vshpc.jobSubmitHash",
+                    "command": "rogerio-cunha.vshpc.jobSubmitHash",
                     "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
                     "group": "0_vshpc@2"
                 },
                 {
-                    "command": "vshpc.jobSubmitDirect",
+                    "command": "rogerio-cunha.vshpc.jobSubmitDirect",
                     "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
                     "group": "0_vshpc@3"
                 },
                 {
-                    "command": "vshpc.jobSubmitAll",
+                    "command": "rogerio-cunha.vshpc.jobSubmitAll",
                     "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
                     "group": "0_vshpc@4"
                 },
                 {
-                    "command": "vshpc.jobSubmitDirectCheck",
+                    "command": "rogerio-cunha.vshpc.jobSubmitDirectCheck",
                     "when": "resourceExtname =~ /.dat/i",
                     "group": "0_vshpc@5"
                 },
                 {
-                    "command": "vshpc.jobSubmitDirectOneStep",
+                    "command": "rogerio-cunha.vshpc.jobSubmitDirectOneStep",
                     "when": "resourceExtname =~ /.dat/i",
                     "group": "0_vshpc@6"
                 },
                 {
-                    "command": "vshpc.jobsMgmt",
+                    "command": "rogerio-cunha.vshpc.jobsMgmt",
                     "group": "0_vshpc@11"
                 },
                 {
-                    "command": "vshpc.OpenConfig",
+                    "command": "rogerio-cunha.vshpc.OpenConfig",
                     "group": "0_vshpc@12"
                 }
             ]
@@ -412,7 +413,7 @@
                     "vshpc.solver.name": {
                         "type": "string",
                         "default": "",
-                        "markdownDescription": "Nome do simulador. Use o comando de [seleção de simuladores](command:vshpc.selectSimulName). Caso o simulador desejado não apareça [carregue uma configuração customizada](command:vshpc.loadCustomConfiguration) Prefira configurar este item na `TAB` workspace.",
+                        "markdownDescription": "Nome do simulador. Use o comando de [seleção de simuladores](command:rogerio-cunha.vshpc.selectSimulName). Caso o simulador desejado não apareça [carregue uma configuração customizada](command:rogerio-cunha.vshpc.loadCustomConfiguration) Prefira configurar este item na `TAB` workspace.",
                         "order": 9
                     },
                     "vshpc.solver.version": {
@@ -432,7 +433,7 @@
         ]
     },
     "scripts": {
-        "vscode:prepublish": "npm run compile",
+        "vscode:prepublish": "npm run compile && cd webview && npm run build",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "pretest": "npm run compile && npm run lint",

@@ -264,9 +264,9 @@ export class JobsPanel {
         }
 
         const settings = getSettings();
-        let script = settings.customConfig.simulators.find(e=>e.name.toLowerCase()==='cmg');
+        let script = settings.customConfig.simulators.find(e=>e.name.toLowerCase()==='cmg')?.progressScript;
         if ( 'simulatorName' in  payload) {
-            script = settings.customConfig.simulators.find(e=>e.name.toLowerCase()=== payload.simulatorName);
+            script = settings.customConfig.simulators.find(e=>e.name.toLowerCase()=== payload.simulatorName)?.progressScript;
         }
         let cmd = `${script} -j ${payload.jobs} ${payload.sameDate?'--same':''}`;
         console.log(`comando enviado para pegar o progresso: ${cmd}`);
@@ -277,7 +277,7 @@ export class JobsPanel {
                 this.sendMessage2View({'message':'cmgprogress','payload': retmsg});
                 //console.log('Chegou do SSH:' + JSON.stringify(ret));
             } else {
-                console.log('Erro de geração do progress');
+                console.log('Erro de geração do progress. Comando enviado: ',cmd);
                 console.log(JSON.stringify(ret));
             }
             this.sendMessage2View({'message':'cmgprogress','payload': []});

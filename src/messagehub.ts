@@ -105,7 +105,7 @@ export async function showProgress() {
 					if (jobHadSuccess) {
 						jobHadSuccess=false;
 						dismiss(`Veja o painel de`,()=>{
-							vscode.commands.executeCommand('vshpc.jobsMgmt');
+							vscode.commands.executeCommand("rogerio-cunha.vshpc.jobsMgmt");
 						},10000," Gerenciamento de jobs");
 					}
 

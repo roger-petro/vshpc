@@ -9,6 +9,9 @@ export interface WindowUnixMap {
     [windows: string] : string
 };
 
+const PKG = require('../package.json');
+export const APP_NAME=PKG['name'];
+
 
 export type SettingsType = {
 
@@ -30,7 +33,6 @@ export type SettingsType = {
     'solverNodes'     : number,
     'workdir'		  : string,
 
-    'customConfigURI'       : string,
     'webviewHistSize' : number,
     'webviewJobsSize' : number,
     'sbatch'          : string;

@@ -5,7 +5,7 @@ import * as PubSub from 'pubsub-js';
 
 import {encrypt } from './crypto';
 import { sendSSHcommand } from './ssh2';
-import { JobArrayType, LogOpt, SubmitOption } from './types';
+import { JobArrayType, LogOpt, SubmitOption, APP_NAME } from './types';
 import { checkAccountSettings, setSettings, getSettings, setWorkDir, loadSettings } from './settings';
 import { createMessageHub } from './messagehub';
 import { jobQueueArray, formatJobs, Consumer } from './jobs';
@@ -15,7 +15,7 @@ import { JobsPanel } from "./panels/jobsPanel";
 
 
 const PKG = require('../package.json');
-const API_ID='vshpc';
+
 
 import { getCurrentHash } from './git';
 import { setCustomConfigLoadCmds } from './customconfig';
@@ -122,7 +122,7 @@ async function activate(context: vscode.ExtensionContext) {
 	/**
 	 * submeter um job diretamente sem fazer clone, nem mesmo precisando de git
 	 */
-	let jobSubmitDirect = vscode.commands.registerCommand('vshpc.jobSubmitDirect', async function (uri:vscode.Uri, files :any[]) {
+	let jobSubmitDirect = vscode.commands.registerCommand("rogerio-cunha.vshpc.jobSubmitDirect", async function (uri:vscode.Uri, files :any[]) {
 		if (uri && files===undefined) {
 			files = [];
 			files.push(uri);
@@ -145,7 +145,7 @@ async function activate(context: vscode.ExtensionContext) {
 	/**
 	 * submeter um job fazendo um checkout de um commit específico
 	 */
-	let jobSubmitHash = vscode.commands.registerCommand('vshpc.jobSubmitHash', async function (uri:vscode.Uri, files :any[]) {
+	let jobSubmitHash = vscode.commands.registerCommand("rogerio-cunha.vshpc.jobSubmitHash", async function (uri:vscode.Uri, files :any[]) {
 		const hash = await askCommitHash();
 		if (!hash) {
 			PubSub.publish(LogOpt.toast, "Hash inválido");
@@ -175,7 +175,7 @@ async function activate(context: vscode.ExtensionContext) {
 	/**
 	 * submeter jobs com git
 	 */
-	let jobSubmit = vscode.commands.registerCommand('vshpc.jobSubmit', async function (uri:vscode.Uri, files :any[]) {
+	let jobSubmit = vscode.commands.registerCommand("rogerio-cunha.vshpc.jobSubmit", async function (uri:vscode.Uri, files :any[]) {
 		if (uri && files===undefined) {
 			files = [];
 			files.push(uri);
@@ -198,7 +198,7 @@ async function activate(context: vscode.ExtensionContext) {
 	/**
 	 * submeter um job para cada arquivo dat do diretório corrente
 	 */
-	let jobSubmitAll = vscode.commands.registerCommand('vshpc.jobSubmitAll', async function (uri:vscode.Uri) {
+	let jobSubmitAll = vscode.commands.registerCommand("rogerio-cunha.vshpc.jobSubmitAll", async function (uri:vscode.Uri) {
 		setWorkDir(uri);
 		let specificHash = await getCurrentHash(settings.workdir) || null;
 		//console.log(JSON.stringify(uri));
@@ -216,7 +216,7 @@ async function activate(context: vscode.ExtensionContext) {
 	/**
 	 * submeter um job com 1 step apenas
 	 */
-	let jobSubmitDirectOneStep = vscode.commands.registerCommand('vshpc.jobSubmitDirectOneStep', async function (uri:vscode.Uri, files: any[]) {
+	let jobSubmitDirectOneStep = vscode.commands.registerCommand("rogerio-cunha.vshpc.jobSubmitDirectOneStep", async function (uri:vscode.Uri, files: any[]) {
 		if (uri && files===undefined) {
 			files = [];
 			files.push(uri);
@@ -239,7 +239,7 @@ async function activate(context: vscode.ExtensionContext) {
 	/**
 	 * submeter um job apenas para checar a sintaxe
 	 */
-	let jobSubmitDirectCheck = vscode.commands.registerCommand('vshpc.jobSubmitDirectCheck', async function (uri:vscode.Uri, files: any[]) {
+	let jobSubmitDirectCheck = vscode.commands.registerCommand("rogerio-cunha.vshpc.jobSubmitDirectCheck", async function (uri:vscode.Uri, files: any[]) {
 		if (uri && files===undefined) {
 			files = [];
 			files.push(uri);
@@ -259,12 +259,12 @@ async function activate(context: vscode.ExtensionContext) {
 		}
 	});
 
-	const jobsMgmt = vscode.commands.registerCommand("vshpc.jobsMgmt", () => {
+	const jobsMgmt = vscode.commands.registerCommand("rogerio-cunha.vshpc.jobsMgmt", () => {
 		JobsPanel.render(context.extensionUri, context);
 	});
 
 
-	let checkSettings = vscode.commands.registerCommand('vshpc.checkSettings', async function () {
+	let checkSettings = vscode.commands.registerCommand("rogerio-cunha.vshpc.checkSettings", async function () {
 		vscode.commands.executeCommand('workbench.action.splitEditorRight').then(() => {
 			vscode.commands.executeCommand('workbench.action.focusRightGroup').then(async () => {
 				const uri = vscode.Uri.parse('settingsSchema:Configurações' );
@@ -278,7 +278,7 @@ async function activate(context: vscode.ExtensionContext) {
 		});
 	});
 
-	let jobCheckSSH = vscode.commands.registerCommand('vshpc.jobCheckSSH', async function() {
+	let jobCheckSSH = vscode.commands.registerCommand("rogerio-cunha.vshpc.jobCheckSSH", async function() {
 		const settings = getSettings();
 		if (!checkAccountSettings()) {
 			return;
@@ -301,30 +301,30 @@ async function activate(context: vscode.ExtensionContext) {
 	/**
 	 * Job de teste enviando +- conforme devem ser os demais casos
 	 */
-	let jobEnterPassword = vscode.commands.registerCommand('vshpc.jobEnterPassword', async function() {
+	let jobEnterPassword = vscode.commands.registerCommand("rogerio-cunha.vshpc.jobEnterPassword", async function() {
 		const settings = getSettings();
 		vscode.window.showInputBox({title: "Password", prompt:'Entre com sua password',
 		password: true, placeHolder:'<windows password>' }).then( async function(value) {
 			if (value) {
 				let enc = encrypt(value);
-				await vscode.workspace.getConfiguration(API_ID).update('connection.password',enc, true);
+				await vscode.workspace.getConfiguration(APP_NAME).update('connection.password',enc, true);
 				setSettings('passwd', enc);
 			}
 		});
 	});
 
 
-	let curVersion = vscode.commands.registerCommand('vshpc.version', function() {
+	let curVersion = vscode.commands.registerCommand("rogerio-cunha.vshpc.version", function() {
 		if ( 'version' in PKG) {
 			PubSub.publish(LogOpt.toast, `Versão: ${PKG.version}`);
 		}
 	});
 
-	context.subscriptions.push(vscode.commands.registerCommand('vshpc.logs', () => {
+	context.subscriptions.push(vscode.commands.registerCommand("rogerio-cunha.vshpc.logs", () => {
         vshpcLog.show();  // Exibe o canal de saída no painel Output
     }));
 
-	let selectSimulVersion = vscode.commands.registerCommand('vshpc.selectSimulVersion', function() {
+	let selectSimulVersion = vscode.commands.registerCommand("rogerio-cunha.vshpc.selectSimulVersion", function() {
 
 	});
 
