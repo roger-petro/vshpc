@@ -1,0 +1,205 @@
+{
+    "settings": {
+      "version": "1",
+      "specHash": "",
+      "dryMode": false,
+      "remoteGitPath": "/usr/bin/git",
+      "defaultFolderFormat": "projectName_hash",
+      "defaultCluster": "<HPC_MASTER_NODE_DOMAIN_NAME>",
+      "defaultPrivRSAKey": "C:\\Users\\{user}\\.ssh\\id_rsa",
+      "defaultSlurmAccount": "",
+      "defaultWindowsUnix": {
+        "<WINDOWS_DRIVE_LETTER>:\\": "/<unix_prefix>",
+        "\\\\dfs\\models": "/<unix_prefix>"
+      },
+      "defaultUnixWindows": {
+        "/dfs_geral_ep/res/": "L:\\res\\",
+        "/res/": "L:\\res\\",
+        "/u": "N:\\"
+      },
+      "solverNames": {
+        "GEM": "gem",
+        "IMEX": "imex",
+        "STARS": "stars",
+        "Eclipse": "eclipse",
+        "OPM": "opm",
+        "GEOSX": "geosx"
+      },
+      "elasticSearchAPI": "http://elastic-hpc:9200/ - to fetch job history",
+      "graphanaAPI": "https://<<GRAFANA_HOSTANME>/ - to fetch",
+      "userSearchSite": "https://USER_SEARCH_PROFILE?map=1&user="
+    },
+    "interface": {
+      "jobsSize": 20,
+      "histSize": 20
+    },
+    "simulators": [
+      {
+        "name": "test",
+        "defaultSolverExtras": "120",
+        "defaultSolverVersion": "",
+        "defaultSlurm": "",
+        "verRegexpClass": "1",
+        "solvers": [
+          "test",
+          "teste"
+        ],
+        "ext": ".test",
+        "defaultSolverConfigFile": "",
+        "progressScript": "",
+        "scriptDirPrefix": "",
+        "sbatch": "/usr/bin/sbatch",
+        "script": [
+          "#!/bin/bash",
+          "#SBATCH --chdir=\"%(chdir)s\"",
+          "#SBATCH --job-name=\"%(jobName)s\"",
+          "#SBATCH --ntasks=1",
+          "#SBATCH --nodes=1",
+          "#SBATCH --cpus-per-task=1",
+          "#SBATCH --account=%(account)s",
+          "#SBATCH --comment=%(jobComment)s",
+          "#SBATCH --qos=normal",
+          "",
+          "sleep %(solverExtras)s",
+          ""
+        ],
+        "cmd": [
+          "%(profile)s; %(sbatch)s -v %(slurm)s \"%(scriptURI)s\""
+        ]
+      },
+      {
+        "name": "cmg",
+        "defaultSolverExtras": "-log -log2 -cputime -doms",
+        "defaultSolverVersion": "2023.10",
+        "defaultSlurm": "",
+        "verRegexpClass": 2,
+        "solvers": [
+          "gem",
+          "imex",
+          "stars"
+        ],
+        "ext": "dat",
+        "progressScript": "<script used to get a simulation progress - not document yet>, leave blank if you don't have any",
+        "scriptDirPrefix": "",
+        "sbatch": "/usr/bin/sbatch",
+        "script": [
+          "#!/bin/bash",
+          "#SBATCH --chdir=\"%(chdir)s\"",
+          "#SBATCH --job-name=\"%(jobName)s\"",
+          "#SBATCH --ntasks=1",
+          "#SBATCH --nodes=%(solverNodes)s",
+          "#SBATCH --cpus-per-task=%(solverCores)s",
+          "#SBATCH --account=%(account)s",
+          "#SBATCH --comment=\"%(jobComment)s\"",
+          "#SBATCH --qos=cmg_vshpc",
+          "",
+          "srun <your_install_CMG_dir>/RunSim.sh  %(solverName)s %(solverVersion)s  \"%(modelURI)s\" -wd \"%(chdir)s\" -wait -parasol %(solverCores)s %(solverExtras)s ",
+          ""
+        ],
+        "cmd": [
+          "%(profile)s;  %(sbatch)s -v %(slurm)s \"%(scriptURI)s\""
+        ]
+      },
+      {
+        "name": "eclipse",
+        "defaultSolverExtras": "",
+        "defaultSolverVersion": "2011.1",
+        "defaultSlurm": "",
+        "verRegexpClass": "4",
+        "solvers": [
+          "eclipse"
+        ],
+        "ext": "data",
+        "progressScript": "",
+        "scriptDirPrefix": "",
+        "sbatch": "/usr/bin/sbatch",
+        "script": [
+          "#!/bin/bash",
+          "#SBATCH --chdir=\"%(chdir)s\"",
+          "#SBATCH --job-name=\"%(jobName)s\"",
+          "#SBATCH --ntasks=1",
+          "#SBATCH --nodes=%(solverNodes)s",
+          "#SBATCH --cpus-per-task=%(solverCores)s",
+          "#SBATCH --account=%(account)s",
+          "#SBATCH --comment=\"%(jobComment)s\"",
+          "#SBATCH --qos=eclipse_vshpc",
+          "",
+          "cd %(chdir)s",
+          "<your_submission_bash_script_or_command>  \"%(modelURI)s %(solverVersion)s  %(solverCores)s %(account)s ",
+          ""
+        ],
+        "cmd": [
+          "%(profile)s; %(sbatch)s -v %(slurm)s \"%(scriptURI)s\""
+        ]
+      },
+      {
+        "name": "opm",
+        "defaultSolverExtras": "--enable-esmry=true --enable-tuning=true --continue-on-convergence-error=true",
+        "defaultSolverVersion": "2024.04",
+        "defaultSlurm": "",
+        "verRegexpClass": "2",
+        "solvers": [
+          "opm"
+        ],
+        "ext": "DATA",
+        "progressScript": "",
+        "scriptDirPrefix": "",
+        "sbatch": "/usr/bin/sbatch",
+        "script": [
+          "#!/bin/bash",
+          "#SBATCH --chdir=\"%(chdir)s\"",
+          "#SBATCH --job-name=\"%(jobName)s\"",
+          "#SBATCH --output=\"%(jobStdOut)s\"",
+          "#SBATCH --error=\"%(jobStdErr)s\"",
+          "#SBATCH --nodes=%(solverNodes)s",
+          "#SBATCH --ntasks-per-node=%(ntasksPerNode)s",
+          "#SBATCH --cpus-per-task=%(solverCores)s",
+          "#SBATCH --account=%(account)s",
+          "#SBATCH --comment=\"%(jobComment)s\"",
+          "#SBATCH --qos=opm_vshpc",
+          "",
+          "srun singularity exec --bind <your-opm-sif-dir-or-flow-dir>/opm-%(solverVersion)s.sif mpirun %(mpiNp)s  %(mpiExtras)s flow  \"%(modelURI)s\"  %(solverExtras)s --output-dir=\"%(chdir)s\" ",
+          ""
+        ],
+        "cmd": [
+          "%(profile)s; %(sbatch)s -v %(slurm)s \"%(scriptURI)s\""
+        ]
+      },
+      {
+        "name": "geosx",
+        "defaultSolverExtras": "",
+        "defaultSolverVersion": "2024.09",
+        "defaultSlurm": "",
+        "verRegexpClass": "2",
+        "solvers": [
+          "geosx"
+        ],
+        "ext": "xml",
+        "progressScript": "",
+        "scriptDirPrefix": "",
+        "sbatch": "/usr/bin/sbatch",
+        "script": [
+          "#!/bin/bash",
+          "#SBATCH --chdir=\"%(chdir)s\"",
+          "#SBATCH --job-name=\"%(jobName)s\"",
+          "#SBATCH --output=\"%(jobStdOut)s\"",
+          "#SBATCH --error=\"%(jobStdErr)s\"",
+          "#SBATCH --nodes=%(solverNodes)s",
+          "#SBATCH --ntasks-per-node=%(ntasksPerNode)s",
+          "#SBATCH --cpus-per-task=%(solverCores)s",
+          "#SBATCH --account=%(account)s",
+          "#SBATCH --comment=\"%(jobComment)s\"",
+          "#SBATCH --qos=opm_vshpc",
+          "",
+          "export EXEC_DIR=<your Unix release bin dir>",
+          "export PATH=$PATH:/usr/lib64/openmpi/bin:${EXEC_DIR}",
+          "",
+          "mpirun %(mpiNp)s %(mpiExtras)s geosx -i \"%(modelURI)s\"  %(solverExtras)s --output=\"%(chdir)s\" ",
+          ""
+        ],
+        "cmd": [
+          "%(profile)s; %(sbatch)s -v %(slurm)s \"%(scriptURI)s\""
+        ]
+      }
+    ]
+  }
