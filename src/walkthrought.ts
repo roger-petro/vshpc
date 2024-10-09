@@ -3,6 +3,7 @@
  */
 
 import * as vscode from 'vscode';
+import * as PubSub from 'pubsub-js';
 import { APP_NAME } from './types';
 
 export function setWalkthroughsCmds(context: vscode.ExtensionContext) {

@@ -24,7 +24,7 @@ export async function scpWrite(content: string, destination: string, cluster: st
         username: user,
     } as ConnectConfig;
 
-    if (key) {
+    if (privRsaKey !== "" && key) {
         sshConfig.privateKey = key;
     }else {
         sshConfig.password = decrypt(passwd) || '';

@@ -12,6 +12,24 @@ import { sprintf } from 'sprintf-js';
 
 // dryMode não manda o comando para o cluster, mas faz todo o restante.
 
+
+export function stringInterpol(str: string, params: any) : string {
+    const parses = str.match(/\{\w+\}/g);
+    if (parses) {
+        parses.forEach(element => {
+            switch (element) {
+                case '{projectDir}':
+                    str = str.replace('{projectDir}',params.chdir);
+                case '{user}' :
+                    str = str.replace('{user}',params.user);
+                case '{modelDir}' :
+                    str = str.replace('{modelDir}',params.destination);
+            };
+        });
+    }
+    return str;
+}
+
 /**
  * Remove a pasta .git e cria o comentário
  * @param settings
@@ -297,10 +315,13 @@ export async function submit(model: string, settings: SettingsType, option: Subm
     if (params.mpiExtras.includes('-np')) {
         params.mpiNp = "";
     }
-    // **** gera o comando final com sprintf ****
+
+    // **** gera o comando final com sprintf e interpola {\w+} com as macros previstas****
     try{
         script = sprintf(simulator.script.join('\n'),params);
+        script = stringInterpol(script, params);
         command = sprintf(simulator.cmd.join(' '),params);
+        command = stringInterpol(command, params);
     } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
         return {
@@ -308,7 +329,6 @@ export async function submit(model: string, settings: SettingsType, option: Subm
             message: msg
         };
     }
-
 
 
     PubSub.publish(LogOpt.vshpc, `> submit: Script de simulação:\n${script}`);

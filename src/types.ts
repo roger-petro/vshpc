@@ -19,6 +19,7 @@ export type SettingsType = {
     'passwd'          : string,
     'privRsaKey'      : string,
     'cluster'         : string,
+    'usePassword'     : boolean,
     'windowsUnix'	  : WindowUnixMap,
     'destination'     : string,
     'folderFormat'    : string,
@@ -114,12 +115,6 @@ export type GitReferencePointers = {
     name: string;
 };
 
-// export const folderFormatAssociation = {
-//     // eslint-disable-next-line @typescript-eslint/naming-convention
-//     "projeto_hash": "%(projectName)s_%(hash)s",
-//     // eslint-disable-next-line @typescript-eslint/naming-convention
-// 	"projeto_tag_hash" : "%(projectName)s_%(tag)s_%(hash)s"
-// };
 
 export type Params2Interpolate = {
     projectName: string;
@@ -136,19 +131,6 @@ export type WorkspaceModelFolder = {
     workspaceindex: number
 };
 
-// export interface SimulDefs {
-// 	defaultSlurm: string;
-//     name: string;
-//     defaultSolverExtras: string;
-//     defaultSolverVersion: string;
-//     solvers: (string)[];
-//     ext: string;
-//     alias: string;
-//     scriptDirPrefix: string;
-//     script: (string)[];
-//     cmd: (string)[];
-//     sbrURI: string;
-// }
 
 /**
  * configuração do vshpc.json
@@ -158,6 +140,7 @@ export type Simulator = {
     name: string;
     defaultSolverExtras: string;
     defaultSolverVersion: string;
+    verRegexpClass? : string,
     defaultSlurm: string;
     solvers: string[];
     ext: string;

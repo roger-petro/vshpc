@@ -1,12 +1,39 @@
+/**
+ * Faz a leitura do vshpc.json ou equivalente, que contenha as configurações
+ * iniciais para a extensão funcionar. Também ajusta os settings com valores padrão.
+ */
+
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as PubSub from 'pubsub-js';
 
 import { LogOpt, CustomConfig, CustomError, Simulator, APP_NAME } from './types';
+import { getSettings } from './settings';
 
 const CUSTOM_CONFIG_NAME = 'vshpc.json';
 
+
+async function adjustSettings(context: vscode.ExtensionContext) {
+    const settings = getSettings();
+    const customConfig = await getCustomConfig(context);
+    if (settings.privRsaKey === "") {
+        settings.privRsaKey = customConfig.settings.defaultPrivRSAKey.replace("{user}", settings.user);
+        vscode.workspace.getConfiguration(APP_NAME).update("connection.privRsaKey", settings.privRsaKey, true);
+    }
+    if (!settings.cluster || settings.cluster === "") {
+        settings.cluster = customConfig.settings.defaultCluster;
+        vscode.workspace.getConfiguration(APP_NAME).update("connection.cluster", settings.cluster, true);
+    }
+    if (Object.keys(settings.windowsUnix).length === 0) {
+        settings.windowsUnix = customConfig.settings.defaultWindowsUnix;
+        vscode.workspace.getConfiguration(APP_NAME).update("path.WindowsUnix", settings.windowsUnix, true);
+    }
+    if (settings.folderFormat === "") {
+        settings.folderFormat = customConfig.settings.defaultFolderFormat;
+        vscode.workspace.getConfiguration(APP_NAME).update("path.folderFormat", customConfig.settings.defaultFolderFormat, true);
+    }
+}
 
 /**
  * Cria o comando que irá carregar o customconfig e salvar
@@ -48,6 +75,9 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
             await context.globalState.update('lastConfigUri', fileUri.toString());
 
             vscode.window.showInformationMessage('Configurações carregadas com sucesso!');
+
+            adjustSettings(context);
+
         } catch (error: any) {
             vscode.window.showErrorMessage('Erro ao carregar as configurações: ' + error.message);
         }
@@ -101,12 +131,15 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
                 return;
             }
 
-            const target = scopeOptions.find(option => option.label === selectedScope)?.target || vscode.ConfigurationTarget.Global;
+            const scope = scopeOptions.find(option => option.label === selectedScope);
+            const target = scope?.target || vscode.ConfigurationTarget.Global;
 
             // Atualizar a configuração 'vshpc.solver.name' com o valor selecionado se mudou o valor
 
-            const curSimulator = vscode.workspace.getConfiguration(APP_NAME).get('solver.name',"");
-            if (curSimulator!==selectedDisplayName){
+            const globalValue = vscode.workspace.getConfiguration(APP_NAME).inspect('solver.name')?.globalValue || "";
+            const workspaceValue = vscode.workspace.getConfiguration(APP_NAME).inspect('solver.name')?.workspaceValue || "";
+            if ((target===vscode.ConfigurationTarget.Global && selectedDisplayName!==globalValue)||
+            (target===vscode.ConfigurationTarget.Workspace && selectedDisplayName!==workspaceValue)){
                 await vscode.workspace.getConfiguration(APP_NAME).update('solver.name', selectedDisplayName, target);
                 const simulator = customConfig.simulators.find(item=>item.solvers.find(sol=> sol === solverNames[selectedDisplayName])) as Simulator;
                 if (simulator) {
@@ -115,10 +148,14 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
                 } else {
                     vscode.window.showErrorMessage('Erro ao indentificar o simulador nas configurações customizadas: ');
                 }
-                vscode.window.showInformationMessage(`Simulador '${selectedDisplayName}' selecionado com sucesso.`);
-            }
-
-        } catch (error) {
+                vscode.window.showInformationMessage('As configurações foram atualizadas. Por favor, recarregue a janela para aplicar as mudanças.', 'Recarregar')
+                    .then(selection => {
+                        if (selection === 'Recarregar') {
+                        vscode.commands.executeCommand('workbench.action.reloadWindow');
+                        }
+                    });
+                }
+            } catch (error) {
             const msg = error instanceof Error ? error.message : String(error);
             vscode.window.showErrorMessage('Erro ao selecionar o simulador: ' + msg);
         }
@@ -139,7 +176,7 @@ export async function getCustomConfig(context: vscode.ExtensionContext): Promise
         return customConfig;
     } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
-        vscode.window.showErrorMessage('Erro ao ler as configurações personalizadas. Você precisa carregá-las. Fale com o administrador/mantendor da aplicação');
+        vscode.window.showErrorMessage('Você precisa carregar as configurações aplicadas à sua empresa. Fale com o administrador/mantendor da aplicação para obter o arquivo de configuração para [carregá-las neste comando](command:rogerio-cunha.vshpc.loadCustomConfiguration).');
         return null;
     }
 }

@@ -247,7 +247,7 @@ export function checkOptions(params: {models:string[], hash?: string}) {
 
 	if (!settings.account || settings.account.length===0) {
 		PubSub.publish(LogOpt.toast_error,`Account precisar ser ajustado na caixa de texto 'project' da configuração do vshpc`);
-		vscode.commands.executeCommand(`workbench.action.openSettings`, `vshpc.scheduler.project`);
+		vscode.commands.executeCommand(`workbench.action.openSettings`, `vshpc.scheduler.slurm`);
 		return false;
 	}
 	if (!settings.solverName || settings.solverName.length===0) {
@@ -290,7 +290,7 @@ export function checkOptions(params: {models:string[], hash?: string}) {
 	}
 	if (settings.solverCores === 1) {
 		PubSub.publish(LogOpt.dismissable,{ message: `Sua simulação está rodando com apenas 1 core.`, callback: ()=>{
-			vscode.commands.executeCommand(`workbench.action.openSettings`, `vshpc.solver.resources.cores`);
+			vscode.commands.executeCommand(`workbench.action.openSettings`, `vshpc.solver.scheduler.cores`);
 		}});
 	}
 	return true;

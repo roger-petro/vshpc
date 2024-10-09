@@ -5,7 +5,7 @@ import * as PubSub from 'pubsub-js';
 
 import {encrypt } from './crypto';
 import { sendSSHcommand } from './ssh2';
-import { JobArrayType, LogOpt, SubmitOption, APP_NAME } from './types';
+import { JobArrayType, LogOpt, SubmitOption, APP_NAME, SettingsType } from './types';
 import { checkAccountSettings, setSettings, getSettings, setWorkDir, loadSettings } from './settings';
 import { createMessageHub } from './messagehub';
 import { jobQueueArray, formatJobs, Consumer } from './jobs';
@@ -61,7 +61,15 @@ async function activate(context: vscode.ExtensionContext) {
     setWalkthroughsCmds(context);
 	setJobTestCmd(context);
 
-	const settings = await loadSettings(context);
+	let settings: SettingsType;
+	loadSettings(context).then((val)=>{
+		settings = val;
+		vscode.workspace.onDidChangeConfiguration(() => {
+			loadSettings(context);
+			//PubSub.publish(LogOpt.toast,"Configurações recarregadas");
+			PubSub.publish(LogOpt.vshpc, '> activate: Novas configurações carregadas');
+		});
+	});
 
 	vscode.workspace.onDidOpenTextDocument(e => {
 		if (e.uri && e.uri.scheme==='file') {
@@ -78,12 +86,6 @@ async function activate(context: vscode.ExtensionContext) {
 			}
 		}
 	});
-
-	vscode.workspace.onDidChangeConfiguration(() => {
-        loadSettings(context);
-		//PubSub.publish(LogOpt.toast,"Configurações recarregadas");
-		PubSub.publish(LogOpt.vshpc, '> activate: Novas configurações carregadas');
-    });
 
 	const jobsSchema = 'jobsSchema';
 	const settingsSchema = 'settingsSchema';

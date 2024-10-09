@@ -10,7 +10,7 @@ import {SettingsType, WindowUnixMap, LogOpt, Params2Interpolate} from './types';
 export function evaluatePath(settings: SettingsType, curPath:string|null = null): string|null {
 
     //curPath pode agora conter interpolações, caso ele seja passado para a função
-    curPath = curPath? pathInterpolation(curPath,settings): settings.workdir;
+    curPath = curPath? macroInterpolation(curPath,settings): settings.workdir;
 
     let windowsUnix: WindowUnixMap = {};
     Object.assign(windowsUnix,settings.windowsUnix);
@@ -18,7 +18,7 @@ export function evaluatePath(settings: SettingsType, curPath:string|null = null)
     const interpolatedObject : { [key: string]: string; } = {};
     //faz o parse a procura de placeholders
     for ( const key in windowsUnix) {
-        interpolatedObject[pathInterpolation(key, settings)] = pathInterpolation(windowsUnix[key], settings);
+        interpolatedObject[macroInterpolation(key, settings)] = macroInterpolation(windowsUnix[key], settings);
     };
 
     for (let key in interpolatedObject) {
@@ -89,33 +89,35 @@ export function evaluatePath(settings: SettingsType, curPath:string|null = null)
  * @params params: um objeto com as chaves >=  aos nomes interpolados
  * @returns path interpolado ou original se não for possível transformar
  */
-export function pathInterpolation(path2Interpolate: string, params: SettingsType) : string {
+export function macroInterpolation(str2interpolate: string, params: SettingsType) : string {
 
-    const parses = path2Interpolate.match(/\{\w+\}/g);
+    const parses = str2interpolate.match(/\{\w+\}/g);
     if (parses) {
         parses.forEach(element => {
             switch (element) {
                 case '{projectDir}':
-                    path2Interpolate = path2Interpolate.replace('{projectDir}',params.workdir);
+                    str2interpolate = str2interpolate.replace('{projectDir}',params.workdir);
                 case '{user}' :
-                    path2Interpolate = path2Interpolate.replace('{user}',params.user);
+                    str2interpolate = str2interpolate.replace('{user}',params.user);
                 case '{project}' :
                     const projectName = path.parse(params.workdir).name;
-                    path2Interpolate = path2Interpolate.replace('{project}',projectName);
+                    str2interpolate = str2interpolate.replace('{project}',projectName);
                 case '{solver}' :
-                    path2Interpolate = path2Interpolate.replace('{solver}',params.solverName);
+                    str2interpolate = str2interpolate.replace('{solver}',params.solverName);
                 case '{version}' :
-                    path2Interpolate = path2Interpolate.replace('{version}',params.solverVersion);
+                    str2interpolate = str2interpolate.replace('{version}',params.solverVersion);
                 case '{account}' :
-                    path2Interpolate = path2Interpolate.replace('{account}',params.account);
+                    str2interpolate = str2interpolate.replace('{account}',params.account);
+                case '{modelDir}' :
+                        str2interpolate = str2interpolate.replace('{modelDir}',params.destination);
                 case '{date}' :
                     //"2016-11-21T08:00:00.000Z"
                     let today = new Date().toISOString();
                     today = today.slice(0,19).replace('T','-');
-                    path2Interpolate = path2Interpolate.replace('{date}',today);
+                    str2interpolate = str2interpolate.replace('{date}',today);
             };
         });
     }
-    return path2Interpolate;
+    return str2interpolate;
 
 }

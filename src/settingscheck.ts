@@ -7,7 +7,7 @@ import {
 import { Repository } from './repository';
 import { sendSSHcommand } from './ssh2';
 import { getSettings } from './settings';
-
+import * as PubSub from 'pubsub-js';
 
 const checks = {
     sshUser: '- Acesso SSH via senha: Falhou',

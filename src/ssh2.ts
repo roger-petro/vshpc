@@ -86,7 +86,7 @@ export async function sendSSHcommand(command: string, params: string[], cluster:
             });
         });
 
-        if (key) {
+        if (privRsaKey !== "" && key) {
             con.connect(
                 sshKeyConfig
             );

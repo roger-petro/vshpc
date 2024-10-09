@@ -7,7 +7,7 @@
         "type": "git",
         "url": "https://github.com/roger-petro/vshpc.git"
       },
-    "version": "0.0.5",
+    "version": "0.0.6",
     "engines": {
         "vscode": "^1.92.0"
     },
@@ -326,6 +326,13 @@
                         "markdownDescription": "Opcional à senha, informe o caminho para chave RSA privada para acesso SSH. Em geral, C:\\users\\CHAVE\\\\.ssh\\id_rsa (não é a .pub!).",
                         "scope": "application",
                         "order": 4
+                    },
+                    "vshpc.connection.usePassword": {
+                        "type": "boolean",
+                        "markdownDescription": "Usar conexão com o cluster somente via password (ignorar as chaves RSA)",
+                        "default": false,
+                        "scope": "application",
+                        "order": 5
                     }
                 }
             },
@@ -413,6 +420,7 @@
                     "vshpc.solver.name": {
                         "type": "string",
                         "default": "",
+                        "readOnly": true,
                         "markdownDescription": "Nome do simulador. Use o comando de [seleção de simuladores](command:rogerio-cunha.vshpc.selectSimulName). Caso a lista de simuladores não apareça, [carregue uma configuração customizada](command:rogerio-cunha.vshpc.loadCustomConfiguration) Prefira configurar este item na `TAB` workspace.",
                         "order": 9
                     },
@@ -424,7 +432,7 @@
 
                     "vshpc.solver.ExtraParams": {
                         "type": "string",
-                        "markdownDescription": "Opções extras para serem passadas para o solver escolhido. Prefira configurar este item na `TAB` Workspace.",
+                        "markdownDescription": "Opções extras para serem passadas para o solver escolhido. As macros `{modelDir}`, `{projectDir}` e `{user}` são subsituídas pelos correspondentes valores do Unix. Prefira configurar este item na `TAB` Workspace.",
                         "default": "",
                         "order": 15
                     }

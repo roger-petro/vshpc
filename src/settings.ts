@@ -13,6 +13,7 @@ let settings: SettingsType = {
 	user: "",
 	passwd: "",
 	privRsaKey: "",
+	usePassword: false,
 	cluster: "",
 	windowsUnix: {},
 	destination: "",
@@ -121,26 +122,21 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
 		settings.passwd = vscode.workspace.getConfiguration(APP_NAME).get("connection.password", "").trim();
 
 		settings.privRsaKey = vscode.workspace.getConfiguration(APP_NAME).get("connection.privRsaKey", "").trim();
-		if (settings.privRsaKey === "") {
-			settings.privRsaKey = settings.customConfig.settings.defaultPrivRSAKey.replace("{user}", settings.user);
-			vscode.workspace.getConfiguration(APP_NAME).update("connection.privRsaKey", settings.privRsaKey, true);
-		}
 
 		if (settings.passwd === "" && settings.privRsaKey === "") {
-			PubSub.publish(LogOpt.vshpc, "> getSettings: Ou é necessário password ou chave RSA privada");
+			PubSub.publish(LogOpt.vshpc, "> getSettings: Ou é necessário password ou chave RSA privada. Se for usar só password, indique na opção correspondente.");
 		}
 
 		settings.cluster = vscode.workspace.getConfiguration(APP_NAME).get("connection.cluster", "").trim();
-		if (!settings.cluster || settings.cluster === "") {
-			settings.cluster = settings.customConfig.settings.defaultCluster;
-			vscode.workspace.getConfiguration(APP_NAME).update("connection.cluster", settings.cluster, true);
+
+
+		settings.usePassword = vscode.workspace.getConfiguration(APP_NAME).get('connection.usePassword',false);
+		if (settings.usePassword) {
+			settings.privRsaKey="";
 		}
 
 		settings.windowsUnix = vscode.workspace.getConfiguration(APP_NAME).get("path.WindowsUnix", {});
-		if (Object.keys(settings.windowsUnix).length === 0) {
-			settings.windowsUnix = settings.customConfig.settings.defaultWindowsUnix;
-			vscode.workspace.getConfiguration(APP_NAME).update("path.WindowsUnix", settings.windowsUnix, true);
-		}
+
 
 		settings.destination = vscode.workspace.getConfiguration(APP_NAME).get("path.destination", "");
 		if (!settings.destination || settings.destination === "") {
@@ -149,15 +145,12 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
 		}
 
 		settings.folderFormat = vscode.workspace.getConfiguration(APP_NAME).get("path.folderFormat", "");
-		if (settings.folderFormat === "") {
-			settings.folderFormat = settings.customConfig.settings.defaultFolderFormat;
-		}
+
 		if (Object.keys(FolderFormats).includes(settings.folderFormat)) {
 			settings.folderFormat = (FolderFormats as Record<string, string>)[settings.folderFormat];
 		} else { settings.folderFormat = "%(projectName)s_%(hash)s"; }
 
 		settings.solverVersion = vscode.workspace.getConfiguration(APP_NAME).get("solver.version", "").trim();
-
 		settings.solverName = vscode.workspace.getConfiguration(APP_NAME).get("solver.name", "").trim();
 
 
@@ -165,40 +158,33 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
 			settings.solverName = (settings.customConfig.settings.solverNames)[settings.solverName];
 		}
 
-
-
 		let simulator = settings.customConfig.simulators.find((item) => item.solvers.find(sol => sol === settings.solverName)) as Simulator;
-
-		settings.slurm = vscode.workspace.getConfiguration(APP_NAME).get("scheduler.slurm", "").trim();
-
-		settings.account = getAccount(settings.slurm);
 
 		settings.sbatch = simulator.sbatch.trim() || "/usr/bin/sbatch";
 
 		settings.solverExtras = vscode.workspace.getConfiguration(APP_NAME).get("solver.ExtraParams", "").trim();
 
-		if (!settings.solverExtras || settings.solverExtras === "") {
-			if (simulator && settings.solverExtras === '') {
-				settings.solverExtras = simulator.defaultSolverExtras;
-				PubSub.publish(LogOpt.vshpc, `> getSettings: valor do solverExtras ajustado para o default ${settings.solverExtras || 'vazio'}, por estar vazio`);
-			}
-		}
+		// if (!settings.solverExtras || settings.solverExtras === "") {
+		// 	if (simulator && settings.solverExtras === '') {
+		// 		settings.solverExtras = simulator.defaultSolverExtras;
+		// 		PubSub.publish(LogOpt.vshpc, `> getSettings: valor do solverExtras ajustado para o default ${settings.solverExtras || 'vazio'}, por estar vazio`);
+		// 	}
+		// }
 
-		if (!settings.solverVersion || settings.solverVersion === "") {
-			if (simulator && settings.solverVersion === '') {
-				settings.solverVersion = simulator.defaultSolverVersion;
-				PubSub.publish(LogOpt.vshpc, `> getSettings: valor do solverVersion ajustado para o default ${settings.solverVersion}, por estar vazio`);
-			}
-		}
+		// if (!settings.solverVersion || settings.solverVersion === "") {
+		// 	if (simulator && settings.solverVersion === '') {
+		// 		settings.solverVersion = simulator.defaultSolverVersion;
+		// 		PubSub.publish(LogOpt.vshpc, `> getSettings: valor do solverVersion ajustado para o default ${settings.solverVersion}, por estar vazio`);
+		// 	}
+		// }
 
+		settings.slurm = vscode.workspace.getConfiguration(APP_NAME).get("scheduler.slurm", "").trim();
+		settings.account = getAccount(settings.slurm);
 
-
-		if (settings.slurm === "") {
-			if (simulator && (simulator.name === 'gem_sbr' || simulator.name === 'cmg')) {
-				settings.slurm = simulator.defaultSlurm;
-				PubSub.publish(LogOpt.vshpc, `> getSettings: parâmetro do SLURM ajustado para o default ${settings.slurm}, por estar vazio`);
-			}
-		}
+		// if (settings.slurm === "") {
+		// 	settings.slurm = simulator.defaultSlurm;
+		// 	PubSub.publish(LogOpt.vshpc, `> getSettings: parâmetro do SLURM ajustado para o default ${settings.slurm}, por estar vazio`);
+		// }
 
 		// while (settings.solverBRConfig.length > 0 && (settings.solverBRConfig[0] === '.' || settings.solverBRConfig[0] === '/')) {
 		// 	settings.solverBRConfig = settings.solverBRConfig.substring(1);
@@ -212,39 +198,25 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
 		settings.webviewJobsSize = 20; //Number(PKG['jobSize']);
 
 		let verErro = false;
-		switch (simulator.name) {
-			case 'cmg':
+		switch (simulator.verRegexpClass) {
+			//TODO: colocar o regexp para criticar a versão no vhspc.json
+			case '2':
 				if (!settings.solverVersion.match(/\d{4}\.\d{2}/)) {
 					verErro = true;
 				}
 				break;
-			case 'gem_sbr':
+			case '3':
 				if (!settings.solverVersion.match(/\d{8}/)) {
 					verErro = true;
 				}
 				break;
-			case 'geomec':
+			case '4':
+				if (!settings.solverVersion.match(/\d{4}\.\d+/)) {
+					verErro = true;
+				}
+				break;
+			case '5':
 				if (!settings.solverVersion.match(/v\d+\.\d/)) {
-					verErro = true;
-				}
-				break;
-			case 'igeo':
-				if (!settings.solverVersion.match(/v\d+\.\d/)) {
-					verErro = true;
-				}
-				break;
-			case 'opm':
-				if (!settings.solverVersion.match(/\d{4}\.\d{2}/)) {
-					verErro = true;
-				}
-				break;
-			case 'geosx':
-				if (!settings.solverVersion.match(/\d{4}\.\d{2}/)) {
-					verErro = true;
-				}
-				break;
-			case 'eclipse':
-				if (!settings.solverVersion.match(/\d{4}\.\d/)) {
 					verErro = true;
 				}
 				break;
@@ -271,7 +243,7 @@ export function checkAccountSettings(): boolean {
 
 			const ret = decrypt(settings.passwd);
 			if (ret && ret.length < 8) {
-				PubSub.publish(LogOpt.toast, 'Configure a senha do SSH via comando `HPC: Entre com a Senha SSH` ou use uma chave RSA');
+				PubSub.publish(LogOpt.toast, 'Configure a senha do SSH via comando [`HPC: Entre com a Senha SSH`](command:rogerio-cunha.vshpc.jobEnterPassword) ou use uma chave RSA');
 				return false;
 			}
 		}

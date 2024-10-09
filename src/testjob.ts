@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import * as PubSub from 'pubsub-js';
 
 import { checkAccountSettings, getSettings } from './settings';
 import { LogOpt } from './types';
@@ -7,7 +8,7 @@ import { scpWrite } from './scp2';
 import { sendSSHcommand } from './ssh2';
 import { dismiss } from './dismissable';
 
-let jobMock = vscode.commands.registerCommand('vshpc.jobMock', async function() {
+let jobMock = vscode.commands.registerCommand("rogerio-cunha.vshpc.jobMock", async function() {
     const settings = getSettings();
     if (!checkAccountSettings()) { return; }
 
@@ -15,6 +16,11 @@ let jobMock = vscode.commands.registerCommand('vshpc.jobMock', async function() 
 
     if (!simulator) {
         PubSub.publish(LogOpt.vshpc, '> jobMock: Não achado o simulador de teste');
+        return;
+    }
+
+    if (settings.usePassword && settings.passwd==="") {
+        PubSub.publish(LogOpt.toast,`É necessário definir a senha de acesso ao cluster`);
         return;
     }
     if (settings.account.length === 0) {
@@ -52,7 +58,7 @@ let jobMock = vscode.commands.registerCommand('vshpc.jobMock', async function() 
             if (match) {text = match[0];};
             //PubSub.publish(LogOpt.toast,`Job criado com: ${ret.stdout}`);
             dismiss(`Criado job ${text}`,()=>{
-                vscode.commands.executeCommand('vshpc.jobsMgmt');
+                vscode.commands.executeCommand("rogerio-cunha.vshpc.jobsMgmt");
             },10000," Gerenciar");
             PubSub.publish(LogOpt.vshpc,`> jobMock: Job criado com: ${ret.stdout}`);
         }
