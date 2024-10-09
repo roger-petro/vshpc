@@ -167,7 +167,7 @@ export class KibanaDataSource {
  * quanto o proxy.ts não entre em cena, quando a extensão estiver em produção.
  */
 // (async () => {
-//     const kibana = new KibanaDataSource("",'atp-ro',60,"COMPLETED");
+//     const kibana = new KibanaDataSource("",'xxxxx',60,"COMPLETED");
 //     let from = 0;
 //     while (1) {
 //         const resp = await kibana.getData(10,from*10);
