@@ -67,7 +67,9 @@ async function checkAsyncs() {
         ]
     );
     checks.sshUser = `- SSH por senha: ${metaData[0].code === 0 ? 'OK!': 'Falhou'}`;
-    checks.sshKey = `- SSH por chave: ${metaData[1].code === 0 ? 'OK!': 'Falhou'}`;
+    checks.sshKey = `- SSH por chave: ${
+        settings.usePassword?  'Configuração forçou o uso de senha. Veja em settings.':
+        metaData[1].code === 0 ? 'OK!': 'Falhou'}`;
 
     let getRemote = false;
     if (metaData[2] === true )  {

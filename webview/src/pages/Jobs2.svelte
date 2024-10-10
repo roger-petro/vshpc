@@ -25,7 +25,7 @@
     let modal_show = false
     let modal_question="Confirma matar os jobs selecionados?"
     let sidebar_show = false
-    let statusMessage = ":"; //mensage mostrada na linha 2 da tela
+    let statusMessage = ":"; //mensagem mostrada na linha 2 da tela
     let selectedUser = "";
     let selectedAccount = "";
     let rows : Job.Row[] = [];
@@ -168,7 +168,7 @@
     });
 
     /**
-     * Solicita ao vscode os jobs via notificaçao
+     * Solicita ao vscode os jobs via notificação
      */
      function listJobs(user:string,account:string,pagesize:number) {
         console.log("Novo tamanho de página " + pagesize);

@@ -432,7 +432,7 @@
 
                     "vshpc.solver.ExtraParams": {
                         "type": "string",
-                        "markdownDescription": "Opções extras para serem passadas para o solver escolhido. As macros `{modelDir}`, `{projectDir}` e `{user}` são subsituídas pelos correspondentes valores do Unix. Prefira configurar este item na `TAB` Workspace.",
+                        "markdownDescription": "Opções extras para serem passadas para o solver escolhido. As macros `{modelDir}`, `{projectDir}` e `{user}` são substituídas pelos correspondentes valores do Unix. Prefira configurar este item na `TAB` Workspace.",
                         "default": "",
                         "order": 15
                     }

@@ -168,8 +168,9 @@ export type CustomConfig = {
         solverNames: Record<string, string>;
         elasticSearchAPI: string;
         graphanaAPI: string;
-        userSearchSite: string
+        userSearchSite: string;
     };
+    ux: Record<string,any>;
     simulators: Simulator[];
 };
 

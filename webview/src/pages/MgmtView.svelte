@@ -15,13 +15,13 @@
                 <Sep w={3}/>
                 <label class="text">
                     <input type="radio" name="relat1" bind:group={relat} value="jobs"/>
-                Jobs em curso</label>
+                <strong>Jobs em curso</strong></label>
                 <label class="text">
                     <input type="radio" name="relat1" bind:group={relat} value="history"/>
-                Histórico</label>
+                <strong>Histórico</strong></label>
                 <Sep w={5}/>
                 <label class="text">
-                    Items por página:
+                    Itens por página:
                 <input class="v_i" type="number" min="10" max="100" name="user" bind:value={itemsPerPage} style="width:50px">
                 </label>
                 {#if relat==="history"}
@@ -35,6 +35,6 @@
     </div>
 </main>
 
-<!-- <style>
+<style>
     @import './common.css';
-</style> -->
+</style>

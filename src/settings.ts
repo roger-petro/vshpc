@@ -6,9 +6,6 @@ import { SettingsType, LogOpt, Simulator, CustomConfig, FolderFormats, APP_NAME 
 import { decrypt } from './crypto';
 import { getCustomConfig } from './customconfig';
 
-const PKG = require('../package.json');
-
-
 let settings: SettingsType = {
 	user: "",
 	passwd: "",
@@ -29,8 +26,8 @@ let settings: SettingsType = {
 	ntasksPerNode: 1,
 	mpiExtras: "",
 	workdir: "",
-	webviewHistSize: 10,
-	webviewJobsSize: 10,
+	webviewHistSize: 20,
+	webviewJobsSize: 20,
 	customConfig: {} as CustomConfig
 };
 
@@ -106,7 +103,6 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
 
 		settings.customConfig = await getCustomConfig(context) as CustomConfig;
 
-
 		let user = process.env.USERNAME;
 		if (user === undefined) {
 			user = "";
@@ -129,14 +125,12 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
 
 		settings.cluster = vscode.workspace.getConfiguration(APP_NAME).get("connection.cluster", "").trim();
 
-
 		settings.usePassword = vscode.workspace.getConfiguration(APP_NAME).get('connection.usePassword',false);
 		if (settings.usePassword) {
 			settings.privRsaKey="";
 		}
 
 		settings.windowsUnix = vscode.workspace.getConfiguration(APP_NAME).get("path.WindowsUnix", {});
-
 
 		settings.destination = vscode.workspace.getConfiguration(APP_NAME).get("path.destination", "");
 		if (!settings.destination || settings.destination === "") {
@@ -153,7 +147,6 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
 		settings.solverVersion = vscode.workspace.getConfiguration(APP_NAME).get("solver.version", "").trim();
 		settings.solverName = vscode.workspace.getConfiguration(APP_NAME).get("solver.name", "").trim();
 
-
 		if (Object.keys(settings.customConfig.settings.solverNames).includes(settings.solverName)) {
 			settings.solverName = (settings.customConfig.settings.solverNames)[settings.solverName];
 		}
@@ -161,45 +154,21 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
 		let simulator = settings.customConfig.simulators.find((item) => item.solvers.find(sol => sol === settings.solverName)) as Simulator;
 
 		settings.sbatch = simulator.sbatch.trim() || "/usr/bin/sbatch";
-
 		settings.solverExtras = vscode.workspace.getConfiguration(APP_NAME).get("solver.ExtraParams", "").trim();
-
-		// if (!settings.solverExtras || settings.solverExtras === "") {
-		// 	if (simulator && settings.solverExtras === '') {
-		// 		settings.solverExtras = simulator.defaultSolverExtras;
-		// 		PubSub.publish(LogOpt.vshpc, `> getSettings: valor do solverExtras ajustado para o default ${settings.solverExtras || 'vazio'}, por estar vazio`);
-		// 	}
-		// }
-
-		// if (!settings.solverVersion || settings.solverVersion === "") {
-		// 	if (simulator && settings.solverVersion === '') {
-		// 		settings.solverVersion = simulator.defaultSolverVersion;
-		// 		PubSub.publish(LogOpt.vshpc, `> getSettings: valor do solverVersion ajustado para o default ${settings.solverVersion}, por estar vazio`);
-		// 	}
-		// }
-
 		settings.slurm = vscode.workspace.getConfiguration(APP_NAME).get("scheduler.slurm", "").trim();
 		settings.account = getAccount(settings.slurm);
-
-		// if (settings.slurm === "") {
-		// 	settings.slurm = simulator.defaultSlurm;
-		// 	PubSub.publish(LogOpt.vshpc, `> getSettings: parâmetro do SLURM ajustado para o default ${settings.slurm}, por estar vazio`);
-		// }
-
-		// while (settings.solverBRConfig.length > 0 && (settings.solverBRConfig[0] === '.' || settings.solverBRConfig[0] === '/')) {
-		// 	settings.solverBRConfig = settings.solverBRConfig.substring(1);
-		// }
 		settings.solverCores = vscode.workspace.getConfiguration(APP_NAME).get("scheduler.cores", 1);
 		settings.solverNodes = vscode.workspace.getConfiguration(APP_NAME).get("scheduler.nodes", 1);
 		settings.ntasksPerNode = vscode.workspace.getConfiguration(APP_NAME).get("scheduler.ntasksPerNode", 1);
 		settings.mpiExtras = vscode.workspace.getConfiguration(APP_NAME).get("scheduler.mpiExtras", "");
 
-		settings.webviewHistSize = 20; //Number(PKG['histSize']);
-		settings.webviewJobsSize = 20; //Number(PKG['jobSize']);
+		if ('ux' in settings.customConfig) {
+			settings.webviewHistSize = 'histSize' in settings.customConfig.ux ? Number(settings.customConfig.ux['histSize']) : 20;
+			settings.webviewJobsSize = 'jobsSize' in settings.customConfig.ux ? Number(settings.customConfig.ux['jobsSize']) : 20;
+		}
 
 		let verErro = false;
 		switch (simulator.verRegexpClass) {
-			//TODO: colocar o regexp para criticar a versão no vhspc.json
 			case '2':
 				if (!settings.solverVersion.match(/\d{4}\.\d{2}/)) {
 					verErro = true;
