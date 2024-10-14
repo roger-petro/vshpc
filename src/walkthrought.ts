@@ -27,13 +27,14 @@ export function setWalkthroughsCmds(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand("rogerio-cunha.vshpc.walkOpenConfig", () => {
-			vscode.commands.executeCommand('workbench.action.openSettings', APP_NAME);
+			vscode.commands.executeCommand('workbench.action.openSettings', `${APP_NAME}.`);
+			//este ponto evita filtrar outras extensões
 		})
 	);
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand("rogerio-cunha.vshpc.OpenConfig", () => {
-			vscode.commands.executeCommand('workbench.action.openSettings', APP_NAME);
+			vscode.commands.executeCommand('workbench.action.openSettings', `${APP_NAME}.`);
 		})
 	);
 

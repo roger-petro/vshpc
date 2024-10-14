@@ -282,7 +282,7 @@ export class JobsPanel {
             }
             this.sendMessage2View({'message':'cmgprogress','payload': []});
         } catch(e) {
-            console.log('Catch');
+            console.log('Catch',e);
             this.sendMessage2View({'message':'cmgprogress','payload': []});
         }
     }
