@@ -10,3 +10,4 @@ vsc-extension-quickstart.md
 **/*.ts
 **/.vscode-test.*
 **/webview
+node_modules

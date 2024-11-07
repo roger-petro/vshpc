@@ -436,7 +436,7 @@
 
                     </div>
                     <div class="grid1-column">{converSlurmTime2Short(job.age)}</div>
-                    <div class="grid1-column">{convertISODate2LocalTime(job.startTime)}</div>
+                    <div class="grid1-column">{convertISODate2LocalTime(job.startTime,"")}</div>
 
                     <!-- coloque as extensões com as quais sei abrir log -->
                     {#if job.name.match(/\.(data|dat)$|((data|dat)\.[a-f0-9]{8})$/i) || job.work_dir.match(/.*\.cmpd.*/i)}

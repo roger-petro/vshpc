@@ -6,8 +6,8 @@
     "repository": {
         "type": "git",
         "url": "https://github.com/roger-petro/vshpc.git"
-      },
-    "version": "0.0.7",
+    },
+    "version": "0.0.9",
     "engines": {
         "vscode": "^1.92.0"
     },
@@ -35,7 +35,6 @@
                             "image": "images/icon.png",
                             "altText": "Load Custom"
                         }
-
                     },
                     {
                         "id": "rogerio-cunha.vshpc.configure_slurm",
@@ -301,7 +300,6 @@
             {
                 "title": "HPC Connection",
                 "properties": {
-
                     "vshpc.connection.cluster": {
                         "type": "string",
                         "markdownDescription": "Head Node do Cluster para submeter jobs (SLURM). Faça a [carga das configurações iniciais ao menos uma vez.](command:rogerio-cunha.vshpc.loadCustomConfiguration)",
@@ -413,7 +411,6 @@
                     }
                 }
             },
-
             {
                 "title": "Solver",
                 "properties": {
@@ -429,7 +426,6 @@
                         "markdownDescription": "Versão do solver de simulação a depender do simulador escolhido (p. ex.: 2019.12, 2018.11, v6.0, etc). Veja exemplos no README. Prefira configurar este item na `TAB` Workspace.",
                         "order": 10
                     },
-
                     "vshpc.solver.ExtraParams": {
                         "type": "string",
                         "markdownDescription": "Opções extras para serem passadas para o solver escolhido. As macros `{modelDir}`, `{projectDir}` e `{user}` são substituídas pelos correspondentes valores do Unix. Prefira configurar este item na `TAB` Workspace.",
@@ -441,12 +437,19 @@
         ]
     },
     "scripts": {
-        "vscode:prepublish": "npm run compile && cd webview && npm run build",
+        "vscode:prepublish": "npm run build:web && npm run esbuild-base -- --minify",
+        "build:all": "npm run build:web && npm run esbuild-base -- --minify",
+		"build:web": "cd webview && npm run build",
+        "server": "cd webview && npm run dev",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "pretest": "npm run compile && npm run lint",
         "lint": "eslint src",
-        "test": "vscode-test"
+        "test": "vscode-test",
+        "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=./out/extension.js --external:vscode --format=cjs --platform=node",
+		"esbuild": "npm run esbuild-base -- --sourcemap",
+        "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
+        "package": "npm run build:all && vsce package"
     },
     "devDependencies": {
         "@types/mocha": "^10.0.7",
@@ -460,6 +463,7 @@
         "@vscode/test-cli": "^0.0.10",
         "@vscode/test-electron": "^2.4.1",
         "@vscode/vsce": "^3.1.0",
+        "esbuild": "^0.24.0",
         "eslint": "^9.9.1",
         "serve-static": "^1.16.2",
         "typescript": "^5.5.4"

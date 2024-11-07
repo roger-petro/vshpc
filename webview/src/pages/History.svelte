@@ -137,7 +137,7 @@
             selection = {};
             histInfoOrder.forEach((key) => {
                 if(key) {
-                    const formattedVal = formatValue(key, rows[elem]._source[key] as string);
+                    const formattedVal = formatValue(key, (rows[elem]._source as Record<string, any>)[key] as string);
                     selection[converHistKeyName(key)] = formattedVal;
                 }
             });
@@ -281,7 +281,7 @@
                     <div class="grid1-column">{job._source.account}</div>
                     <div class="grid1-column">{job._source.state}</div>
                     <div class="grid1-column">{convertSeconds2Short(job._source.elapsed)}</div>
-                    <div class="grid1-column">{convertISODate2LocalTime(job._source["@submit"])}</div>
+                    <div class="grid1-column">{convertISODate2LocalTime(job._source["@submit"],"+03:00")}</div>
                     <!-- svelte-ignore a11y-click-events-have-key-events -->
                     <!-- svelte-ignore a11y-missing-attribute -->
                     {#if linkAvailable(job._source)}
