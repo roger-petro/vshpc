@@ -70,6 +70,7 @@ export type JobArrayType = {
     cluster: string //fixo em "reservatório"
     work_dir: string //fixo em uma mensagem, veja getJobs
     qos: string //qos do job
+    comment: string
 };
 
 /**

@@ -9,8 +9,62 @@ import * as PubSub from 'pubsub-js';
 import { expressServer } from "../utilities/proxy";
 import { openLog, evaluatePathReverse } from "../utilities/openLog";
 import { sendSSHcommand } from "../ssh2";
+import { exec } from "child_process";
 
 
+function generateCommitUrl(hash:string, uri:string): string {
+
+    // Valida se a URI é http/https ou git (SSH)
+    const httpRegex = /^(http|https):\/\/([\w.-]+)\/(.+?)(\.git)?$/;
+    const sshRegex = /^git@([\w.-]+):(.+?)(\.git)?$/;
+
+    let baseUrl: string;
+    let projectPath: string;
+
+    if (httpRegex.test(uri)) {
+        const match = uri.match(httpRegex);
+        if (!match) {throw new Error("URI inválida");}
+        [, , baseUrl, projectPath] = match;
+        baseUrl = `https://${baseUrl}`;
+    } else if (sshRegex.test(uri)) {
+        const match = uri.match(sshRegex);
+        if (!match) {throw new Error("URI inválida");}
+        [, baseUrl, projectPath] = match;
+        baseUrl = `https://${baseUrl}`;
+    } else {
+        throw new Error("Formato de URI desconhecido");
+    }
+
+    // Remove a extensão .git do final, se existir
+    projectPath = projectPath.replace(/\.git$/, "");
+
+    // Verifica se é GitHub ou GitLab
+    if (baseUrl.includes("github.com")) {
+        return `${baseUrl}/${projectPath}/commit/${hash}`;
+    } else if (baseUrl.includes("gitlab")) {
+        return `${baseUrl}/${projectPath}/-/commit/${hash}`;
+    }
+    else if (baseUrl.includes("git.ep")) {
+        return `${baseUrl}/${projectPath}/-/commit/${hash}`;
+    } else {
+        throw new Error("Servidor Git não suportado");
+    }
+}
+
+function getGitServerURL(job: JobArrayType): string {
+    if ('comment' in job) {
+        const parts = job.comment.split('|');
+        if (parts.length === 5) {
+            try {
+                return generateCommitUrl(parts[3],parts[4]);
+            }
+            catch {
+                return "";
+            }
+        }
+    }
+    return "";
+}
 
 /**
  * This class manages the state and behavior of HelloWorld webview panels.
@@ -217,6 +271,13 @@ export class JobsPanel {
                         commands.executeCommand('simpleBrowser.show', encodeURI(this.settings.customConfig.settings.userSearchSite + message.args));
                         env.openExternal(Uri.parse(message.args));
                         break;
+                    case "openGitServer":
+                        console.log('Vou tentar achar o git server com estes dados' + JSON.stringify(payload));
+                        const url = getGitServerURL(payload);
+                        if (url) { 
+                            env.openExternal(Uri.parse(url));
+                            //commands.executeCommand('simpleBrowser.show', encodeURI(url));
+                        }
                     case "openSystemFolder":
                         winpath = evaluatePathReverse(payload.chdir);
                         commands.executeCommand('revealFileInOS', Uri.parse(winpath));

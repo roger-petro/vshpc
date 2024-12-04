@@ -191,7 +191,7 @@ export async function getJobs(settings: SettingsType, payload:any): Promise<JobA
 		filterUser = ` -u ${settings.user}`;
 	}
 
-	const outputFormat = "%A;%M;%N;%P;%T;%V;%o;%a;%j;%u;%C;%Z;%q";
+	const outputFormat = "%A;%M;%N;%P;%T;%V;%o;%a;%j;%u;%C;%Z;%q;%k";
     let cmd = `squeue ${filterUser} ${filterAccount} --format "${outputFormat}"  --sort=-V 2>/dev/null`;
 
 	PubSub.publish(LogOpt.vshpc, `> getJobs: ${cmd}`);
@@ -221,7 +221,8 @@ export async function getJobs(settings: SettingsType, payload:any): Promise<JobA
 					cores:		job[10],
 					cluster:    "Reservatório",
 					work_dir:	job[11],
-					qos: job[12]
+					qos: job[12],
+					comment: job[13]
                 });
             }
             return jobsArray;

@@ -16,5 +16,6 @@ export module Job {
             command: string;
             work_dir: string;
             qos: string;
+            comment?: string;
     }
 }

@@ -99,7 +99,7 @@
             let data = 'data' in param ? param['data'] : param['detail']
             if (data && "message" in data) {
                 switch (data.message) {
-                    case "jobs":
+                    case "jobs":  //retorno do getJobs intermediado pelo jobsPanel
                         //console.log(`Comando selecionado: ${data.jobs}`);
                         rows = data.payload;
                         selectedRows = Array(rows.length).fill(false);
@@ -261,6 +261,10 @@
         vscode.postMessage({ command: "openUrlLink", args: user});
     }
 
+    function openGitServer(job: Job.Row) {
+        vscode.postMessage({command: "openGitServer", payload: job})
+    }
+
     function openSystemFolder(folder:string) {
         if (folder) {
             vscode.postMessage({
@@ -343,6 +347,16 @@
         const end = str.substring(str.length - partSize);
         return `${start}...${end}`;
     }
+
+    function getCommitHash(job :Job.Row) {
+        if ('comment' in job) {
+            const parts = job.comment?.split('|') || []
+            if (parts?.length >= 4) {
+                return parts[3].substring(0,8)
+            }
+        }
+        return ""
+    }
 </script>
 
 <main>
@@ -417,7 +431,9 @@
                 <div class="grid1-header">Age</div>
                 <div class="grid1-header">Start</div>
                 <div class="grid1-header">Nome (clique em um para acessar o log)</div>
+                <div class="grid1-header">Commit</div>
                 <div class="grid1-header">Abrir pasta...</div>
+
                 {#each currentPageRows as  job, index (job.id)}
                     <div class="grid1-column">
                         <input type="checkbox" disabled={job.user!==getMeta("user")}
@@ -450,6 +466,16 @@
                         <!-- svelte-ignore a11y-no-static-element-interactions -->
                         <div class="grid1-column"><a on:click={() => openLog(job.id)}>{shortName(job.name)}</a></div>
                         <!--div class="grid1-column">{job.name}</div-->
+                    {/if}
+                    {#if getCommitHash(job)}
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <!-- svelte-ignore a11y-missing-attribute -->
+                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <div class="grid1-column"><a on:click={()=> openGitServer(job)}>{getCommitHash(job)}</a></div>
+                    {:else}
+                        <div class="grid1-column">
+                            n/a
+                        </div>
                     {/if}
                     <div class="grid1-column">
                         <!-- svelte-ignore a11y-missing-attribute -->

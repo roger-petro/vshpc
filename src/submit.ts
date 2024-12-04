@@ -309,7 +309,7 @@ export async function submit(model: string, settings: SettingsType, option: Subm
          * para efeitos de identificar posteriormente outra simulação tentar rodar
          * simultâneamente para o mesmo commit e bloquear
         */
-        params.jobComment+=`|${params.hash.substring(8)}`;
+        params.jobComment+=`|${params.hash}|${repo?.getGitServer()}`;
     }
 
     if (params.mpiExtras.includes('-np')) {

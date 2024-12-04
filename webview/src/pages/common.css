@@ -13,7 +13,7 @@ main {
 }
 .grid1 {
     display: grid;
-    grid-template-columns: 30px 90px 60px 100px 100px 80px 80px 150px 1fr 170px;
+    grid-template-columns: 30px 90px 60px 100px 100px 80px 80px 150px 1fr 90px 170px;
 
 }
 
