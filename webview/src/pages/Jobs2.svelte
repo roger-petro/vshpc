@@ -262,7 +262,9 @@
     }
 
     function openGitServer(job: Job.Row) {
-        vscode.postMessage({command: "openGitServer", payload: job})
+        if ('comment' in job) {
+            vscode.postMessage({command: "openGitServer", payload: job.comment})
+        }
     }
 
     function openSystemFolder(folder:string) {
@@ -411,7 +413,7 @@
                     {#if rows.length > 0}<span class="text">Total de páginas: {pages.length}</span>{/if}
                     <Sep w={2}/>
 
-                    <Tooltip text="Selecione para ler o progresso dos modelos usando a mesma data de fim da simulação (mais rápido)"><span class="text">Datas iguais: <input type="checkbox" bind:checked={sameDate}></span></Tooltip>
+                    <Tooltip text="Selecione para ler o progresso dos modelos usando a mesma data de fim da simulação para todos os casos (mais rápido)"><span class="text">Datas iguais: <input type="checkbox" bind:checked={sameDate}></span></Tooltip>
 
                 </div>
         </div>
@@ -430,8 +432,8 @@
                 <div class="grid1-header"><Tooltip text="clique para atualizar o progresso (apenas CMG)"><button on:click={getProgress}>Progresso</button></Tooltip></div>
                 <div class="grid1-header">Age</div>
                 <div class="grid1-header">Start</div>
-                <div class="grid1-header">Nome (clique em um para acessar o log)</div>
-                <div class="grid1-header">Commit</div>
+                <div class="grid1-header"><Tooltip text="clique no nome para tentar abrir o .log">Nome do job</Tooltip></div>
+                <div class="grid1-header"><Tooltip text="Apenas para simulações após 06/12/2024">Commit</Tooltip></div>
                 <div class="grid1-header">Abrir pasta...</div>
 
                 {#each currentPageRows as  job, index (job.id)}

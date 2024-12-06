@@ -17,9 +17,10 @@
     } from "../utilities/utils";
     import type { KibanaPaged } from "../utilities/kibanaAPI";
     import { KibanaDataSource } from "../utilities/kibanaPaged";
+    import type { Job } from "../utilities/row";
     import Modal from "../lib/Modal.svelte";
     import SideBarDetails from "../lib/SidebarDetails.svelte";
-
+    import Tooltip from '../lib/CustomToolTip.svelte';
 
     let modal_show = false
     let modal_question="Confirma matar os jobs selecionados?"
@@ -29,6 +30,8 @@
     let selectedAccount = "";
     let results : KibanaPaged.Frame | null = null; //jobs históricos
     let rows: KibanaPaged.Hit[] = []; //aponta para os resultados efetivos da query kibana
+    let rows_extra: Job.RowExtra[] = [];
+    let reset = false;
     let page = 0
     let totalPages = 0;
     export let itemsPerPage = 25;
@@ -48,6 +51,7 @@
         if (result) {
             rows = removeDuplicates(result.hits.hits) as  KibanaPaged.Hit[];
             page = 0;
+            getSlurmacct()
         }
     });
 
@@ -114,6 +118,10 @@
                         if (data.retcode !== 200)
                             showMessage(data.extra,4000);
                         break;
+                    case "sacct":
+                        console.log("Retornou este objeto: ", data.payload)
+                        rows_extra = data.payload;
+                        reset = !reset;
                 }
             }
         };
@@ -160,6 +168,17 @@
         });
     };
 
+    function getSlurmacct() {
+        let jobs = rows.map(e=>String(e._source.jobid))
+        vscode.postMessage({
+            command: "listSacct",
+            info: "Carregar dados do slurm sacct",
+            payload : {
+                jobs: jobs.join(',')
+            }
+        })
+    }
+
     const setPage = async (p: number, inc=true) => {
         //showMessage(p)
 		if (p >= 0 && p < totalPages) {
@@ -170,8 +189,10 @@
                 results = await kibana.getData(itemsPerPage,p*itemsPerPage);
                 loading = false;
                 //console.log(JSON.stringify(results));
-                if (results) rows = removeDuplicates(results.hits.hits);
-
+                if (results) { 
+                    rows = removeDuplicates(results.hits.hits);
+                    getSlurmacct()
+                }
             }
 		}
 	}
@@ -202,7 +223,20 @@
             })
         }
     }
+    function openGitServer(jobid: number) {
+        const idx = rows_extra.findIndex(e=>e.id === String(jobid));
+        if (idx > -1) {
+            vscode.postMessage({command: "openGitServer", payload: rows_extra[idx].comment})
+        }
+    }
 
+    function getCommitHash(jobid : number) {
+        const idx = rows_extra.findIndex(e=>e.id === String(jobid));
+        if (idx >-1) {
+            return rows_extra[idx].hash.substring(0,8);
+        }
+        return ""
+    }
 </script>
 
 <main>
@@ -219,16 +253,16 @@
                     <label for="user" class="text">Account:</label>
                     <input class="v_i" type="text" max="16" name="user" bind:value={selectedAccount} style="width:150px">
                     <Sep w={1}/>
-                    <span class="hint" title="Filtrar quantos dias desejados de histórico">
+                    <Tooltip text="Filtrar quantos dias desejados de histórico">
                         <label class="text">
                             Dias de histórico:
                         <input bind:value={days}
-                            size="12"
+                            size="6"
                             placeholder="days"
                         />
                         </label>
-                    </span>
-                    <span class="hint" title="Filtrar pelo tipo de resultado dos jobs">
+                    </Tooltip>
+                    <Tooltip text="Filtrar pelo tipo de resultado dos jobs">
                         <select class="v_i" bind:value={stateFilter}>
                             <option value="">Todos</option>
                             <option value="COMPLETED">Completos</option>
@@ -236,7 +270,7 @@
                             <option value="FAILED">Falharam</option>
                             <option value="NODE_FAIL">Erro no nó</option>
                         </select>
-                    </span>
+                    </Tooltip>
                     <Sep w={2}/>
                     <button on:click={() => setPage(page-5>0?page-5:0, true)}>&laquo;</button>
                     {#if rows && rows.length > 0}
@@ -267,13 +301,15 @@
         <div class="third-line">
             <Toasts />
             <div class="grid2">
+                {#key reset}
                 <div class="grid1-header">Id</div>
                 <div class="grid1-header">User</div>
                 <div class="grid1-header">Account</div>
                 <div class="grid1-header">Status</div>
                 <div class="grid1-header">Duração</div>
                 <div class="grid1-header">Data da Simulação</div>
-                <div class="grid1-header">Nome (clique em um para acessar o log)</div>
+                <div class="grid1-header"><Tooltip text="clique no nome para tentar abrir o .log">Nome do job</Tooltip></div>
+                <div class="grid1-header"><Tooltip text="Apenas para simulações após 06/12/2024">Commit</Tooltip></div>
                 <div class="grid1-header">Abrir pasta...</div>
                 {#each rows as job, index (job._source.jobid)}
                     <div class="grid1-column"><a href="/" on:click={()=>{moreInfo(job._source.jobid)}}>{job._source.jobid}</a></div>
@@ -292,6 +328,16 @@
                     {:else}
                         <div class="grid1-column">{job._source.job_name}</div>
                     {/if}
+                    {#if getCommitHash(job._source.jobid)}
+                        <!-- svelte-ignore a11y-click-events-have-key-events -->
+                        <!-- svelte-ignore a11y-missing-attribute -->
+                        <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <div class="grid1-column"><a on:click={()=> openGitServer(job._source.jobid)}>{getCommitHash(job._source.jobid)}</a></div>
+                    {:else}
+                        <div class="grid1-column">
+                            n/a
+                        </div>
+                    {/if}
                     <div class="grid1-column">
                         <!-- svelte-ignore a11y-missing-attribute -->
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -305,6 +351,7 @@
                         <a on:click={() => openVScodeFolder(job._source.work_dir)}>VSCode</a>
                     </div>
                 {/each}
+                {/key}
             </div>
         </div>
     </div>

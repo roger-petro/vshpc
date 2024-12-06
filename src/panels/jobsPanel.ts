@@ -2,9 +2,9 @@ import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn,
     TextDocument, env, commands, ExtensionContext, ExtensionMode } from "vscode";
 import { getUri } from "../utilities/getURI";
 import { getNonce } from "../utilities/getNonce";
-import {getJobs,killJob, getUserJobUpdates}  from '../jobs';
+import {getJobs, getSacct, killJob, getUserJobUpdates}  from '../jobs';
 import {getSettings} from '../settings';
-import { JobArrayType, LogOpt, SettingsType } from "../types";
+import { JobArrayType, LogOpt, SacctType, SettingsType } from "../types";
 import * as PubSub from 'pubsub-js';
 import { expressServer } from "../utilities/proxy";
 import { openLog, evaluatePathReverse } from "../utilities/openLog";
@@ -51,18 +51,18 @@ function generateCommitUrl(hash:string, uri:string): string {
     }
 }
 
-function getGitServerURL(job: JobArrayType): string {
-    if ('comment' in job) {
-        const parts = job.comment.split('|');
-        if (parts.length === 5) {
-            try {
-                return generateCommitUrl(parts[3],parts[4]);
-            }
-            catch {
-                return "";
-            }
+function getGitServerURL(comment: string): string {
+
+    const parts = comment.split('|');
+    if (parts.length === 5) {
+        try {
+            return generateCommitUrl(parts[3],parts[4]);
+        }
+        catch {
+            return "";
         }
     }
+
     return "";
 }
 
@@ -240,6 +240,9 @@ export class JobsPanel {
                     case "listJobs":
                         this._askForJobs(payload);
                         break;
+                    case "listSacct":
+                        this._askSacct(payload);
+                        break;
                     case "updateJobs":
                         this._askForUpdateJobs(payload);
                         break;
@@ -306,6 +309,17 @@ export class JobsPanel {
             this.sendMessage2View({'message':'jobs', 'payload': ret});
         } else {
             this.sendMessage2View({'message': 'info', 'payload': 'Nenhum job encontrado!', extra:'noJobs'});
+        }
+    }
+
+    private async _askSacct(payload: any) {
+        let ret : SacctType[] = [];
+        ret = await getSacct(this.settings,payload.jobs);
+        if (ret.length > 0) {
+
+            this.sendMessage2View({'message':'sacct', 'payload': ret});
+        } else {
+            this.sendMessage2View({'message': 'info', 'payload': 'Nenhum job encontrado no sacct!', extra:'noSacct'});
         }
     }
 

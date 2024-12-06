@@ -18,4 +18,10 @@ export module Job {
             qos: string;
             comment?: string;
     }
+    export interface RowExtra {
+        id : string;
+        comment: string;
+        hash : string;
+        gitServer: string,
+    }
 }

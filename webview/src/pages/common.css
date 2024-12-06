@@ -19,7 +19,7 @@ main {
 
 .grid2 {
     display: grid;
-    grid-template-columns: 90px 60px 100px 100px 80px 150px 1fr 170px ;
+    grid-template-columns: 90px 60px 100px 100px 80px 150px 1fr 90px 170px ;
 
 }
 
@@ -192,7 +192,14 @@ input:not([type="checkbox"]){
     font-family: var(--vscode-font-family);
 }
 
-
+.v_i {
+    border-radius: 3px;
+    font-family: var(--vscode-font-family);
+    color: var(--vscode-inputOption-activeForeground);
+    outline-color: var(--vscode-input-border);
+    background-color: var(--vscode-inputOption-activeBackground);
+    border: 1px solid black;
+}
 
 /* fieldset {
     border-radius: 5px;
@@ -201,4 +208,10 @@ input:not([type="checkbox"]){
 
 button:disabled {
     background: var(--vscode-disabledForeground)
+}
+
+.highlight {
+    border: 3px solid rgba(255, 255, 0, 0.8); /* Borda amarela */
+    background-color: rgba(255, 255, 0, 0.2); /* Fundo amarelo claro */
+    border-radius: 3px;
 }

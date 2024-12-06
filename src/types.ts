@@ -73,6 +73,13 @@ export type JobArrayType = {
     comment: string
 };
 
+export type SacctType = {
+    id: string,
+    comment: string,
+    hash : string,
+    gitServer: string
+}
+
 /**
  * informações sobre o job que vai ser enviado
  * e eventualmente ficar na fila até o envio dos anteriores

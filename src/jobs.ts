@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import * as PubSub from 'pubsub-js';
-import { JobArrayType, RetMsg, SettingsType, LogOpt, SubmitOption, JobQueueElement } from './types';
+import { JobArrayType, RetMsg, SettingsType, LogOpt, SubmitOption, JobQueueElement, SacctType } from './types';
 import { checkAccountSettings, getSettings, checkSubmitSettings } from './settings';
 import { submit } from './submit';
 import { sendSSHcommand } from './ssh2';
@@ -239,6 +239,56 @@ export async function getJobs(settings: SettingsType, payload:any): Promise<JobA
 };
 
 
+/**
+ * Obtém os comentários dos jobs listados
+ * @param settings
+ * @param payload, lista csv dos jobids
+ * @returns
+ */
+export async function getSacct(settings: SettingsType, payload:any): Promise<SacctType[]> {
+    //retorno do squeue array com (-h tira o cabeçalho!):
+    // 1 id;
+
+
+	const outputFormat = "Jobid,Qos,Comment";
+    let cmd = `sacct -p -X --delimiter ^ -o ${outputFormat} -j ${payload} 2>/dev/null`;
+
+	PubSub.publish(LogOpt.vshpc, `> getJobs: ${cmd}`);
+    let ret = await sendSSHcommand(cmd,[''],settings.cluster,settings.user,settings.passwd, settings.privRsaKey);
+    try {
+        let jobsArray: SacctType[] = [];
+        if (ret && ret.code === 0 && ret.multiline!== undefined && ret.multiline.length > 0) {
+			//pula a primeira linha, já que o ssh esta descartando respostas com linhas vazias
+			//por isso i=1
+            for (let i = 1; i < ret.multiline.length; i++) {
+                let job = ret.multiline[i].trim().split('^');
+                if (job.length < outputFormat.split(',').length) {
+                    PubSub.publish(LogOpt.vshpc, '> getJobs: Quantidade de informações insuficientes');
+                    return [];
+                }
+				if (job[1].includes("vshpc")) {
+					if (job[2].split("|").length >= 5) {
+						jobsArray.push( {
+							id:         job[0],
+							comment:    job[2],
+							hash : job[2].split("|")[3],
+							gitServer : job[2].split("|")[4]
+						});
+					}
+				}
+            }
+            return jobsArray;
+        }
+        else {
+			PubSub.publish(LogOpt.vshpc, `> getSacct: Algo errado ao retornar os jobs. Código: ${ret.code} stdout: ${ret.stdout} stderr: ${ret.stderr}`);
+			return [];
+		}
+    } catch (e) {
+		const msg = e instanceof Error ? e.message : String(e);
+        PubSub.publish(LogOpt.vshpc,`> getSacct: ${msg}`);
+        return [];
+    }
+};
 
 /**
  * Obtém os jobs que estão sendo executados no cluster para o usuário corrente

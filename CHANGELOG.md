@@ -4,6 +4,10 @@ All notable changes to the "vshpc" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [ 1.0.0]
+
+- Apresentação do hash da simulação no gerenciador de jobs
+
 ## [ 0.0.9]
 
 - Correção do fuso horário para hora de início de job, conforme apresentado no gerenciador de jobs
