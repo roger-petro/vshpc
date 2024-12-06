@@ -77,7 +77,8 @@ export type SacctType = {
     id: string,
     comment: string,
     hash : string,
-    gitServer: string
+    gitServer: string,
+    tag: string
 }
 
 /**

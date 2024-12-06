@@ -310,6 +310,9 @@ export async function submit(model: string, settings: SettingsType, option: Subm
          * simultâneamente para o mesmo commit e bloquear
         */
         params.jobComment+=`|${params.hash}|${repo?.getGitServer()}`;
+        if (repo?.getTag() && repo?.getTag() !== "0") {
+            params.jobComment+=`|${repo?.getTag()}`;
+        }
     }
 
     if (params.mpiExtras.includes('-np')) {

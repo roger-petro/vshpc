@@ -23,5 +23,6 @@ export module Job {
         comment: string;
         hash : string;
         gitServer: string,
+        tag: string
     }
 }

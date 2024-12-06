@@ -54,7 +54,7 @@ function generateCommitUrl(hash:string, uri:string): string {
 function getGitServerURL(comment: string): string {
 
     const parts = comment.split('|');
-    if (parts.length === 5) {
+    if (parts.length > 5) {
         try {
             return generateCommitUrl(parts[3],parts[4]);
         }
@@ -281,6 +281,7 @@ export class JobsPanel {
                             env.openExternal(Uri.parse(url));
                             //commands.executeCommand('simpleBrowser.show', encodeURI(url));
                         }
+                        break;
                     case "openSystemFolder":
                         winpath = evaluatePathReverse(payload.chdir);
                         commands.executeCommand('revealFileInOS', Uri.parse(winpath));

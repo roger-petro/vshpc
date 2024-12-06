@@ -7,14 +7,16 @@
 
     // Função para atualizar a posição do tooltip baseada na sua posição na tela
     function updateTooltipPosition() {
-        const rect = tooltipElement.getBoundingClientRect();
-        const tooltipHeight = 120; // Altura aproximada do tooltip, ajuste conforme necessário
+        if (text.length>0) {
+            const rect = tooltipElement.getBoundingClientRect();
+            const tooltipHeight = 120; // Altura aproximada do tooltip, ajuste conforme necessário
 
-        // Verifica se tem espaço suficiente acima, senão mostra abaixo
-        if (rect.top < tooltipHeight) {
-            showAbove = false;
-        } else {
-            showAbove = true;
+            // Verifica se tem espaço suficiente acima, senão mostra abaixo
+            if (rect.top < tooltipHeight) {
+                showAbove = false;
+            } else {
+                showAbove = true;
+            }
         }
     }
 
@@ -25,11 +27,14 @@
 
 <!-- svelte-ignore a11y-mouse-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<span class="tooltip" bind:this={tooltipElement} on:mouseover={updateTooltipPosition}>
-    <slot></slot>
-    <span class="tooltip-content" class:show-above={showAbove} class:show-below={!showAbove}>{text}</span>
-</span>
-
+{#if text.length> 0}
+    <span class="tooltip" bind:this={tooltipElement} on:mouseover={updateTooltipPosition}>
+        <slot></slot>
+        <span class="tooltip-content" class:show-above={showAbove} class:show-below={!showAbove}>{text}</span>
+    </span>
+{:else}
+    <span><slot></slot></span>
+{/if}
 <style>
     .tooltip {
         position: relative;

@@ -11,7 +11,7 @@
 <main>
     <div class="wrapper">
         <div class="first-line">
-                <label for="pagetop" class="title highlight">Gerenciamento de Jobs:</label>
+                <label for="pagetop" class="title">Gerenciamento de Jobs:</label>
                 <Sep w={3}/>
                 <label class="text highlight">
                     <input type="radio" name="relat1" bind:group={relat} value="jobs"/>

@@ -237,6 +237,14 @@
         }
         return ""
     }
+
+    function getCommitTag(jobid: number) {
+        const idx = rows_extra.findIndex(e=>e.id === String(jobid));
+        if (idx >-1) {
+            return rows_extra[idx].tag;
+        }
+        return ""
+    }
 </script>
 
 <main>
@@ -332,7 +340,9 @@
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
                         <!-- svelte-ignore a11y-missing-attribute -->
                         <!-- svelte-ignore a11y-no-static-element-interactions -->
-                        <div class="grid1-column"><a on:click={()=> openGitServer(job._source.jobid)}>{getCommitHash(job._source.jobid)}</a></div>
+                        <Tooltip text={getCommitTag(job._source.jobid)}>
+                            <div class="grid1-column"><a on:click={()=> openGitServer(job._source.jobid)}>{getCommitHash(job._source.jobid)}</a></div>
+                        </Tooltip>
                     {:else}
                         <div class="grid1-column">
                             n/a

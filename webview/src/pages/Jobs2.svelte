@@ -359,6 +359,16 @@
         }
         return ""
     }
+
+    function getTag(job :Job.Row) {
+        if ('comment' in job) {
+            const parts = job.comment?.split('|') || []
+            if (parts?.length >= 5) { 
+                return parts[5].trim()
+            }
+        }
+        return ""
+    }
 </script>
 
 <main>
@@ -473,7 +483,9 @@
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
                         <!-- svelte-ignore a11y-missing-attribute -->
                         <!-- svelte-ignore a11y-no-static-element-interactions -->
+                        <Tooltip text="{getTag(job)? getTag(job): "na"}">
                         <div class="grid1-column"><a on:click={()=> openGitServer(job)}>{getCommitHash(job)}</a></div>
+                        </Tooltip>
                     {:else}
                         <div class="grid1-column">
                             n/a

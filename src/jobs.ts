@@ -268,11 +268,16 @@ export async function getSacct(settings: SettingsType, payload:any): Promise<Sac
                 }
 				if (job[1].includes("vshpc")) {
 					if (job[2].split("|").length >= 5) {
+						let tag = "";
+						if (job[2].split("|").length >= 6) {
+							tag = job[2].split("|")[5];
+						}
 						jobsArray.push( {
 							id:         job[0],
 							comment:    job[2],
 							hash : job[2].split("|")[3],
-							gitServer : job[2].split("|")[4]
+							gitServer : job[2].split("|")[4],
+							tag
 						});
 					}
 				}
