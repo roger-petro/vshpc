@@ -7,9 +7,9 @@
         "type": "git",
         "url": "https://github.com/roger-petro/vshpc.git"
     },
-    "version": "0.0.9",
+    "version": "1.0.3",
     "engines": {
-        "vscode": "^1.92.0"
+        "vscode": "^1.70.0"
     },
     "categories": [
         "Other"
@@ -439,7 +439,7 @@
     "scripts": {
         "vscode:prepublish": "npm run build:web && npm run esbuild-base -- --minify",
         "build:all": "npm run build:web && npm run esbuild-base -- --minify",
-		"build:web": "cd webview && npm run build",
+        "build:web": "cd webview && npm run build",
         "server": "cd webview && npm run dev",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
@@ -447,7 +447,7 @@
         "lint": "eslint src",
         "test": "vscode-test",
         "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=./out/extension.js --external:vscode --format=cjs --platform=node",
-		"esbuild": "npm run esbuild-base -- --sourcemap",
+        "esbuild": "npm run esbuild-base -- --sourcemap",
         "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
         "package": "npm run build:all && vsce package"
     },
@@ -457,7 +457,7 @@
         "@types/pubsub-js": "^1.8.6",
         "@types/sprintf-js": "^1.1.4",
         "@types/ssh2": "^1.15.1",
-        "@types/vscode": "^1.92.0",
+        "@types/vscode": "^1.70.0",
         "@typescript-eslint/eslint-plugin": "^8.3.0",
         "@typescript-eslint/parser": "^8.3.0",
         "@vscode/test-cli": "^0.0.10",
