@@ -288,8 +288,8 @@ async function activate(context: vscode.ExtensionContext) {
 		PubSub.publish(LogOpt.vshpc,`> jobCheckSSH: chamado com ${settings.cluster}, ${settings.user}, ********`);
 		let ret = await sendSSHcommand('pwd',[''], settings.cluster,settings.user,settings.passwd, settings.privRsaKey);
 		if (ret) {
-			PubSub.publish(LogOpt.vshpc,`> jobCheckSSH: Valor retornado: Código:` +
-			` ${ret.code}, Mensagem :${ret.stdout}, Erro: ${ret.code!==0 ? ret.stderr : 'sem erro'}`);
+			PubSub.publish(LogOpt.vshpc, `> jobCheckSSH: Valor retornado: Código:` +
+				` ${ret.code}, Mensagem :${ret.stdout}, Erro: ${ret.code !== 0 ? ret.stderr ? ret.stderr : ret.stdout : 'sem mensagem extra'}`);
 		}
 		if (ret && ret.code===0) {
 			PubSub.publish(LogOpt.toast,'SSH para o host está OK!');

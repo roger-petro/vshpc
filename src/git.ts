@@ -348,21 +348,26 @@ export async function checkRemoteFolder(settings: SettingsType,remoteFolder: str
 
 /** verifica se a um arquivo remoto existe, via SSH
  */
-export async function checkRemoteFile(settings: SettingsType,remoteFile: string): Promise<boolean>{
+export async function checkRemoteFile(settings: SettingsType, remoteFile: string): Promise<RetMsg> {
     const ret = await sendSSHcommand(`[ -f "${remoteFile}" ]; echo $?`, [''],
-        settings.cluster,settings.user,settings.passwd, settings.privRsaKey );
+        settings.cluster, settings.user, settings.passwd, settings.privRsaKey);
     if (!ret) {
-        PubSub.publish(LogOpt.vshpc, "> checkRemoteFile: Erro ao verificar a existência do arquivo");
-        return false;
+        PubSub.publish(LogOpt.vshpc, "> checkRemoteFile: Erro ao executar o ssh");
+        return {
+            success: false, message: "engine ssh fail"
+        };
     }
-    if (ret) {PubSub.publish(LogOpt.vshpc,`> checkRemoteFile: ${remoteFile} `+
-        `SSH code: ${ret.code}${ret.code===0? "✔️": "❌"}   , ` +
-        `Existe?: ${ret.stdout}${ret.stdout==="0"? "✔️": "❌"}   , `+
-        `Erro: ${ret.stderr||"none"}`); }
+    if (ret && ret.code !== 0) {
+        PubSub.publish(LogOpt.vshpc, `> checkRemoteFile: ${remoteFile} ` +
+            `SSH code: ${ret.code}${ret.code === 0 ? "✔️" : "❌"}   , ` +
+            `Existe?: ${ret.stdout}${ret.stdout === "0" ? "✔️" : "❌"}   , ` +
+            `Erro: ${ret.stderr || ret.stdout}`);
+        return { success: false, message: ret.stderr || ret.stdout };
+    }
     if (ret && ret.code === 0 && ret.stdout==="0") {
-        return true;
+        return { success: true, message: 'found' };
     }
-    return false;
+    return { success: false, message: "unknown" };
 };
 
 /** Realiza as operações de git clone, shallow clone

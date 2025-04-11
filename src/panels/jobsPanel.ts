@@ -9,7 +9,7 @@ import * as PubSub from 'pubsub-js';
 import { expressServer } from "../utilities/proxy";
 import { openLog, evaluatePathReverse } from "../utilities/openLog";
 import { sendSSHcommand } from "../ssh2";
-import { exec } from "child_process";
+
 
 
 function generateCommitUrl(hash:string, uri:string): string {
