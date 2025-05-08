@@ -1,19 +1,27 @@
-import { Disposable, Webview, WebviewPanel, window, Uri, ViewColumn, 
-    TextDocument, env, commands, ExtensionContext, ExtensionMode } from "vscode";
-import { getUri } from "../utilities/getURI";
-import { getNonce } from "../utilities/getNonce";
-import {getJobs,killJob, getUserJobUpdates}  from '../jobs';
-import {getSettings} from '../settings';
-import { JobArrayType, LogOpt, SettingsType } from "../types";
+import {
+    Disposable,
+    Webview,
+    WebviewPanel,
+    window,
+    Uri,
+    ViewColumn,
+    TextDocument,
+    env,
+    commands,
+    ExtensionContext,
+    ExtensionMode,
+} from 'vscode';
+import { getUri } from '../utilities/getURI';
+import { getNonce } from '../utilities/getNonce';
+import { getJobs, killJob, getUserJobUpdates } from '../jobs';
+import { getSettings } from '../settings';
+import { JobArrayType, LogOpt, SettingsType } from '../types';
 import * as PubSub from 'pubsub-js';
-import { expressServer } from "../utilities/proxy";
-import { openLog, evaluatePathReverse } from "../utilities/openLog";
-import { sendSSHcommand } from "../ssh2";
+import { expressServer } from '../utilities/proxy';
+import { openLog, evaluatePathReverse } from '../utilities/openLog';
+import { sendSSHcommand } from '../ssh2';
 
-
-
-function generateCommitUrl(hash:string, uri:string): string {
-
+function generateCommitUrl(hash: string, uri: string): string {
     // Valida se a URI é http/https ou git (SSH)
     const httpRegex = /^(http|https):\/\/([\w.-]+)\/(.+?)(\.git)?$/;
     const sshRegex = /^git@([\w.-]+):(.+?)(\.git)?$/;
@@ -23,31 +31,34 @@ function generateCommitUrl(hash:string, uri:string): string {
 
     if (httpRegex.test(uri)) {
         const match = uri.match(httpRegex);
-        if (!match) {throw new Error("URI inválida");}
+        if (!match) {
+            throw new Error('URI inválida');
+        }
         [, , baseUrl, projectPath] = match;
         baseUrl = `https://${baseUrl}`;
     } else if (sshRegex.test(uri)) {
         const match = uri.match(sshRegex);
-        if (!match) {throw new Error("URI inválida");}
+        if (!match) {
+            throw new Error('URI inválida');
+        }
         [, baseUrl, projectPath] = match;
         baseUrl = `https://${baseUrl}`;
     } else {
-        throw new Error("Formato de URI desconhecido");
+        throw new Error('Formato de URI desconhecido');
     }
 
     // Remove a extensão .git do final, se existir
-    projectPath = projectPath.replace(/\.git$/, "");
+    projectPath = projectPath.replace(/\.git$/, '');
 
     // Verifica se é GitHub ou GitLab
-    if (baseUrl.includes("github.com")) {
+    if (baseUrl.includes('github.com')) {
         return `${baseUrl}/${projectPath}/commit/${hash}`;
-    } else if (baseUrl.includes("gitlab")) {
+    } else if (baseUrl.includes('gitlab')) {
         return `${baseUrl}/${projectPath}/-/commit/${hash}`;
-    }
-    else if (baseUrl.includes("git.ep")) {
+    } else if (baseUrl.includes('git.ep')) {
         return `${baseUrl}/${projectPath}/-/commit/${hash}`;
     } else {
-        throw new Error("Servidor Git não suportado");
+        throw new Error('Servidor Git não suportado');
     }
 }
 
@@ -56,14 +67,13 @@ function getGitServerURL(job: JobArrayType): string {
         const parts = job.comment.split('|');
         if (parts.length === 5) {
             try {
-                return generateCommitUrl(parts[3],parts[4]);
-            }
-            catch {
-                return "";
+                return generateCommitUrl(parts[3], parts[4]);
+            } catch {
+                return '';
             }
         }
     }
-    return "";
+    return '';
 }
 
 /**
@@ -89,7 +99,11 @@ export class JobsPanel {
      * @param panel A reference to the webview panel
      * @param extensionUri The URI of the directory containing the extension
      */
-    private constructor(panel: WebviewPanel, private extensionUri: Uri, private context: ExtensionContext) {
+    private constructor(
+        panel: WebviewPanel,
+        private extensionUri: Uri,
+        private context: ExtensionContext,
+    ) {
         this._panel = panel;
         this.settings = getSettings();
         this.isProduction = this.context.extensionMode === ExtensionMode.Production;
@@ -102,7 +116,6 @@ export class JobsPanel {
 
         // Set an event listener to listen for messages passed from the webview context
         this._setWebviewMessageListener(this._panel.webview);
-
     }
 
     /**
@@ -119,9 +132,9 @@ export class JobsPanel {
             // If a webview panel does not already exist create and show a new one
             const panel = window.createWebviewPanel(
                 // Panel view type
-                "showJobs",
+                'showJobs',
                 // Panel title
-                "Gerenciamento de Jobs",
+                'Gerenciamento de Jobs',
                 // The editor column the panel should be displayed in
                 ViewColumn.One,
                 // Extra panel configurations
@@ -131,8 +144,11 @@ export class JobsPanel {
                     enableCommandUris: true,
                     retainContextWhenHidden: true,
                     // Restrict the webview to only load resources from the `out` and `src/webview-ui/public/build` directories
-                    localResourceRoots: [Uri.joinPath(extensionUri, "media"), Uri.joinPath(extensionUri,"webview")],
-                }
+                    localResourceRoots: [
+                        Uri.joinPath(extensionUri, 'media'),
+                        Uri.joinPath(extensionUri, 'webview'),
+                    ],
+                },
             );
 
             JobsPanel.currentPanel = new JobsPanel(panel, extensionUri, context);
@@ -157,9 +173,9 @@ export class JobsPanel {
         }
     }
 
-    public sendMessage2View(args:Object) {
+    public sendMessage2View(args: Object) {
         this._panel.webview.postMessage(args);
-    };
+    }
     /**
      * Defines and returns the HTML that should be rendered within the webview panel.
      *
@@ -173,19 +189,18 @@ export class JobsPanel {
      */
     private _getWebviewContent(webview: Webview, extensionUri: Uri) {
         // The CSS file from the Svelte build output
-        const stylesUri = getUri(webview, extensionUri, ["media", "assets", "index.css"]);
+        const stylesUri = getUri(webview, extensionUri, ['media', 'assets', 'index.css']);
         // The JS file from the Svelte build output
-
 
         const nonce = getNonce();
 
         let scriptUri = null;
         const isProduction = this.context.extensionMode === ExtensionMode.Production;
         if (isProduction) {
-            scriptUri = getUri(webview, extensionUri, ["media", "index.js"]);
+            scriptUri = getUri(webview, extensionUri, ['media', 'index.js']);
         } else {
-            console.log("Modo de desenvolvimento");
-            scriptUri = "http://localhost:5173/src/main.ts";
+            console.log('Modo de desenvolvimento');
+            scriptUri = 'http://localhost:5173/src/main.ts';
         }
         /* proxy */
         const proxyPort = Math.ceil(Math.random() * (44999 - 44001) + 44001);
@@ -210,8 +225,8 @@ export class JobsPanel {
           <meta name="account" content="${this.settings.account}" />
           <meta name="proxyPort" content="${proxyPort}" />
           <meta name="route" content="vshpc.jobsviewer" />
-          ${ isProduction? `<link rel="stylesheet" type="text/css" href="${stylesUri}"/>`:''}
-          <script defer ${isProduction? '': `type="module"`} src="${scriptUri}"></script>
+          ${isProduction ? `<link rel="stylesheet" type="text/css" href="${stylesUri}"/>` : ''}
+          <script defer ${isProduction ? '' : `type="module"`} src="${scriptUri}"></script>
         </head>
         <body>
         <div id="app"></div>
@@ -234,60 +249,78 @@ export class JobsPanel {
                 const command = message.command;
                 const info = message.info;
                 const payload = message.payload;
-                console.log('jobsPanel->_setWebviewMessageListener->Ondidreceive: ' + JSON.stringify(message)  );
+                console.log(
+                    'jobsPanel->_setWebviewMessageListener->Ondidreceive: ' +
+                        JSON.stringify(message),
+                );
                 let caller = message.caller ?? undefined;
                 switch (command) {
-                    case "listJobs":
+                    case 'listJobs':
                         this._askForJobs(payload);
                         break;
-                    case "updateJobs":
+                    case 'updateJobs':
                         this._askForUpdateJobs(payload);
                         break;
-                    case "killJobs":
+                    case 'killJobs':
                         if (Array.isArray(message.payload)) {
                             const settings = getSettings();
-                                //console.log('Enviando kill para ' + message.payload.join(' '));
-                                let ret = await killJob(settings,message.payload.join(' '));
+                            //console.log('Enviando kill para ' + message.payload.join(' '));
+                            let ret = await killJob(settings, message.payload.join(' '));
                         }
                         setTimeout(() => {
                             this._askForJobs(payload);
-                        },4000);
+                        }, 4000);
                         break;
-                    case "openLog":
+                    case 'openLog':
                         let retcode = '400';
                         let retmsg = '';
                         try {
-                            retcode = await openLog(payload)?'200':'400';
+                            retcode = (await openLog(payload)) ? '200' : '400';
                         } catch (e) {
                             const msg = e instanceof Error ? e.message : String(e);
-                            retmsg=msg;
-                            retcode='500';
+                            retmsg = msg;
+                            retcode = '500';
                         }
-                        this.sendMessage2View({'message': 'openLogRet',
-                            code: retcode, caller: caller, extra:retmsg});
+                        this.sendMessage2View({
+                            message: 'openLogRet',
+                            code: retcode,
+                            caller: caller,
+                            extra: retmsg,
+                        });
                         break;
-                    case "openUrlLink":
+                    case 'openUrlLink':
                         console.log('Vou tentar achar ' + Uri.parse(message.args));
-                        commands.executeCommand('simpleBrowser.show', encodeURI(this.settings.customConfig.settings.userSearchSite + message.args));
+                        commands.executeCommand(
+                            'simpleBrowser.show',
+                            encodeURI(
+                                this.settings.customConfig.settings.userSearchSite + message.args,
+                            ),
+                        );
                         env.openExternal(Uri.parse(message.args));
                         break;
-                    case "openGitServer":
-                        console.log('Vou tentar achar o git server com estes dados' + JSON.stringify(payload));
+                    case 'openGitServer':
+                        console.log(
+                            'Vou tentar achar o git server com estes dados' +
+                                JSON.stringify(payload),
+                        );
                         const url = getGitServerURL(payload);
-                        if (url) { 
+                        if (url) {
                             env.openExternal(Uri.parse(url));
                             //commands.executeCommand('simpleBrowser.show', encodeURI(url));
                         }
-                    case "openSystemFolder":
+                    case 'openSystemFolder':
                         winpath = evaluatePathReverse(payload.chdir);
                         commands.executeCommand('revealFileInOS', Uri.parse(winpath));
                         break;
-                    case "openVScodeFolder":
+                    case 'openVScodeFolder':
                         winpath = evaluatePathReverse(payload.chdir);
-                        commands.executeCommand('vscode.openFolder', Uri.parse(winpath),{'forceNewWindow': true, 'noRecentEntry': true});
+                        commands.executeCommand('vscode.openFolder', Uri.parse(winpath), {
+                            forceNewWindow: true,
+                            noRecentEntry: true,
+                        });
                         break;
 
-                    case "cmgprogress" : {
+                    case 'cmgprogress': {
                         console.log('Informações enviadas o askjobs');
                         this._askForProgress(payload);
                         break;
@@ -295,57 +328,70 @@ export class JobsPanel {
                 }
             },
             undefined,
-            this._disposables
+            this._disposables,
         );
     }
 
-    private async _askForJobs(payload:any) {
-        let ret : JobArrayType[] = [];
-        ret = await getJobs(this.settings,payload);
+    private async _askForJobs(payload: any) {
+        let ret: JobArrayType[] = [];
+        ret = await getJobs(this.settings, payload);
         if (ret.length > 0) {
-            this.sendMessage2View({'message':'jobs', 'payload': ret});
+            this.sendMessage2View({ message: 'jobs', payload: ret });
         } else {
-            this.sendMessage2View({'message': 'info', 'payload': 'Nenhum job encontrado!', extra:'noJobs'});
+            this.sendMessage2View({
+                message: 'info',
+                payload: 'Nenhum job encontrado!',
+                extra: 'noJobs',
+            });
         }
     }
 
-    private async _askForUpdateJobs(payload:any) {
-        let ret : JobArrayType[] = [];
-        ret = await getUserJobUpdates(this.settings,payload);
+    private async _askForUpdateJobs(payload: any) {
+        let ret: JobArrayType[] = [];
+        ret = await getUserJobUpdates(this.settings, payload);
         if (ret.length > 0) {
-            this.sendMessage2View({'message':'updateJobs', 'payload': ret});
+            this.sendMessage2View({ message: 'updateJobs', payload: ret });
         }
     }
 
-
-    private async _askForProgress(payload:any) {
+    private async _askForProgress(payload: any) {
         if (!payload) {
             console.log('Sem argumentos');
             return;
         }
 
         const settings = getSettings();
-        let script = settings.customConfig.simulators.find(e=>e.name.toLowerCase()==='cmg')?.progressScript;
-        if ( 'simulatorName' in  payload) {
-            script = settings.customConfig.simulators.find(e=>e.name.toLowerCase()=== payload.simulatorName)?.progressScript;
+        let script = settings.customConfig.simulators.find(
+            e => e.name.toLowerCase() === 'cmg',
+        )?.progressScript;
+        if ('simulatorName' in payload) {
+            script = settings.customConfig.simulators.find(
+                e => e.name.toLowerCase() === payload.simulatorName,
+            )?.progressScript;
         }
-        let cmd = `${script} -j ${payload.jobs} ${payload.sameDate?'--same':''}`;
+        let cmd = `${script} -j ${payload.jobs} ${payload.sameDate ? '--same' : ''}`;
         console.log(`comando enviado para pegar o progresso: ${cmd}`);
         try {
-            let ret = await sendSSHcommand(cmd,[],settings.cluster,settings.user,settings.passwd,settings.privRsaKey);
+            let ret = await sendSSHcommand(
+                cmd,
+                [],
+                settings.cluster,
+                settings.user,
+                settings.passwd,
+                settings.privRsaKey,
+            );
             if (ret.code === 0) {
                 const retmsg = JSON.parse(ret.stdout);
-                this.sendMessage2View({'message':'cmgprogress','payload': retmsg});
+                this.sendMessage2View({ message: 'cmgprogress', payload: retmsg });
                 //console.log('Chegou do SSH:' + JSON.stringify(ret));
             } else {
-                console.log('Erro de geração do progress. Comando enviado: ',cmd);
+                console.log('Erro de geração do progress. Comando enviado: ', cmd);
                 console.log(JSON.stringify(ret));
             }
-            this.sendMessage2View({'message':'cmgprogress','payload': []});
-        } catch(e) {
-            console.log('Catch',e);
-            this.sendMessage2View({'message':'cmgprogress','payload': []});
+            this.sendMessage2View({ message: 'cmgprogress', payload: [] });
+        } catch (e) {
+            console.log('Catch', e);
+            this.sendMessage2View({ message: 'cmgprogress', payload: [] });
         }
     }
 }
-

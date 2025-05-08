@@ -1,13 +1,13 @@
 /*
-* Objeto com os dados do repositório aberto ou desejado
-* captura informações locais e depois do repositório remoto associado
-*/
+ * Objeto com os dados do repositório aberto ou desejado
+ * captura informações locais e depois do repositório remoto associado
+ */
 
 import * as PubSub from 'pubsub-js';
 import * as path from 'node:path';
 import { sprintf } from 'sprintf-js';
 
-import {evaluatePath} from './path';
+import { evaluatePath } from './path';
 import { LogOpt, SettingsType, GitReferencePointers } from './types';
 import {
     getGitProjectName,
@@ -19,17 +19,15 @@ import {
     getBranchName,
     checkRemoteFolder,
     getLocalReferences,
-    getCommitLog
+    getCommitLog,
 } from './git';
-
-
 
 export class Repository {
     protected settings: SettingsType;
 
     protected gitServer: string; //URI do repositório git
-    protected branchName: string|null; //branch atual do repositório aberto (pode ser HEAD)
-    protected projectName: string|null; //tirado da URI git
+    protected branchName: string | null; //branch atual do repositório aberto (pode ser HEAD)
+    protected projectName: string | null; //tirado da URI git
     protected currentHash: string; //full length do SHA-1 do checkout corrente
     protected isDetached: boolean; //diz se é detached ou não
     protected tags: string[]; //tags existentes no checkout corrente
@@ -37,11 +35,11 @@ export class Repository {
     protected isLocalRepo: boolean;
     protected isLocalRootRepo: boolean;
     protected isDestinationRelative: boolean;
-    protected remoteProjectPath: string|null; //caminho no cluster saído do "de-para"
+    protected remoteProjectPath: string | undefined; //caminho no cluster saído do "de-para"
     protected isRemoteProjectPath: boolean; //diz se existe o remotePath
     //protected isRemotePathRepo: boolean; //diz se remotePath é um repositório
 
-    protected remoteClonePath : string; //caminho de saída da simulação calculado em função se eh git e do hash
+    protected remoteClonePath: string; //caminho de saída da simulação calculado em função se eh git e do hash
     protected isRemoteClonePath: boolean; //verifica de o destino do clone existe, identificando também se há uma pasta .git nela
 
     protected branchTips: string[]; // no formato origin/HEAD, origin/master etc, pego do repositório local
@@ -49,23 +47,23 @@ export class Repository {
 
     protected commitLog: string[]; //o log do commit corrente
 
-    constructor(settings: SettingsType, hash : string) {
+    constructor(settings: SettingsType, hash: string) {
         this.settings = settings;
-        this.projectName = "";
-        this.gitServer = "";
-        this.branchName = "";
-        this.currentHash = "";
+        this.projectName = '';
+        this.gitServer = '';
+        this.branchName = '';
+        this.currentHash = '';
         this.isDetached = false;
         this.tags = [];
         this.isLocalRepo = false;
         this.isLocalRootRepo = false;
         this.isDestinationRelative = false;
 
-        this.remoteProjectPath = "";
+        this.remoteProjectPath = '';
         this.isRemoteProjectPath = false;
         //this.isRemotePathRepo = false;
 
-        this.remoteClonePath = "";
+        this.remoteClonePath = '';
         this.isRemoteClonePath = false;
 
         this.branchTips = [];
@@ -78,7 +76,7 @@ export class Repository {
      * observando o folder local (aberto no Workspace)
      * @returns
      */
-    async getLocalMetaData (specificHash: string| null): Promise<boolean> {
+    async getLocalMetaData(specificHash: string | null): Promise<boolean> {
         const checkRepo = await checkIsRepo(this.settings.workdir);
 
         this.isLocalRepo = checkRepo.isRepo;
@@ -86,24 +84,22 @@ export class Repository {
         this.isDestinationRelative = false;
 
         if (checkRepo.isRepo) {
-            const metaData = await Promise.all(
-                [
-                    getGitServer(this.settings.workdir),
-                    getBranchName(this.settings.workdir),
-                    getCurrentTags(this.settings.workdir, specificHash),
-                    getLocalReferences(this.settings.workdir),
-                ]
-            );
+            const metaData = await Promise.all([
+                getGitServer(this.settings.workdir),
+                getBranchName(this.settings.workdir),
+                getCurrentTags(this.settings.workdir, specificHash),
+                getLocalReferences(this.settings.workdir),
+            ]);
             this.gitServer = metaData[0];
             this.branchName = metaData[1];
-            this.isDetached = this.branchName === "HEAD"? true: false;
+            this.isDetached = this.branchName === 'HEAD' ? true : false;
             this.tags = metaData[2];
             this.localReferences = metaData[3];
 
             /**
              * Atenção que o branchName vai apontar para o projeto aberto
              */
-            if (specificHash){
+            if (specificHash) {
                 this.currentHash = specificHash;
             } else {
                 this.currentHash = await getCurrentHash(this.settings.workdir);
@@ -111,13 +107,16 @@ export class Repository {
 
             this.projectName = getGitProjectName(this.gitServer);
             if (this.projectName === 'origin') {
-                PubSub.publish(LogOpt.vshpc,'LogOpt.vshpc, `> getLocalMetaData: Não há ainda um repositório remoto vinculado no git config');
+                PubSub.publish(
+                    LogOpt.vshpc,
+                    'LogOpt.vshpc, `> getLocalMetaData: Não há ainda um repositório remoto vinculado no git config',
+                );
                 this.projectName = path.basename(this.settings.workdir);
             }
 
             const metadata2 = await Promise.all([
                 getBranchesTips(this.settings.workdir, false, this.currentHash),
-                getCommitLog(this.settings.workdir, this.currentHash)
+                getCommitLog(this.settings.workdir, this.currentHash),
             ]);
 
             this.branchTips = metadata2[0];
@@ -136,15 +135,16 @@ export class Repository {
      * @returns true se a pasta remota já existe e contém um git, false se não contém git ou não existe
      */
     async getRemoteMetaData(): Promise<boolean> {
-
         this.calcPath();
 
-        if (this.remoteProjectPath === null) {
+        if (this.remoteProjectPath === undefined) {
             return false;
         }
         //antes aqui via-se se existia a pasta .git
-        PubSub.publish(LogOpt.vshpc,
-            `> getRemoteMetaData: Local folder: ${this.settings.workdir}. Remote Folder: ${this.remoteProjectPath}`);
+        PubSub.publish(
+            LogOpt.vshpc,
+            `> getRemoteMetaData: Local folder: ${this.settings.workdir}. Remote Folder: ${this.remoteProjectPath}`,
+        );
 
         this.isRemoteProjectPath = await checkRemoteFolder(this.settings, this.remoteProjectPath);
         //this.isRemotePathRepo = await checkRemoteFolder(this.settings, `${this.remotePath}/.git`);
@@ -152,65 +152,78 @@ export class Repository {
         //só pode ser chamado depois que determinar o caminho final
         this.isRemoteClonePath = await checkRemoteFolder(this.settings, this.remoteClonePath);
 
-        PubSub.publish(LogOpt.vshpc,"> getRemoteMetaData: Executado");
+        PubSub.publish(LogOpt.vshpc, '> getRemoteMetaData: Executado');
         return this.isRemoteProjectPath;
     }
 
-    async calcPath(){
+    async calcPath() {
         this.remoteProjectPath = evaluatePath(this.settings, this.settings.workdir);
         this.remoteClonePath = '';
         if (!this.remoteProjectPath) {
-            PubSub.publish(LogOpt.vshpc, `> getRemoteMetaData: Local folder: ${this.settings.workdir} não pode ser determinado. Verifique o 'de-para'`);
+            PubSub.publish(
+                LogOpt.vshpc,
+                `> getRemoteMetaData: Local folder: ${this.settings.workdir} não pode ser determinado. Verifique o 'de-para'`,
+            );
             return '';
         }
         const dest = this.settings.destination;
         const destParsed = path.parse(dest);
 
-        PubSub.publish(LogOpt.vshpc, `> getRemoteMetaData: Usando com valor da variável "destination" o caminho: ${dest}`);
+        PubSub.publish(
+            LogOpt.vshpc,
+            `> getRemoteMetaData: Usando com valor da variável "destination" o caminho: ${dest}`,
+        );
 
-        if (destParsed.root.search(/^\w:\\/)>-1) {
+        if (destParsed.root.search(/^\w:\\/) > -1) {
             this.remoteClonePath = evaluatePath(this.settings, dest) || this.remoteProjectPath;
         }
-        if (destParsed.root==='/') {
+        if (destParsed.root === '/') {
             this.remoteClonePath = dest;
         }
         if (destParsed.root === '') {
-            if (destParsed.base!=='.' && destParsed.base!=='..') {
-                PubSub.publish(LogOpt.vshpc, `> getRemoteMetaData: Por ser em caminho fora da pasta irmã ou da pasta filha não será aceito outro job com mesmo nome`);
+            if (destParsed.base !== '.' && destParsed.base !== '..') {
+                PubSub.publish(
+                    LogOpt.vshpc,
+                    `> getRemoteMetaData: Por ser em caminho fora da pasta irmã ou da pasta filha não será aceito outro job com mesmo nome`,
+                );
                 this.isDestinationRelative = true;
             }
             let p = evaluatePath(this.settings, this.settings.workdir) || '';
             //console.log('Valor de p ' + p + ' valor do replace ' + dest.replaceAll('\\','/'));
-            this.remoteClonePath = path.posix.resolve(p, dest.replaceAll('\\','/'));
+            this.remoteClonePath = path.posix.resolve(p, dest.replaceAll('\\', '/'));
         }
 
-        PubSub.publish(LogOpt.vshpc,
-            `> getRemoteMetaData: destino foi calculado ainda sem os sufixos : ${this.remoteClonePath}`);
+        PubSub.publish(
+            LogOpt.vshpc,
+            `> getRemoteMetaData: destino foi calculado ainda sem os sufixos : ${this.remoteClonePath}`,
+        );
 
         if (this.currentHash) {
             if (this.settings.folderFormat) {
                 const template = this.settings.folderFormat;
                 const params = {
-                    tag : this.getTag(),
+                    tag: this.getTag(),
                     hash: this.getHash(8),
                     projectName: this.projectName,
-                    yyyymmdd: '0000.00.00'
+                    yyyymmdd: '0000.00.00',
                 };
-                if (this.commitLog.length === 5 ) {
+                if (this.commitLog.length === 5) {
                     params.yyyymmdd = this.commitLog[2];
                 }
                 this.remoteClonePath = this.remoteClonePath.concat(`/${sprintf(template, params)}`);
             } else {
-                this.remoteClonePath = this.remoteClonePath.concat(`/${this.projectName}_${this.getHash(8)}`);
+                this.remoteClonePath = this.remoteClonePath.concat(
+                    `/${this.projectName}_${this.getHash(8)}`,
+                );
             }
         }
     }
 
-    getIsDestRelative() : boolean {
+    getIsDestRelative(): boolean {
         return this.isDestinationRelative;
     }
 
-    getIsLocalRepo() : boolean {
+    getIsLocalRepo(): boolean {
         return this.isLocalRepo;
     }
 
@@ -222,7 +235,7 @@ export class Repository {
      * Pega a pasta no destino retornada do "de-para"
      * @returns caminho de saída do "de-para"
      */
-    getRemotePath(): string|null {
+    getRemotePath(): string | undefined {
         return this.remoteProjectPath;
     }
 
@@ -231,7 +244,7 @@ export class Repository {
      * observando o que foi visto pelo getRemoteMetaData
      * @returns boolean
      */
-    getIsRemotePath() : boolean {
+    getIsRemotePath(): boolean {
         return this.isRemoteProjectPath;
     }
 
@@ -239,7 +252,7 @@ export class Repository {
      * Retorna o caminho remoto de destino do clone
      * @returns caminho remoto onde será feito clone
      */
-    getRemoteClonePath() : string {
+    getRemoteClonePath(): string {
         return this.remoteClonePath;
     }
 
@@ -248,7 +261,7 @@ export class Repository {
      * observando o que foi visto pelo getRemoteMetaData
      * @returns boolean
      */
-    getIsRemoteClonePath() : boolean {
+    getIsRemoteClonePath(): boolean {
         return this.isRemoteClonePath;
     }
 
@@ -257,18 +270,18 @@ export class Repository {
      * @param size
      * @returns sha1 (string)
      */
-    getHash(size:number|'full') {
-        if (size==='full' || size > 40 || size === 0) {
-            size=40; //sha-1 tem 40 chars
+    getHash(size: number | 'full') {
+        if (size === 'full' || size > 40 || size === 0) {
+            size = 40; //sha-1 tem 40 chars
         }
-        return this.currentHash.substring(0,size);
+        return this.currentHash.substring(0, size);
     }
 
-    getGitServer() : string {
+    getGitServer(): string {
         return this.gitServer;
     }
 
-    getProjectName() : string|null {
+    getProjectName(): string | null {
         return this.projectName;
     }
 
@@ -277,23 +290,21 @@ export class Repository {
      * @returns nome do tag ou "0"
      */
     getTag(): string {
-
-        let tag = this.tags.find( e => e.match(/^[\d\._-]+$/));
-        if (tag === undefined ) {
-            tag = this.tags.find( e => e.match(/^[vV\d\._-]+$/));
+        let tag = this.tags.find(e => e.match(/^[\d\._-]+$/));
+        if (tag === undefined) {
+            tag = this.tags.find(e => e.match(/^[vV\d\._-]+$/));
         }
-        if (tag === undefined ) {
-            tag = this.tags.find( e => e.match(/^[PpCcSsvV\d\._-]+$/));
+        if (tag === undefined) {
+            tag = this.tags.find(e => e.match(/^[PpCcSsvV\d\._-]+$/));
         }
-        if (tag === undefined ) {
-            tag = this.tags.find( e => e.match(/[PpCcSsvV\d\._-]/));
+        if (tag === undefined) {
+            tag = this.tags.find(e => e.match(/[PpCcSsvV\d\._-]/));
         }
 
         if (tag === undefined && this.tags.length > 0) {
             tag = this.tags[0];
-        }
-        else if(tag === undefined) {
-            tag="0";
+        } else if (tag === undefined) {
+            tag = '0';
         }
         return tag;
     }
@@ -301,19 +312,18 @@ export class Repository {
     /** diz se é HEAD ou não
      *
      */
-    getIsDetached() : boolean {
+    getIsDetached(): boolean {
         return this.isDetached;
     }
 
     /**
      * Retorna o nome do branch ou HEAD. Note que quando há um detached head
      * o nome retorna HEAD, senão o nome do branch,
-     * observando o folder local (aberto no Workspace) 
+     * observando o folder local (aberto no Workspace)
      */
-    getBranchName() : string | null {
+    getBranchName(): string | null {
         return this.branchName;
     }
-
 
     /**
      *
@@ -321,7 +331,7 @@ export class Repository {
      * (branches e tags), numa associação entre sha-1 e o nome
      * da referência, observando o projeto aberto no vscode
      */
-    getLocalReferences() : GitReferencePointers[] {
+    getLocalReferences(): GitReferencePointers[] {
         return this.localReferences;
     }
 
@@ -330,34 +340,33 @@ export class Repository {
      * que tenham o checkout corrente no seu tronco
      * @returns array com os branches
      */
-    getCurrentBranchTips():string[] {
+    getCurrentBranchTips(): string[] {
         return this.branchTips;
     }
 
-
-    getCommitUserName() : string {
-        if ( this.commitLog.length === 5) {
+    getCommitUserName(): string {
+        if (this.commitLog.length === 5) {
             return this.commitLog[0];
         }
         return '';
     }
 
-    getCommitUserMail() : string {
-        if ( this.commitLog.length === 5) {
+    getCommitUserMail(): string {
+        if (this.commitLog.length === 5) {
             return this.commitLog[1];
         }
         return '';
     }
 
     getCommitData(): string {
-        if ( this.commitLog.length === 5) {
+        if (this.commitLog.length === 5) {
             return this.commitLog[2];
         }
         return '';
     }
 
     getCommitHour(): string {
-        if ( this.commitLog.length === 5) {
+        if (this.commitLog.length === 5) {
             return this.commitLog[3];
         }
         return '';
@@ -368,10 +377,9 @@ export class Repository {
      * @returns string com o texto do commit
      */
     getCommitComment(): string {
-        if ( this.commitLog.length === 5) {
+        if (this.commitLog.length === 5) {
             return this.commitLog[4];
         }
         return '';
     }
-
 }

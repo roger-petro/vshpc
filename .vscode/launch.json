@@ -3,19 +3,55 @@
 // Hover to view descriptions of existing attributes.
 // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
 {
-	"version": "0.2.0",
-	"configurations": [
-		{
-			"name": "Run Extension",
-			"type": "extensionHost",
-			"request": "launch",
-			"args": [
-				"--extensionDevelopmentPath=${workspaceFolder}"
-			],
-			"outFiles": [
-				"${workspaceFolder}/out/**/*.js"
-			],
-			"preLaunchTask": "${defaultBuildTask}"
-		}
-	]
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Extension",
+            "type": "extensionHost",
+            "request": "launch",
+            "args": ["--extensionDevelopmentPath=${workspaceFolder}"],
+            "outFiles": ["${workspaceFolder}/out/**/*.js"],
+            "preLaunchTask": "${defaultBuildTask}"
+        },
+        {
+            "name": "Debug arquivo TS aberto (via tsx)",
+            "type": "node",
+            "request": "launch",
+
+            // Executa "npx tsx <arquivo aberto>"
+            "runtimeExecutable": "npx",
+            "runtimeArgs": ["tsx", "${file}"],
+
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": ["<node_internals>/**"]
+        },
+        // ================================
+        // 1) Debug Extension Tests
+        //    roda a sua extensão + tests dentro do VS Code
+        // ================================
+        {
+            "name": "Debug Extension Tests",
+            "type": "extensionHost",
+            "request": "launch",
+            "runtimeExecutable": "${execPath}",
+            "preLaunchTask": "npm: compile",
+            "outFiles": ["${workspaceFolder}/out/**/*.js"],
+            "sourceMaps": true,
+            "sourceMapPathOverrides": {
+                "${workspaceFolder}/out/*": "${workspaceFolder}/*"
+            },
+            "envFile": "${workspaceFolder}/.env.test",
+
+            "args": [
+                // 1) abre esse diretório como workspace
+                "L:\\res\\usuarios\\x0gd\\simuls\\caso_punq",
+                "--extensionDevelopmentPath=${workspaceFolder}",
+                "--extensionTestsPath=${workspaceFolder}/out/test/suite/index.js"
+            ],
+
+            "internalConsoleOptions": "neverOpen"
+        }
+    ]
 }

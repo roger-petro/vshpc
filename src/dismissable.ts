@@ -1,4 +1,4 @@
-import * as vscode from "vscode";
+import * as vscode from 'vscode';
 
 /*
 Função para mostrar uma mensagem de informação na tela para o usuário
@@ -7,7 +7,7 @@ baseado em https://www.eliostruyf.com/creating-timer-dismissable-notifications-v
 */
 
 const sleep = (time: number) => {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         setTimeout(() => {
             resolve(true);
         }, time);
@@ -21,9 +21,14 @@ const sleep = (time: number) => {
  * @param message mensagem que será mostrada
  * @param callback função que será chamada se o usuário clicar em "Detalhe"
  */
-export function dismiss(message: string = "Please wait....", callback: Function, timeout=10000, labelString = "Detalhe") {
+export function dismiss(
+    message: string = 'Please wait....',
+    callback: Function,
+    timeout = 10000,
+    labelString = 'Detalhe',
+) {
     //const commandId = "vshpc.undo";
-    const commandId  = 'rogerio-cunha.vshpc.exec-' + Math.ceil(Math.random() * (9999 - 1000) + 1000);
+    const commandId = 'rogerio-cunha.vshpc.exec-' + Math.ceil(Math.random() * (9999 - 1000) + 1000);
     let customCancellationToken: vscode.CancellationTokenSource | null = null;
     const disp = vscode.commands.registerCommand(commandId, () => {
         callback();
@@ -38,7 +43,7 @@ export function dismiss(message: string = "Please wait....", callback: Function,
             cancellable: false,
         },
         async (progress, _token) => {
-            return new Promise(async (resolve) => {
+            return new Promise(async resolve => {
                 customCancellationToken = new vscode.CancellationTokenSource();
 
                 customCancellationToken.token.onCancellationRequested(() => {
@@ -49,14 +54,17 @@ export function dismiss(message: string = "Please wait....", callback: Function,
                     resolve(null);
                     return;
                 });
-                const seconds = timeout/1000;
+                const seconds = timeout / 1000;
                 for (let i = 0; i < seconds; i++) {
                     // Increment is summed up with the previous value
-                    progress.report({ increment: seconds, message: `${message} [${labelString}](command:${commandId})` });
-                    await sleep(timeout/10);
+                    progress.report({
+                        increment: seconds,
+                        message: `${message} [${labelString}](command:${commandId})`,
+                    });
+                    await sleep(timeout / 10);
                 }
                 resolve(null);
             });
-        }
+        },
     );
 }

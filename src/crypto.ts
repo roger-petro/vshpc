@@ -2,38 +2,36 @@ import * as crypto from 'crypto';
 const algorithm = 'aes-256-cbc';
 import * as PubSub from 'pubsub-js';
 import { getSettings } from './settings';
-import {LogOpt} from './types';
-
+import { LogOpt } from './types';
 
 function evalKey() {
-    let specHash : string| null = null;
+    let specHash: string | null = null;
     const VSHPC = getSettings().customConfig;
     if (VSHPC && VSHPC.settings.specHash) {
         specHash = VSHPC.settings.specHash;
     }
-    let keystr="sRfsmrWW";
-    if (specHash){
+    let keystr = 'sRfsmrWW';
+    if (specHash) {
         keystr = process.env.USERNAME + specHash;
     } else {
         keystr = process.env.USERNAME + keystr;
     }
-    return crypto.createHash('sha256').update(String(keystr)).digest('base64').substr(0,32);
+    return crypto.createHash('sha256').update(String(keystr)).digest('base64').substr(0, 32);
 }
 
-
-export function  encrypt(text:string):string {
+export function encrypt(text: string): string {
     let iv = crypto.randomBytes(16);
     let cipher = crypto.createCipheriv(algorithm, Buffer.from(evalKey()), iv);
     let encrypted = cipher.update(text);
     encrypted = Buffer.concat([encrypted, cipher.final()]);
     return `${iv.toString('hex')}:${encrypted.toString('hex')}`;
-};
+}
 
-export function decrypt(text:string):string|null {
+export function decrypt(text: string): string | null {
     try {
         if (text.length === 0) {
             return null;
-        };
+        }
 
         if (text.includes(':')) {
             try {
@@ -45,23 +43,20 @@ export function decrypt(text:string):string|null {
                 let decrypted = decipher.update(encryptedText);
                 decrypted = Buffer.concat([decrypted, decipher.final()]);
                 return decrypted.toString();
-            }
-            catch(error) {
+            } catch (error) {
                 const msg = error instanceof Error ? error.message : String(error);
-                PubSub.publish(LogOpt.vshpc,`> decrypt: erro: ${msg}`);
-                return (msg);
+                PubSub.publish(LogOpt.vshpc, `> decrypt: erro: ${msg}`);
+                return msg;
             }
-        }
-        else {
-            PubSub.publish(LogOpt.vshpc,"> decrypt: Dado encriptado fora do padrão");
+        } else {
+            PubSub.publish(LogOpt.vshpc, '> decrypt: Dado encriptado fora do padrão');
             return null;
         }
-    } catch(e) {
+    } catch (e) {
         //console.log(e.message);
         return null;
     }
 }
 
 if (typeof require !== 'undefined' && require.main === module) {
-
 }

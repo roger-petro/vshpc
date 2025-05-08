@@ -6,3 +6,7 @@ node_modules
 vshpc.json
 **/*_.json
 media
+
+**/*.nocommit.*
+.env
+.env.*
