@@ -2,6 +2,7 @@ import { readFileSync } from 'fs';
 import { LogOpt } from './types';
 import { decrypt } from './crypto';
 import * as PubSub from 'pubsub-js';
+import { WithImplicitCoercion } from 'buffer';
 
 export async function scpRead(
     content: string,

@@ -22,7 +22,7 @@ import { encrypt } from '../../crypto';
 import { adjustSettings } from '../../customconfig';
 import { jobQueueArray } from '../../jobs';
 import { submit } from '../../submit';
-import { SettingsType, SubmitOption } from '../../types';
+import { FolderFormats, SettingsType, SubmitOption } from '../../types';
 import { Repository } from '../../repository';
 import { checkIsRepo, getCurrentHash, getGitProjectName } from '../../git';
 
@@ -34,6 +34,7 @@ suite('Git commands', async function (this: Suite) {
     let modelUri: vscode.Uri;
     let repo: Repository;
     let settings: SettingsType;
+    let specificHash: string;
 
     suiteSetup(async function () {
         // ativa a extensão
@@ -68,20 +69,41 @@ suite('Git commands', async function (this: Suite) {
         settings.passwd = encrypt(process.env.PASSWORD || '');
         settings.account = baseWindowsSettings.account;
     });
-
     test('Check if is git', async function () {
         let isrepo = await checkIsRepo(settings.workdir);
         if (!isrepo) {
             console.log('Não é um repositório git, escapando os testes');
             this.skip();
         }
+        assert.ok(isrepo, 'Não é repo');
+    });
 
-        let specificHash = await getCurrentHash(settings.workdir);
+    test('Get hash', async function () {
+        specificHash = (await getCurrentHash(settings.workdir)) || '';
+        assert.ok(specificHash.length > 0);
+    });
+
+    test('Create repo Object', async function () {
         repo = new Repository(settings, specificHash);
-        assert.ok(repo.getHash(8).length === 8, 'Comprimento do hash é estranho');
+        assert.ok(repo.getHash('full') === specificHash);
+    });
+
+    test('Get Local Metadata Object', async function () {
+        await repo.getLocalMetaData(null);
+        assert.ok(repo.getGitServer().includes('.git'));
+    });
+
+    test('Get Remote Metadata Object', async function () {
+        await repo.getRemoteMetaData();
+        assert.ok(repo.getIsRemotePath, 'Remote path não foi encontrado');
     });
 
     test('Verifica o nome do diretorio do projeto remoto', async () => {
+        let p = await repo.getRemotePath();
+        //console.log(p);
+        assert.equal(p, process.env.REMOTE_PROJECT_FOLDER);
+    });
+    test('Verifica o diretorio remoto via API do Repository', async () => {
         let p = await repo.getRemotePath();
         assert.equal(p, process.env.REMOTE_PROJECT_FOLDER);
     });
@@ -93,8 +115,88 @@ suite('Git commands', async function (this: Suite) {
         let p = await getGitProjectName('git@git.site.com:/proj/dir/projeto.git');
         assert.equal(p, 'projeto');
     });
-    test('Verifica o diretorio remoto via API do Repository', async () => {
-        let p = await repo.getRemotePath();
-        assert.equal(p, process.env.REMOTE_PROJECT_FOLDER);
+
+    test('Nome da pasta de clonagem remota #1', async () => {
+        if (process.platform === 'win32') {
+            settings.folderFormat = 'projectName_hash';
+            settings.destination = expectedResults.test_git_01.destination;
+            if (Object.keys(FolderFormats).includes(settings.folderFormat)) {
+                settings.folderFormat = (FolderFormats as Record<string, string>)[
+                    settings.folderFormat
+                ];
+            }
+            await repo.getRemoteMetaData();
+            let p = await repo.getRemoteClonePath();
+            let remote = expectedResults.test_git_01.prefix + repo.getHash(8);
+            console.log('     ›', 'Pasta via getRemoteClonePath:', p);
+            console.log('     ›', 'Pasta remota esperada:       ', remote);
+            assert.ok(p === remote, 'Pasta não conferem');
+        } else {
+            console.log('     ›', 'Falta este teste no Linux');
+        }
+    });
+
+    test('Nome da pasta de clonagem remota #2', async () => {
+        if (process.platform === 'win32') {
+            settings.folderFormat = 'projectName_hash';
+            settings.destination = expectedResults.test_git_02.destination;
+            if (Object.keys(FolderFormats).includes(settings.folderFormat)) {
+                settings.folderFormat = (FolderFormats as Record<string, string>)[
+                    settings.folderFormat
+                ];
+            }
+            await repo.getRemoteMetaData();
+            let p = await repo.getRemoteClonePath();
+            let remote = expectedResults.test_git_02.prefix + repo.getHash(8);
+            console.log('     ›', 'Pasta via getRemoteClonePath:', p);
+            console.log('     ›', 'Pasta remota esperada:       ', remote);
+            assert.ok(p === remote, 'Pasta não conferem');
+        } else {
+            console.log('     ›', 'Falta este teste no Linux');
+        }
+    });
+    test('Nome da pasta de clonagem remota #3', async () => {
+        if (process.platform === 'win32') {
+            settings.folderFormat = 'projectName_hash';
+            settings.destination = expectedResults.test_git_03.destination;
+            if (Object.keys(FolderFormats).includes(settings.folderFormat)) {
+                settings.folderFormat = (FolderFormats as Record<string, string>)[
+                    settings.folderFormat
+                ];
+            }
+            await repo.getRemoteMetaData();
+            let p = await repo.getRemoteClonePath();
+            let remote = expectedResults.test_git_03.prefix + repo.getHash(8);
+            console.log('     ›', 'Pasta via getRemoteClonePath:', p);
+            console.log('     ›', 'Pasta remota esperada:       ', remote);
+            assert.ok(p === remote, 'Pasta não conferem');
+        } else {
+            console.log('     ›', 'Falta este teste no Linux');
+        }
+    });
+    test('Nome da pasta de clonagem remota #4', async () => {
+        if (process.platform === 'win32') {
+            settings.folderFormat = 'projectName_YYYY.MM.DD_tag_hash';
+            settings.destination = expectedResults.test_git_04.destination;
+            const hash = expectedResults.test_git_04.commit;
+            if (Object.keys(FolderFormats).includes(settings.folderFormat)) {
+                settings.folderFormat = (FolderFormats as Record<string, string>)[
+                    settings.folderFormat
+                ];
+            }
+            repo = new Repository(settings, '');
+            await repo.getLocalMetaData(hash);
+            await repo.getRemoteMetaData();
+            let p = await repo.getRemoteClonePath();
+            let remote =
+                expectedResults.test_git_04.prefix +
+                `${expectedResults.test_git_04.commitDate}_${expectedResults.test_git_04.tag}_` +
+                expectedResults.test_git_04.commit.substring(0, 8);
+            console.log('     ›', 'Pasta via getRemoteClonePath:', p);
+            console.log('     ›', 'Pasta remota esperada:       ', remote);
+            assert.ok(p === remote, 'Pasta não conferem');
+        } else {
+            console.log('     ›', 'Falta este teste no Linux');
+        }
     });
 });

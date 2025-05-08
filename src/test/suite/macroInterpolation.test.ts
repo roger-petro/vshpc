@@ -4,7 +4,7 @@ import { macroInterpolation } from '../../path';
 import { baseWindowsSettings } from './test-data.nocommit';
 import path from 'path';
 
-suite('macroInterpolation()', () => {
+suite('function macroInterpolation()', () => {
     test('substitui {user} e {project}', () => {
         const result = macroInterpolation(
             'Usuário: {user} — Projeto: {project}',

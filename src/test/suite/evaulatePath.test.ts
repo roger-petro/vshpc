@@ -7,20 +7,11 @@ import path from 'path';
 suite('evaluatePath()', () => {
     test('Converte do settings.workdir', () => {
         const result = evaluatePath(settings);
-        assert.strictEqual(result, expectedResults['test1']['output']);
+        assert.strictEqual(result, expectedResults['test_path_01']['output']);
     });
 
     test('Converte path with alias', () => {
-        const result = evaluatePath(settings, expectedResults['test2']['input']);
-        assert.strictEqual(result, expectedResults['test2']['output']);
+        const result = evaluatePath(settings, expectedResults['test_path_02']['input']);
+        assert.strictEqual(result, expectedResults['test_path_02']['output']);
     });
-
-    // test("gera data no formato YYYY-MM-DD-HH:mm:ss em {date}", () => {
-    //   const result = macroInterpolation("Hoje é {date}", baseWindowsSettings);
-    //   assert.match(
-    //     result,
-    //     /^Hoje é \d{4}-\d{2}-\d{2}-\d{2}:\d{2}:\d{2}$/,
-    //     "a data não corresponde ao formato esperado"
-    //   );
-    // });
 });

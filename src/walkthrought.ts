@@ -4,7 +4,7 @@
 
 import * as vscode from 'vscode';
 import * as PubSub from 'pubsub-js';
-import { APP_NAME } from './types';
+import { APP_NAME } from './types.js';
 
 export function setWalkthroughsCmds(context: vscode.ExtensionContext) {
     context.subscriptions.push(

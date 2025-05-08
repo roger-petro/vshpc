@@ -4,6 +4,7 @@ import path from 'path';
 import * as fs from 'fs/promises';
 import * as vscode from 'vscode';
 import * as dotenv from 'dotenv';
+
 dotenv.config({ path: path.resolve(__dirname, '../../.env.test') });
 
 import { baseWindowsSettings, expectedResults } from './test-data.nocommit';
@@ -25,7 +26,7 @@ import { submit } from '../../submit';
 import { SubmitOption } from '../../types';
 import { Repository } from '../../repository';
 
-suite('Test Commands', async function (this: Suite) {
+suite('vshpc execution commands', async function (this: Suite) {
     this.timeout(100_000);
     let ctx: vscode.ExtensionContext;
     let modelUri: vscode.Uri;
@@ -66,7 +67,7 @@ suite('Test Commands', async function (this: Suite) {
 
     test('posso obter o globalStorageUri e montar o configFileUri', () => {
         const uri = vscode.Uri.joinPath(ctx.globalStorageUri, 'vshpc.json');
-        console.log('configFileUri =', uri.toString());
+        //console.log('configFileUri =', uri.toString());
         assert.ok(uri.path.endsWith('/vshpc.json'));
     });
 
@@ -137,7 +138,7 @@ suite('Test Commands', async function (this: Suite) {
         assert.ok(ws && ws.length > 0, 'nenhuma workspace aberta');
         // confere que o path corresponde ao que passamos
         const opened = ws[0].uri.fsPath;
-        console.log('Workspace aberto em:', opened);
+        //console.log('Workspace aberto em:', opened);
         assert.ok(opened.toLowerCase().includes('usuarios'));
     });
 
@@ -163,34 +164,39 @@ suite('Test Commands', async function (this: Suite) {
             false,
             null,
         );
-        console.log('Retorno do submit:', ret);
+
         assert.equal(ret.success, true);
+        assert.match(ret.message, /[0-9]{6,}/);
+        console.log('     ›', 'Retorno do submit:', ret);
     });
 
-    // test('Envio de um model com git', async () => {
-    //     const simRootUri = vscode.workspace.workspaceFolders![0].uri;
-    //     modelUri = vscode.Uri.joinPath(simRootUri, process.env.MODEL_NAME || 'bogus.file');
-    //     const settings = await loadSettings(ctx);
-    //     await adjustSettings(ctx);
-    //     settings.user = baseWindowsSettings.user;
-    //     settings.cluster = baseWindowsSettings.cluster;
-    //     settings.privRsaKey = baseWindowsSettings.privRsaKey;
-    //     settings.passwd = encrypt(process.env.PASSWORD || '');
-    //     settings.account = baseWindowsSettings.account;
-    //     settings.solverName = baseWindowsSettings.solverName;
-    //     settings.solverVersion = baseWindowsSettings.solverVersion;
-    //     settings.solverCores = baseWindowsSettings.solverCores;
-    //     settings.solverNodes = baseWindowsSettings.solverNodes;
-    //     settings.solverExtras = baseWindowsSettings.solverExtras;
-    //     const repo = new Repository(settings, '');
-    //     const ret = await submit(
-    //         process.env.MODEL_NAME || 'bogus.file',
-    //         settings,
-    //         SubmitOption.git,
-    //         false,
-    //         repo,
-    //     );
-    //     console.log('Retorno do submit:', ret);
-    //     assert.equal(ret.success, true);
-    // });
+    test('Envio de um model com git', async () => {
+        const simRootUri = vscode.workspace.workspaceFolders![0].uri;
+        modelUri = vscode.Uri.joinPath(simRootUri, process.env.MODEL_NAME || 'bogus.file');
+        const settings = await loadSettings(ctx);
+        await adjustSettings(ctx);
+        settings.user = baseWindowsSettings.user;
+        settings.cluster = baseWindowsSettings.cluster;
+        settings.privRsaKey = baseWindowsSettings.privRsaKey;
+        settings.passwd = encrypt(process.env.PASSWORD || '');
+        settings.account = baseWindowsSettings.account;
+        settings.solverName = baseWindowsSettings.solverName;
+        settings.solverVersion = baseWindowsSettings.solverVersion;
+        settings.solverCores = baseWindowsSettings.solverCores;
+        settings.solverNodes = baseWindowsSettings.solverNodes;
+        settings.solverExtras = baseWindowsSettings.solverExtras;
+        const repo = new Repository(settings, '');
+        await repo.getLocalMetaData(null);
+        await repo.getRemoteMetaData();
+        const ret = await submit(
+            process.env.MODEL_NAME || 'bogus.file',
+            settings,
+            SubmitOption.git,
+            false,
+            repo,
+        );
+        assert.equal(ret.success, true);
+        assert.match(ret.message, /[0-9]{6,}/);
+        console.log('Retorno do submit:', ret);
+    });
 });
