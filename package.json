@@ -7,7 +7,7 @@
         "type": "git",
         "url": "https://github.com/roger-petro/vshpc.git"
     },
-    "version": "1.0.4",
+    "version": "1.1.0",
     "engines": {
         "vscode": "^1.75.0"
     },

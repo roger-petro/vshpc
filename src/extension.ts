@@ -437,7 +437,7 @@ async function activate(context: vscode.ExtensionContext) {
 
 function deactivate() {}
 
-export function getExtensionContext(): vscode.ExtensionContext {
+function getExtensionContext(): vscode.ExtensionContext {
     if (!extensionContext) {
         throw new Error('Extensão ainda não foi ativada');
     }
