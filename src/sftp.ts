@@ -2,7 +2,6 @@ import { readFileSync } from 'fs';
 import { LogOpt } from './types';
 import { decrypt } from './crypto';
 import * as PubSub from 'pubsub-js';
-import { WithImplicitCoercion } from 'buffer';
 
 export async function scpRead(
     content: string,
@@ -43,7 +42,7 @@ export async function scpRead(
             .then(() => {
                 return client.get(content, undefined);
             })
-            .then((buffer: WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer>) => {
+            .then((buffer: ArrayBuffer | SharedArrayBuffer) => {
                 client.end();
                 //console.log(Buffer.from(buffer).toString('base64'));
                 resolve(Buffer.from(buffer).toString('base64'));

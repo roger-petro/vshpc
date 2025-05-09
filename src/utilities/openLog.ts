@@ -20,18 +20,43 @@ type PayLoad = {
 export function evaluatePathReverse(path: string) {
     let rev = '';
     let settings = getSettings();
-    let unix2Windows = settings.customConfig.settings.defaultUnixWindows;
-    for (const [key, value] of Object.entries(unix2Windows)) {
-        if (path.startsWith(key)) {
+
+    let reverseMapping = {};
+
+    if (process.platform === 'win32') {
+        console.log('Mapeamento será feito para Windows');
+        reverseMapping = settings.customConfig.settings.defaultUnixWindows;
+    }
+    if (process.platform === 'linux') {
+        console.log('Mapeamento será feito para Linux');
+        if ('defaultUnixReverseMapping' in settings.customConfig.settings) {
+            reverseMapping = settings.customConfig.settings.defaultUnixReverseMapping;
+            if (Object.keys(reverseMapping).length === 0) {
+                console.log('Reverse mapping está vazio para o linux. Problema?');
+                rev = path;
+            }
+        } else {
+            console.log('O Reverse mapping para o linux não existe. Problema?');
+            rev = path;
+        }
+    }
+    for (const [key, value] of Object.entries(reverseMapping)) {
+        if (path.startsWith(key) && typeof value === 'string') {
+            console.log('trocando:', key, ' por ', value);
             rev = path.replace(key, value);
-            rev = rev.replaceAll('\\\\', '\\');
             break;
         }
     }
+
+    if (rev.includes('\\\\')) {
+        rev = rev.replaceAll('\\\\', '\\');
+    }
+
+    rev = rev.replaceAll('\\', '/').replaceAll('//', '/');
     if (!rev.startsWith('/')) {
         rev = '/' + rev;
     }
-    rev = rev.replaceAll('\\', '/').replaceAll('//', '/');
+    console.log('antes:', path, ' depois:', rev);
     return rev;
 }
 

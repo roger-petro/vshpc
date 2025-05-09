@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: path.resolve(__dirname, '../../.env.test') });
 
-import { baseWindowsSettings, expectedResults } from './test-data.nocommit';
+import { baseSettings, expectedResults } from './test-data.nocommit';
 
 import {
     checkAccountSettings,
@@ -63,11 +63,11 @@ suite('Git commands', async function (this: Suite) {
         await vscode.workspace.fs.writeFile(destUri, content);
 
         /** essa variáveis eu quero sobrescrever em relaçao ao vshpc.json */
-        settings.user = baseWindowsSettings.user;
-        settings.cluster = baseWindowsSettings.cluster;
-        settings.privRsaKey = baseWindowsSettings.privRsaKey;
+        settings.user = baseSettings.user;
+        settings.cluster = baseSettings.cluster;
+        settings.privRsaKey = baseSettings.privRsaKey;
         settings.passwd = encrypt(process.env.PASSWORD || '');
-        settings.account = baseWindowsSettings.account;
+        settings.account = baseSettings.account;
     });
     test('Check if is git', async function () {
         let isrepo = await checkIsRepo(settings.workdir);

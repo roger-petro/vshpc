@@ -19,7 +19,7 @@ let settings: SettingsType = {
     solverVersion: '',
     account: '',
     slurm: '',
-    sbatch: '',
+    sbatch: '/usr/bin/sbatch',
     solverExtras: '',
     solverCores: 1,
     solverNodes: 1,
@@ -99,8 +99,6 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
     let ret: string | undefined;
 
     try {
-        settings.customConfig = (await getCustomConfig(context)) as CustomConfig;
-
         let user = process.env.USERNAME;
         if (user === undefined) {
             user = '';
@@ -186,78 +184,86 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
             .get('solver.name', '')
             .trim();
 
-        if (Object.keys(settings.customConfig.settings.solverNames).includes(settings.solverName)) {
-            settings.solverName = settings.customConfig.settings.solverNames[settings.solverName];
-        }
+        settings.customConfig = ((await getCustomConfig(context)) as CustomConfig) || {};
+        if (Object.keys(settings.customConfig).length > 0) {
+            if (
+                Object.keys(settings.customConfig.settings.solverNames).includes(
+                    settings.solverName,
+                )
+            ) {
+                settings.solverName =
+                    settings.customConfig.settings.solverNames[settings.solverName];
+            }
 
-        let simulator = settings.customConfig.simulators.find(item =>
-            item.solvers.find(sol => sol === settings.solverName),
-        ) as Simulator;
+            let simulator = settings.customConfig.simulators.find(item =>
+                item.solvers.find(sol => sol === settings.solverName),
+            ) as Simulator;
 
-        settings.sbatch = simulator.sbatch.trim() || '/usr/bin/sbatch';
-        settings.solverExtras = vscode.workspace
-            .getConfiguration(APP_NAME)
-            .get('solver.ExtraParams', '')
-            .trim();
-        settings.slurm = vscode.workspace
-            .getConfiguration(APP_NAME)
-            .get('scheduler.slurm', '')
-            .trim();
-        settings.account = getAccount(settings.slurm);
-        settings.solverCores = vscode.workspace
-            .getConfiguration(APP_NAME)
-            .get('scheduler.cores', 1);
-        settings.solverNodes = vscode.workspace
-            .getConfiguration(APP_NAME)
-            .get('scheduler.nodes', 1);
-        settings.ntasksPerNode = vscode.workspace
-            .getConfiguration(APP_NAME)
-            .get('scheduler.ntasksPerNode', 1);
-        settings.mpiExtras = vscode.workspace
-            .getConfiguration(APP_NAME)
-            .get('scheduler.mpiExtras', '');
+            settings.sbatch = simulator.sbatch.trim() || '/usr/bin/sbatch';
 
-        if ('ux' in settings.customConfig) {
-            settings.webviewHistSize =
-                'histSize' in settings.customConfig.ux
-                    ? Number(settings.customConfig.ux['histSize'])
-                    : 20;
-            settings.webviewJobsSize =
-                'jobsSize' in settings.customConfig.ux
-                    ? Number(settings.customConfig.ux['jobsSize'])
-                    : 20;
-        }
+            settings.solverExtras = vscode.workspace
+                .getConfiguration(APP_NAME)
+                .get('solver.ExtraParams', '')
+                .trim();
+            settings.slurm = vscode.workspace
+                .getConfiguration(APP_NAME)
+                .get('scheduler.slurm', '')
+                .trim();
+            settings.account = getAccount(settings.slurm);
+            settings.solverCores = vscode.workspace
+                .getConfiguration(APP_NAME)
+                .get('scheduler.cores', 1);
+            settings.solverNodes = vscode.workspace
+                .getConfiguration(APP_NAME)
+                .get('scheduler.nodes', 1);
+            settings.ntasksPerNode = vscode.workspace
+                .getConfiguration(APP_NAME)
+                .get('scheduler.ntasksPerNode', 1);
+            settings.mpiExtras = vscode.workspace
+                .getConfiguration(APP_NAME)
+                .get('scheduler.mpiExtras', '');
 
-        let verErro = false;
-        switch (simulator.verRegexpClass) {
-            case '2':
-                if (!settings.solverVersion.match(/\d{4}\.\d{2}/)) {
-                    verErro = true;
-                }
-                break;
-            case '3':
-                if (!settings.solverVersion.match(/\d{8}/)) {
-                    verErro = true;
-                }
-                break;
-            case '4':
-                if (!settings.solverVersion.match(/\d{4}\.\d+/)) {
-                    verErro = true;
-                }
-                break;
-            case '5':
-                if (!settings.solverVersion.match(/v\d+\.\d/)) {
-                    verErro = true;
-                }
-                break;
-        }
+            if ('ux' in settings.customConfig) {
+                settings.webviewHistSize =
+                    'histSize' in settings.customConfig.ux
+                        ? Number(settings.customConfig.ux['histSize'])
+                        : 20;
+                settings.webviewJobsSize =
+                    'jobsSize' in settings.customConfig.ux
+                        ? Number(settings.customConfig.ux['jobsSize'])
+                        : 20;
+            }
+            let verErro = false;
+            switch (simulator.verRegexpClass) {
+                case '2':
+                    if (!settings.solverVersion.match(/\d{4}\.\d{2}/)) {
+                        verErro = true;
+                    }
+                    break;
+                case '3':
+                    if (!settings.solverVersion.match(/\d{8}/)) {
+                        verErro = true;
+                    }
+                    break;
+                case '4':
+                    if (!settings.solverVersion.match(/\d{4}\.\d+/)) {
+                        verErro = true;
+                    }
+                    break;
+                case '5':
+                    if (!settings.solverVersion.match(/v\d+\.\d/)) {
+                        verErro = true;
+                    }
+                    break;
+            }
 
-        if (verErro) {
-            settings.solverVersion = simulator.defaultSolverVersion;
-            PubSub.publish(
-                LogOpt.toast,
-                `Reajustada versão do solver para ${settings.solverVersion}. Confira o settings.`,
-            );
+            if (verErro) {
+                settings.solverVersion = simulator.defaultSolverVersion;
+                PubSub.publish(
+                    LogOpt.toast,
+                    `Reajustada versão do solver para ${settings.solverVersion}. Confira o settings.`,
+                );
+            }
         }
     } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);

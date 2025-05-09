@@ -61,7 +61,7 @@
                     {
                         "id": "rogerio-cunha.vshpc.configure_test",
                         "title": "Testar se a configuração está correta",
-                        "description": "Por fim, as configurações podem ser testadas usando a paleta de comandos do VSCODE, na opção HPC: Verificar Configurações\n[Testar a configuração agora](command:rogerio-cunha.vshpc.checkSettings)",
+                        "description": "Por fim, as configurações podem ser testadas (tendo um modelo aberto) usando a paleta de comandos do VSCODE, na opção HPC: Verificar Configurações\n[Testar a configuração agora](command:rogerio-cunha.vshpc.checkSettings)",
                         "media": {
                             "image": "images/icon.png",
                             "altText": "Test configuration"
@@ -337,14 +337,14 @@
                         "additionalProperties": {
                             "type": "string"
                         },
-                        "markdownDescription": "Relação `de-para` entre o caminho e Windows e o caminho Unix visto pelo Cluster. [Carregue uma configuração customizada](command:rogerio-cunha.vshpc.loadCustomConfiguration) para obter valores default.",
+                        "markdownDescription": "Relação `de-para` entre o caminho e Windows e o caminho Unix visto pelo Cluster (ou do Linux para o cluster, se tiver rodando neste sistema). [Carregue uma configuração customizada](command:rogerio-cunha.vshpc.loadCustomConfiguration) para obter valores default.",
                         "scope": "application",
                         "order": 5
                     },
                     "vshpc.path.destination": {
                         "type": "string",
                         "markdownDescription": "Pasta absoluta ou relativa, no formato Windows, indicando o destino para onde serão realizados os clones e as simulações quando usando simulações com clone. Veja o README.md para exemplos. Qualquer valor diferente de ..\\ e .\\ (nível da pasta pai e nível atual) implicará em não poder haver um mesmo job rodando para o modelo. Prefira configurar este item na `TAB` workspace.",
-                        "default": "..\\",
+                        "default": "..",
                         "order": 6
                     },
                     "vshpc.path.folderFormat": {
@@ -431,7 +431,6 @@
             }
         ]
     },
-
     "scripts": {
         "vscode:prepublish": "npm run build:web && npm run esbuild-base -- --minify",
         "build:all": "npm run build:web && npm run esbuild-base -- --minify",
@@ -443,13 +442,14 @@
         "lint": "eslint src",
         "testOld": "vscode-test",
         "test": "npm run compile && node ./out/test/runTest.js",
-        "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=./out/extension.js --external:vscode --format=cjs --platform=node",
+        "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=./out/extension.js --external:vscode  --external:cpu-features --external:ssh2 --format=cjs --platform=node",
         "esbuild": "npm run esbuild-base -- --sourcemap",
         "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
         "package": "npm run build:all && vsce package"
     },
     "devDependencies": {
         "@types/chai": "^5.2.2",
+        "@types/dotenv": "^6.1.1",
         "@types/mocha": "^10.0.10",
         "@types/node": "^20.17.46",
         "@types/pubsub-js": "^1.8.6",
@@ -463,6 +463,7 @@
         "@vscode/vsce": "^3.1.0",
         "chai": "^5.2.0",
         "chalk": "^5.4.1",
+        "dotenv": "^16.5.0",
         "esbuild": "^0.24.0",
         "eslint": "^9.9.1",
         "mocha": "^10.2.0",
@@ -474,7 +475,6 @@
         "axios": "^1.7.7",
         "cors": "^2.8.5",
         "crypto": "^1.0.1",
-        "dotenv": "^16.5.0",
         "express": "^4.21.0",
         "flatted": "^3.3.1",
         "http-proxy-middleware": "^3.0.2",

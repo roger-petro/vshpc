@@ -17,6 +17,7 @@ async function main() {
             process.exit(1);
         }
         await runTests({
+            version: '1.98.2',
             extensionDevelopmentPath,
             extensionTestsPath,
             launchArgs: [

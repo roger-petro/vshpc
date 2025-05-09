@@ -17,7 +17,7 @@ export const expectedResults = {
        output: '<string com o path esperado na saida>',
    },
 };
-export const baseWindowsSettings: SettingsType = {
+export const baseSettings: SettingsType = {
    contem um tipo settings preenchido com valores de teste
 
 }

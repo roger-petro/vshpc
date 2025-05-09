@@ -30,7 +30,7 @@ let currentJobs: JobArrayType[] = [];
 /** retornar o contexto para uso nos testes unitários */
 let extensionContext: vscode.ExtensionContext;
 
-async function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
     extensionContext = context;
     const vshpcLog = vscode.window.createOutputChannel('vsHPC Log');
 
@@ -66,11 +66,11 @@ async function activate(context: vscode.ExtensionContext) {
     let settings: SettingsType;
     loadSettings(context).then(val => {
         settings = val;
-        vscode.workspace.onDidChangeConfiguration(() => {
-            loadSettings(context);
-            //PubSub.publish(LogOpt.toast,"Configurações recarregadas");
-            PubSub.publish(LogOpt.vshpc, '> activate: Novas configurações carregadas');
-        });
+        PubSub.publish(LogOpt.vshpc, '> activate: Novas configurações carregadas');
+        //vscode.workspace.onDidChangeConfiguration(() => {
+        //    loadSettings(context);
+        //    //PubSub.publish(LogOpt.toast,"Configurações recarregadas");
+        //});
     });
 
     vscode.workspace.onDidOpenTextDocument(e => {
@@ -317,11 +317,27 @@ async function activate(context: vscode.ExtensionContext) {
     let checkSettings = vscode.commands.registerCommand(
         'rogerio-cunha.vshpc.checkSettings',
         async function () {
+            const include = '**/*.{dat,DATA,gdt,geo}';
+            const exclude = undefined; // nenhum folder a excluir
+            const maxResults = 1; // já para ao achar o primeiro
+
+            const files = await vscode.workspace.findFiles(include, exclude, maxResults);
+            if (files.length === 0) {
+                if (settings.solverName.length < 2) {
+                    PubSub.publish(
+                        LogOpt.toast,
+                        'Para realizar os testes completos da extensão abra primeiro um folder com seu modelo de simulação',
+                    );
+                    return false;
+                }
+                return;
+            }
             vscode.commands.executeCommand('workbench.action.splitEditorRight').then(() => {
                 vscode.commands
                     .executeCommand('workbench.action.focusRightGroup')
                     .then(async () => {
                         const uri = vscode.Uri.parse('settingsSchema:Configurações');
+
                         precheck();
                         const doc = await vscode.workspace.openTextDocument(uri);
                         await vscode.window.showTextDocument(doc, { preview: false });
@@ -435,17 +451,11 @@ async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(selectSimulVersion);
 }
 
-function deactivate() {}
+export function deactivate() {}
 
-function getExtensionContext(): vscode.ExtensionContext {
+export function getExtensionContext(): vscode.ExtensionContext {
     if (!extensionContext) {
         throw new Error('Extensão ainda não foi ativada');
     }
     return extensionContext;
 }
-
-module.exports = {
-    activate,
-    deactivate,
-    getExtensionContext,
-};

@@ -85,5 +85,5 @@ export function macroInterpolation(input: string, params: SettingsType): string 
     return out;
 }
 
-// import { baseWindowsSettings } from '../src/test/suite/baseSettings';
-// console.log(evaluatePath(baseWindowsSettings, 'L:\\res\\outros\\simuls\\'));
+// import { baseSettings } from '../src/test/suite/baseSettings';
+// console.log(evaluatePath(baseSettings, 'L:\\res\\outros\\simuls\\'));

@@ -7,7 +7,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config({ path: path.resolve(__dirname, '../../.env.test') });
 
-import { baseWindowsSettings, expectedResults } from './test-data.nocommit';
+import { baseSettings, expectedResults } from './test-data.nocommit';
 
 import {
     checkAccountSettings,
@@ -58,11 +58,11 @@ suite('vshpc execution commands', async function (this: Suite) {
         const settings = await loadSettings(ctx);
 
         /** essa variáveis eu quero sobrescrever em relaçao ao vshpc.json */
-        settings.user = baseWindowsSettings.user;
-        settings.cluster = baseWindowsSettings.cluster;
-        settings.privRsaKey = baseWindowsSettings.privRsaKey;
+        settings.user = baseSettings.user;
+        settings.cluster = baseSettings.cluster;
+        settings.privRsaKey = baseSettings.privRsaKey;
         settings.passwd = encrypt(process.env.PASSWORD || '');
-        settings.account = baseWindowsSettings.account;
+        settings.account = baseSettings.account;
     });
 
     test('posso obter o globalStorageUri e montar o configFileUri', () => {
@@ -82,11 +82,11 @@ suite('vshpc execution commands', async function (this: Suite) {
         const settings = await loadSettings(ctx);
 
         /** essa variáveis eu quero sobrescrever em relaçao ao vshpc.json */
-        settings.user = baseWindowsSettings.user;
-        settings.cluster = baseWindowsSettings.cluster;
-        settings.privRsaKey = baseWindowsSettings.privRsaKey;
+        settings.user = baseSettings.user;
+        settings.cluster = baseSettings.cluster;
+        settings.privRsaKey = baseSettings.privRsaKey;
         settings.passwd = encrypt(process.env.PASSWORD || '');
-        settings.account = baseWindowsSettings.account;
+        settings.account = baseSettings.account;
         const ret = await vscode.commands.executeCommand<string>('rogerio-cunha.vshpc.jobCheckSSH');
         assert.strictEqual(ret, '200');
     });
@@ -95,11 +95,11 @@ suite('vshpc execution commands', async function (this: Suite) {
         const settings = await loadSettings(ctx);
 
         /** essa variáveis eu quero sobrescrever em relaçao ao vshpc.json */
-        settings.user = baseWindowsSettings.user;
-        settings.cluster = baseWindowsSettings.cluster;
-        settings.privRsaKey = baseWindowsSettings.privRsaKey;
+        settings.user = baseSettings.user;
+        settings.cluster = baseSettings.cluster;
+        settings.privRsaKey = baseSettings.privRsaKey;
         settings.passwd = encrypt(process.env.PASSWORD || '');
-        settings.account = baseWindowsSettings.account;
+        settings.account = baseSettings.account;
         const ret = await vscode.commands.executeCommand<string>('rogerio-cunha.vshpc.jobMock');
         assert.strictEqual(ret, '200');
     });
@@ -116,11 +116,11 @@ suite('vshpc execution commands', async function (this: Suite) {
         const settings = await loadSettings(ctx);
         await adjustSettings(ctx);
         /** essa variáveis eu quero sobrescrever em relaçao ao vshpc.json */
-        settings.user = baseWindowsSettings.user;
-        settings.cluster = baseWindowsSettings.cluster;
-        settings.privRsaKey = baseWindowsSettings.privRsaKey;
+        settings.user = baseSettings.user;
+        settings.cluster = baseSettings.cluster;
+        settings.privRsaKey = baseSettings.privRsaKey;
         settings.passwd = encrypt(process.env.PASSWORD || '');
-        settings.account = baseWindowsSettings.account;
+        settings.account = baseSettings.account;
 
         const ret1 = await precheck();
         let m1 = ret1.match(/falhou|nok|erro/i);
@@ -147,16 +147,16 @@ suite('vshpc execution commands', async function (this: Suite) {
         modelUri = vscode.Uri.joinPath(simRootUri, process.env.MODEL_NAME || 'bogus.file');
         const settings = await loadSettings(ctx);
         await adjustSettings(ctx);
-        settings.user = baseWindowsSettings.user;
-        settings.cluster = baseWindowsSettings.cluster;
-        settings.privRsaKey = baseWindowsSettings.privRsaKey;
+        settings.user = baseSettings.user;
+        settings.cluster = baseSettings.cluster;
+        settings.privRsaKey = baseSettings.privRsaKey;
         settings.passwd = encrypt(process.env.PASSWORD || '');
-        settings.account = baseWindowsSettings.account;
-        settings.solverName = baseWindowsSettings.solverName;
-        settings.solverVersion = baseWindowsSettings.solverVersion;
-        settings.solverCores = baseWindowsSettings.solverCores;
-        settings.solverNodes = baseWindowsSettings.solverNodes;
-        settings.solverExtras = baseWindowsSettings.solverExtras;
+        settings.account = baseSettings.account;
+        settings.solverName = baseSettings.solverName;
+        settings.solverVersion = baseSettings.solverVersion;
+        settings.solverCores = baseSettings.solverCores;
+        settings.solverNodes = baseSettings.solverNodes;
+        settings.solverExtras = baseSettings.solverExtras;
         const ret = await submit(
             process.env.MODEL_NAME || 'bogus.file',
             settings,
@@ -175,16 +175,16 @@ suite('vshpc execution commands', async function (this: Suite) {
         modelUri = vscode.Uri.joinPath(simRootUri, process.env.MODEL_NAME || 'bogus.file');
         const settings = await loadSettings(ctx);
         await adjustSettings(ctx);
-        settings.user = baseWindowsSettings.user;
-        settings.cluster = baseWindowsSettings.cluster;
-        settings.privRsaKey = baseWindowsSettings.privRsaKey;
+        settings.user = baseSettings.user;
+        settings.cluster = baseSettings.cluster;
+        settings.privRsaKey = baseSettings.privRsaKey;
         settings.passwd = encrypt(process.env.PASSWORD || '');
-        settings.account = baseWindowsSettings.account;
-        settings.solverName = baseWindowsSettings.solverName;
-        settings.solverVersion = baseWindowsSettings.solverVersion;
-        settings.solverCores = baseWindowsSettings.solverCores;
-        settings.solverNodes = baseWindowsSettings.solverNodes;
-        settings.solverExtras = baseWindowsSettings.solverExtras;
+        settings.account = baseSettings.account;
+        settings.solverName = baseSettings.solverName;
+        settings.solverVersion = baseSettings.solverVersion;
+        settings.solverCores = baseSettings.solverCores;
+        settings.solverNodes = baseSettings.solverNodes;
+        settings.solverExtras = baseSettings.solverExtras;
         const repo = new Repository(settings, '');
         await repo.getLocalMetaData(null);
         await repo.getRemoteMetaData();

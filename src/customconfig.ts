@@ -12,36 +12,44 @@ import { LogOpt, CustomConfig, CustomError, Simulator, APP_NAME } from './types'
 import { getSettings } from './settings';
 
 const CUSTOM_CONFIG_NAME = 'vshpc.json';
+const CUSTOM_VERSION = '2';
 
 export async function adjustSettings(context: vscode.ExtensionContext) {
     const settings = getSettings();
     const customConfig = await getCustomConfig(context);
-    if (settings.privRsaKey === '') {
-        settings.privRsaKey = customConfig.settings.defaultPrivRSAKey.replace(
-            '{user}',
-            settings.user,
-        );
-        vscode.workspace
-            .getConfiguration(APP_NAME)
-            .update('connection.privRsaKey', settings.privRsaKey, true);
-    }
-    if (!settings.cluster || settings.cluster === '') {
-        settings.cluster = customConfig.settings.defaultCluster;
-        vscode.workspace
-            .getConfiguration(APP_NAME)
-            .update('connection.cluster', settings.cluster, true);
-    }
-    if (Object.keys(settings.pathMapping).length === 0) {
-        settings.pathMapping = customConfig.settings.defaultWindowsUnix;
-        vscode.workspace
-            .getConfiguration(APP_NAME)
-            .update('path.WindowsUnix', settings.pathMapping, true);
-    }
-    if (settings.folderFormat === '') {
-        settings.folderFormat = customConfig.settings.defaultFolderFormat;
-        vscode.workspace
-            .getConfiguration(APP_NAME)
-            .update('path.folderFormat', customConfig.settings.defaultFolderFormat, true);
+
+    if (customConfig) {
+        if (settings.privRsaKey === '') {
+            let rsafile = customConfig.settings.defaultPrivRSAKey;
+            if (process.platform === 'linux') {
+                rsafile = customConfig.settings.defaultLinuxPrivRSAKey;
+            }
+            settings.privRsaKey = rsafile.replace('{user}', settings.user);
+            vscode.workspace
+                .getConfiguration(APP_NAME)
+                .update('connection.privRsaKey', settings.privRsaKey, true);
+        }
+        if (!settings.cluster || settings.cluster === '') {
+            settings.cluster = customConfig.settings.defaultCluster;
+            vscode.workspace
+                .getConfiguration(APP_NAME)
+                .update('connection.cluster', settings.cluster, true);
+        }
+        if (Object.keys(settings.pathMapping).length === 0) {
+            settings.pathMapping = customConfig.settings.defaultWindowsUnix;
+            if (process.platform === 'linux') {
+                settings.pathMapping = customConfig.settings.defaultUnixMapping;
+            }
+            vscode.workspace
+                .getConfiguration(APP_NAME)
+                .update('path.WindowsUnix', settings.pathMapping, true);
+        }
+        if (settings.folderFormat === '') {
+            settings.folderFormat = customConfig.settings.defaultFolderFormat;
+            vscode.workspace
+                .getConfiguration(APP_NAME)
+                .update('path.folderFormat', customConfig.settings.defaultFolderFormat, true);
+        }
     }
 }
 
@@ -217,17 +225,28 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
     context.subscriptions.push(loadCustomConfig);
 }
 
-export async function getCustomConfig(context: vscode.ExtensionContext): Promise<any> {
+export async function getCustomConfig(
+    context: vscode.ExtensionContext,
+): Promise<CustomConfig | null> {
+    const configFileUri = vscode.Uri.joinPath(context.globalStorageUri, CUSTOM_CONFIG_NAME);
     try {
-        const configFileUri = vscode.Uri.joinPath(context.globalStorageUri, CUSTOM_CONFIG_NAME);
         PubSub.publish(LogOpt.vshpc, `> O customconfig será lido de ${configFileUri}`);
         const fileContent = await vscode.workspace.fs.readFile(configFileUri);
         const customConfig = JSON.parse(Buffer.from(fileContent).toString('utf-8'));
+        if (customConfig && 'version' in customConfig && customConfig.version !== CUSTOM_VERSION) {
+            vscode.window.showWarningMessage(
+                `Carregue a versão ${CUSTOM_VERSION} das configurações customizadas. Fale com o administrador.`,
+            );
+        }
         return customConfig;
     } catch (error) {
+        if (error instanceof vscode.FileSystemError && error.code === 'FileNotFound') {
+            // o arquivo não existe
+            PubSub.publish(LogOpt.vshpc, `> O customconfig não foi encontrado em ${configFileUri}`);
+        }
         const msg = error instanceof Error ? error.message : String(error);
         vscode.window.showErrorMessage(
-            'Você precisa carregar as configurações aplicadas à sua empresa. Fale com o administrador/mantendor da aplicação para obter o arquivo de configuração para [carregá-las neste comando](command:rogerio-cunha.vshpc.loadCustomConfiguration).',
+            `VSHPC: Carregue as configurações da sua empresa. Fale com o administrador/mantendor para obter o arquivo JSON na versão ${CUSTOM_VERSION} e [carregá-las neste comando](command:rogerio-cunha.vshpc.loadCustomConfiguration).`,
         );
         return null;
     }
