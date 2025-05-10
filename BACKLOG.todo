@@ -1,0 +1,10 @@
+# Todo
+
+- bug da pasta (drive) que mapeia o home unix do usuário
+- sobrescrer as configuras se a versão antigo for velha, perguntando ao usuário.
+- tentar instalar o json de uma url no servidor git ou outro.
+- clonar se a pasta tiver vazia (colocar o commit.json lá e verificar ele), ou forçar clonar se ela existir e o usuário pedir
+- colocar hash no histórico do vshpc
+
+ok - fazer ele rodar no linux
+ok - identificar se a versão velha está instalada e alarmar
