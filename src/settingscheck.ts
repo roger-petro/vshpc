@@ -4,6 +4,8 @@ import { Repository } from './repository';
 import { sendSSHcommand } from './ssh2';
 import { getSettings } from './settings';
 import * as PubSub from 'pubsub-js';
+import { SettingsType } from './types';
+import { CUSTOM_VERSION } from './customconfig';
 
 const checks = {
     sshUser: '- Acesso SSH via senha: Falhou',
@@ -33,7 +35,7 @@ export function precheck() {
     formattedSettings = '';
     const settings = getSettings();
     for (let item in settings) {
-        const value = print(item, (settings as any)[item]);
+        const value = print(item, (settings as any)[item], settings);
         formattedSettings = formattedSettings + value + '\n';
     }
     formattedSettings = formattedSettings + '\n' + 'Aguarde o restante do relatório....' + '\n\n';
@@ -141,7 +143,7 @@ async function checkAsyncs() {
     }
 }
 
-function print(key: string, value: any): string {
+function print(key: string, value: any, settings: SettingsType): string {
     let newKey = key;
     switch (key) {
         case 'user':
@@ -192,7 +194,10 @@ function print(key: string, value: any): string {
         case 'workdir':
             newKey = 'Pasta de trabalho atual (workdir)';
         case 'customConfig':
-            return 'customConfig: Não apresentado';
+            if (Object.keys(settings.customConfig.settings).length > 0) {
+                return `customConfig: versão do json carregado: ${settings.customConfig.settings.version}. Versão desejada: ${CUSTOM_VERSION}`;
+            }
+            return 'customConfig: custom config não foi carregado';
     }
     if (value === '') {
         value = 'Não preenchido';

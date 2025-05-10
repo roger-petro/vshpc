@@ -12,7 +12,7 @@ import { LogOpt, CustomConfig, CustomError, Simulator, APP_NAME } from './types'
 import { getSettings } from './settings';
 
 const CUSTOM_CONFIG_NAME = 'vshpc.json';
-const CUSTOM_VERSION = '2';
+export const CUSTOM_VERSION = '2';
 
 export async function adjustSettings(context: vscode.ExtensionContext) {
     const settings = getSettings();
@@ -197,22 +197,18 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
                         await vscode.workspace
                             .getConfiguration(APP_NAME)
                             .update('solver.ExtraParams', simulator.defaultSolverExtras, target);
+
+                        try {
+                            vscode.window.showInformationMessage(
+                                `Simulador selecionado: ${selectedDisplayName}. Reabra a janela para ver as mudanças.`,
+                            );
+                        } catch {}
                     } else {
                         PubSub.publish(
                             LogOpt.toast_error,
                             'Erro ao indentificar o simulador nas configurações customizadas: ',
                         );
                     }
-                    vscode.window
-                        .showInformationMessage(
-                            'As configurações foram atualizadas. Por favor, recarregue a janela para aplicar as mudanças.',
-                            'Recarregar',
-                        )
-                        .then(selection => {
-                            if (selection === 'Recarregar') {
-                                vscode.commands.executeCommand('workbench.action.reloadWindow');
-                            }
-                        });
                 }
             } catch (error) {
                 const msg = error instanceof Error ? error.message : String(error);
@@ -235,7 +231,11 @@ export async function getCustomConfig(
         PubSub.publish(LogOpt.vshpc, `> O customconfig será lido de ${configFileUri}`);
         const fileContent = await vscode.workspace.fs.readFile(configFileUri);
         const customConfig = JSON.parse(Buffer.from(fileContent).toString('utf-8'));
-        if (customConfig && 'version' in customConfig && customConfig.version !== CUSTOM_VERSION) {
+        if (
+            customConfig &&
+            'version' in customConfig.settings &&
+            customConfig.settings.version !== CUSTOM_VERSION
+        ) {
             vscode.window.showWarningMessage(
                 `Carregue a versão ${CUSTOM_VERSION} das configurações customizadas. Fale com o administrador.`,
             );

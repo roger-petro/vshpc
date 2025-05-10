@@ -69,7 +69,7 @@ export async function activate(context: vscode.ExtensionContext) {
         PubSub.publish(LogOpt.vshpc, '> activate: Novas configurações carregadas');
         vscode.workspace.onDidChangeConfiguration(() => {
             loadSettings(context, true);
-            //PubSub.publish(LogOpt.toast,"Configurações recarregadas");
+            PubSub.publish(LogOpt.vshpc,"Configurações recarregadas");
         });
     });
 

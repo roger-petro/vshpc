@@ -152,6 +152,7 @@ export type Simulator = {
  */
 export type CustomConfig = {
     settings: {
+        version: string;
         specHash: string;
         dryMode: boolean;
         defaultFolderFormat: string;

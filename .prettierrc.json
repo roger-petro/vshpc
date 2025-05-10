@@ -7,14 +7,5 @@
     "trailingComma": "all",
     "bracketSpacing": true,
     "arrowParens": "avoid",
-    "endOfLine": "lf",
-    "overrides": [
-        {
-            "files": ["*.json", "*.jsonc"],
-            "options": {
-                "parser": "json",
-                "tabWidth": 4
-            }
-        }
-    ]
+    "endOfLine": "lf"
 }
