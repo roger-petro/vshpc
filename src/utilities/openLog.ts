@@ -4,6 +4,7 @@
 import { window, Uri } from 'vscode';
 import { LogOpt } from '../types';
 import { getSettings } from '../settings';
+import { macroInterpolation } from '../path';
 
 type PayLoad = {
     jobid: string;
@@ -15,7 +16,8 @@ type PayLoad = {
 /**
  * Faz o oposto do evaluatePath
  * Pegando o caminho windows dado um caminho linux
- * Retorna um path no formato "Uri.path"
+ * Retorna um path no formato "Uri.path" (barras como /l:/path/dir no windows)
+
  */
 export function evaluatePathReverse(path: string) {
     let rev = '';
@@ -24,11 +26,11 @@ export function evaluatePathReverse(path: string) {
     let reverseMapping = {};
 
     if (process.platform === 'win32') {
-        console.log('Mapeamento será feito para Windows');
+        console.log('       >', 'Mapeamento será feito para Windows');
         reverseMapping = settings.customConfig.settings.defaultUnixWindows;
     }
     if (process.platform === 'linux') {
-        console.log('Mapeamento será feito para Linux');
+        console.log('       >', 'Mapeamento será feito para Linux');
         if ('defaultUnixReverseMapping' in settings.customConfig.settings) {
             reverseMapping = settings.customConfig.settings.defaultUnixReverseMapping;
             if (Object.keys(reverseMapping).length === 0) {
@@ -41,9 +43,18 @@ export function evaluatePathReverse(path: string) {
         }
     }
     for (const [key, value] of Object.entries(reverseMapping)) {
-        if (path.startsWith(key) && typeof value === 'string') {
-            console.log('trocando:', key, ' por ', value);
-            rev = path.replace(key, value);
+        if (path.startsWith(macroInterpolation(key, settings)) && typeof value === 'string') {
+            console.log(
+                '       >',
+                'trocando:',
+                macroInterpolation(key, settings),
+                ' por ',
+                macroInterpolation(value, settings),
+            );
+            rev = path.replace(
+                macroInterpolation(key, settings),
+                macroInterpolation(value, settings),
+            );
             break;
         }
     }
@@ -56,7 +67,7 @@ export function evaluatePathReverse(path: string) {
     if (!rev.startsWith('/')) {
         rev = '/' + rev;
     }
-    console.log('antes:', path, ' depois:', rev);
+    console.log('       >', 'antes:', path, ' depois:', rev);
     return rev;
 }
 

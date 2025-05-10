@@ -76,7 +76,7 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
                 });
 
                 if (!uris || uris.length === 0) {
-                    vscode.window.showInformationMessage('Operação cancelada pelo usuário.');
+                    PubSub.publish(LogOpt.toast, 'Operação cancelada pelo usuário.');
                     return;
                 }
 
@@ -99,13 +99,11 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
                 // Armazenar o último caminho usado
                 await context.globalState.update('lastConfigUri', fileUri.toString());
 
-                vscode.window.showInformationMessage('Configurações carregadas com sucesso!');
+                PubSub.publish(LogOpt.toast, 'Configurações carregadas com sucesso!');
 
                 adjustSettings(context);
             } catch (error: any) {
-                vscode.window.showErrorMessage(
-                    'Erro ao carregar as configurações: ' + error.message,
-                );
+                PubSub.publish(LogOpt.toast, 'Erro ao carregar as configurações: ' + error.message);
             }
         },
     );
@@ -118,7 +116,8 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
                 // Carregar o customConfig
                 const customConfig = (await getCustomConfig(context)) as CustomConfig;
                 if (!customConfig) {
-                    vscode.window.showErrorMessage(
+                    PubSub.publish(
+                        LogOpt.toast_error,
                         'Configurações personalizadas não carregadas. Por favor, execute o comando "Carregar Configuração Personalizada" primeiro.',
                     );
                     return;
@@ -127,7 +126,8 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
                 // Obter solverNames do customConfig
                 const solverNames = customConfig.settings?.solverNames;
                 if (!solverNames || Object.keys(solverNames).length === 0) {
-                    vscode.window.showErrorMessage(
+                    PubSub.publish(
+                        LogOpt.toast_error,
                         'Nenhum simulador encontrado nas configurações personalizadas.',
                     );
                     return;
@@ -142,7 +142,7 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
                 });
 
                 if (!selectedDisplayName) {
-                    vscode.window.showInformationMessage('Operação cancelada pelo usuário.');
+                    PubSub.publish(LogOpt.toast, 'Operação cancelada pelo usuário.');
                     return;
                 }
 
@@ -163,7 +163,7 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
                 );
 
                 if (!selectedScope) {
-                    vscode.window.showInformationMessage('Operação cancelada pelo usuário.');
+                    PubSub.publish(LogOpt.toast, 'Operação cancelada pelo usuário.');
                     return;
                 }
 
@@ -198,7 +198,8 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
                             .getConfiguration(APP_NAME)
                             .update('solver.ExtraParams', simulator.defaultSolverExtras, target);
                     } else {
-                        vscode.window.showErrorMessage(
+                        PubSub.publish(
+                            LogOpt.toast_error,
                             'Erro ao indentificar o simulador nas configurações customizadas: ',
                         );
                     }
@@ -215,7 +216,7 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
                 }
             } catch (error) {
                 const msg = error instanceof Error ? error.message : String(error);
-                vscode.window.showErrorMessage('Erro ao selecionar o simulador: ' + msg);
+                PubSub.publish(LogOpt.toast_error, 'Erro ao selecionar o simulador: ' + msg);
             }
         },
     );
@@ -227,6 +228,7 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
 
 export async function getCustomConfig(
     context: vscode.ExtensionContext,
+    reconf = false,
 ): Promise<CustomConfig | null> {
     const configFileUri = vscode.Uri.joinPath(context.globalStorageUri, CUSTOM_CONFIG_NAME);
     try {
@@ -245,9 +247,12 @@ export async function getCustomConfig(
             PubSub.publish(LogOpt.vshpc, `> O customconfig não foi encontrado em ${configFileUri}`);
         }
         const msg = error instanceof Error ? error.message : String(error);
-        vscode.window.showErrorMessage(
-            `VSHPC: Carregue as configurações da sua empresa. Fale com o administrador/mantendor para obter o arquivo JSON na versão ${CUSTOM_VERSION} e [carregá-las neste comando](command:rogerio-cunha.vshpc.loadCustomConfiguration).`,
-        );
+        if (!reconf) {
+            PubSub.publish(
+                LogOpt.toast,
+                `VSHPC: Carregue as configurações da sua empresa. Fale com o administrador/mantendor para obter o arquivo JSON na versão ${CUSTOM_VERSION} e [carregá-las neste comando](command:rogerio-cunha.vshpc.loadCustomConfiguration).`,
+            );
+        }
         return null;
     }
 }
@@ -268,7 +273,7 @@ export function getCustomConfigDirect(context: vscode.ExtensionContext) {
         if (!fs.existsSync(uri)) {
             uri = path.join(context.extensionPath, CUSTOM_CONFIG_NAME);
             if (!fs.existsSync(uri)) {
-                vscode.window.showErrorMessage(`${CUSTOM_CONFIG_NAME} não encontrado.`);
+                PubSub.publish(LogOpt.toast, `${CUSTOM_CONFIG_NAME} não encontrado.`);
                 throw new CustomError('Custom config não foi econtrado nos locais de procura');
             }
         }
@@ -278,7 +283,7 @@ export function getCustomConfigDirect(context: vscode.ExtensionContext) {
         rawData = fs.readFileSync(uri, 'utf-8');
         PubSub.publish(LogOpt.vshpc, `> ${CUSTOM_CONFIG_NAME} carregado da origem ${uri}`);
     } catch (error: any) {
-        vscode.window.showErrorMessage(`Erro ao carregar ${uri}: ` + error.message);
+        PubSub.publish(LogOpt.toast, `Erro ao carregar ${uri}: ` + error.message);
         throw new CustomError('Custom config não foi econtrado');
     }
     return JSON.parse(rawData) as CustomConfig;

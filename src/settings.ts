@@ -95,7 +95,10 @@ export function getSettings(): SettingsType {
     return settings;
 }
 
-export async function loadSettings(context: vscode.ExtensionContext): Promise<SettingsType> {
+export async function loadSettings(
+    context: vscode.ExtensionContext,
+    reconf = false,
+): Promise<SettingsType> {
     let ret: string | undefined;
 
     try {
@@ -184,7 +187,7 @@ export async function loadSettings(context: vscode.ExtensionContext): Promise<Se
             .get('solver.name', '')
             .trim();
 
-        settings.customConfig = ((await getCustomConfig(context)) as CustomConfig) || {};
+        settings.customConfig = ((await getCustomConfig(context, reconf)) as CustomConfig) || {};
         if (Object.keys(settings.customConfig).length > 0) {
             if (
                 Object.keys(settings.customConfig.settings.solverNames).includes(

@@ -6,7 +6,7 @@ import * as vscode from 'vscode';
 import * as dotenv from 'dotenv';
 dotenv.config({ path: path.resolve(__dirname, '../../.env.test') });
 
-import { baseSettings, expectedResults } from './test-data.nocommit';
+import { linuxTests, winTests, baseLinuxSettings, baseWindowsSettings } from './test-data.nocommit';
 
 import {
     checkAccountSettings,
@@ -28,13 +28,22 @@ import { checkIsRepo, getCurrentHash, getGitProjectName } from '../../git';
 
 let isGit = false;
 
-suite('Git commands', async function (this: Suite) {
+suite('07 - Git commands', async function (this: Suite) {
     this.timeout(10_000);
     let ctx: vscode.ExtensionContext;
     let modelUri: vscode.Uri;
     let repo: Repository;
     let settings: SettingsType;
     let specificHash: string;
+    let tests: typeof linuxTests | typeof winTests;
+    suiteSetup(function () {
+        tests = winTests;
+        settings = baseWindowsSettings;
+        if (process.platform === 'linux') {
+            tests = linuxTests;
+            settings = baseLinuxSettings;
+        }
+    });
 
     suiteSetup(async function () {
         // ativa a extensão
@@ -63,11 +72,11 @@ suite('Git commands', async function (this: Suite) {
         await vscode.workspace.fs.writeFile(destUri, content);
 
         /** essa variáveis eu quero sobrescrever em relaçao ao vshpc.json */
-        settings.user = baseSettings.user;
-        settings.cluster = baseSettings.cluster;
-        settings.privRsaKey = baseSettings.privRsaKey;
+        settings.user = settings.user;
+        settings.cluster = settings.cluster;
+        settings.privRsaKey = settings.privRsaKey;
         settings.passwd = encrypt(process.env.PASSWORD || '');
-        settings.account = baseSettings.account;
+        settings.account = settings.account;
     });
     test('Check if is git', async function () {
         let isrepo = await checkIsRepo(settings.workdir);
@@ -119,7 +128,7 @@ suite('Git commands', async function (this: Suite) {
     test('Nome da pasta de clonagem remota #1', async () => {
         if (process.platform === 'win32') {
             settings.folderFormat = 'projectName_hash';
-            settings.destination = expectedResults.test_git_01.destination;
+            settings.destination = tests.test_git_01.destination;
             if (Object.keys(FolderFormats).includes(settings.folderFormat)) {
                 settings.folderFormat = (FolderFormats as Record<string, string>)[
                     settings.folderFormat
@@ -127,7 +136,7 @@ suite('Git commands', async function (this: Suite) {
             }
             await repo.getRemoteMetaData();
             let p = await repo.getRemoteClonePath();
-            let remote = expectedResults.test_git_01.prefix + repo.getHash(8);
+            let remote = tests.test_git_01.prefix + repo.getHash(8);
             console.log('     ›', 'Pasta via getRemoteClonePath:', p);
             console.log('     ›', 'Pasta remota esperada:       ', remote);
             assert.ok(p === remote, 'Pasta não conferem');
@@ -139,7 +148,7 @@ suite('Git commands', async function (this: Suite) {
     test('Nome da pasta de clonagem remota #2', async () => {
         if (process.platform === 'win32') {
             settings.folderFormat = 'projectName_hash';
-            settings.destination = expectedResults.test_git_02.destination;
+            settings.destination = tests.test_git_02.destination;
             if (Object.keys(FolderFormats).includes(settings.folderFormat)) {
                 settings.folderFormat = (FolderFormats as Record<string, string>)[
                     settings.folderFormat
@@ -147,7 +156,7 @@ suite('Git commands', async function (this: Suite) {
             }
             await repo.getRemoteMetaData();
             let p = await repo.getRemoteClonePath();
-            let remote = expectedResults.test_git_02.prefix + repo.getHash(8);
+            let remote = tests.test_git_02.prefix + repo.getHash(8);
             console.log('     ›', 'Pasta via getRemoteClonePath:', p);
             console.log('     ›', 'Pasta remota esperada:       ', remote);
             assert.ok(p === remote, 'Pasta não conferem');
@@ -158,7 +167,7 @@ suite('Git commands', async function (this: Suite) {
     test('Nome da pasta de clonagem remota #3', async () => {
         if (process.platform === 'win32') {
             settings.folderFormat = 'projectName_hash';
-            settings.destination = expectedResults.test_git_03.destination;
+            settings.destination = tests.test_git_03.destination;
             if (Object.keys(FolderFormats).includes(settings.folderFormat)) {
                 settings.folderFormat = (FolderFormats as Record<string, string>)[
                     settings.folderFormat
@@ -166,7 +175,7 @@ suite('Git commands', async function (this: Suite) {
             }
             await repo.getRemoteMetaData();
             let p = await repo.getRemoteClonePath();
-            let remote = expectedResults.test_git_03.prefix + repo.getHash(8);
+            let remote = tests.test_git_03.prefix + repo.getHash(8);
             console.log('     ›', 'Pasta via getRemoteClonePath:', p);
             console.log('     ›', 'Pasta remota esperada:       ', remote);
             assert.ok(p === remote, 'Pasta não conferem');
@@ -177,8 +186,8 @@ suite('Git commands', async function (this: Suite) {
     test('Nome da pasta de clonagem remota #4', async () => {
         if (process.platform === 'win32') {
             settings.folderFormat = 'projectName_YYYY.MM.DD_tag_hash';
-            settings.destination = expectedResults.test_git_04.destination;
-            const hash = expectedResults.test_git_04.commit;
+            settings.destination = tests.test_git_04.destination;
+            const hash = tests.test_git_04.commit;
             if (Object.keys(FolderFormats).includes(settings.folderFormat)) {
                 settings.folderFormat = (FolderFormats as Record<string, string>)[
                     settings.folderFormat
@@ -189,9 +198,9 @@ suite('Git commands', async function (this: Suite) {
             await repo.getRemoteMetaData();
             let p = await repo.getRemoteClonePath();
             let remote =
-                expectedResults.test_git_04.prefix +
-                `${expectedResults.test_git_04.commitDate}_${expectedResults.test_git_04.tag}_` +
-                expectedResults.test_git_04.commit.substring(0, 8);
+                tests.test_git_04.prefix +
+                `${tests.test_git_04.commitDate}_${tests.test_git_04.tag}_` +
+                tests.test_git_04.commit.substring(0, 8);
             console.log('     ›', 'Pasta via getRemoteClonePath:', p);
             console.log('     ›', 'Pasta remota esperada:       ', remote);
             assert.ok(p === remote, 'Pasta não conferem');

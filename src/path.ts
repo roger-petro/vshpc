@@ -54,11 +54,18 @@ export function macroInterpolation(input: string, params: SettingsType): string 
                 case '{user}':
                     out = out.replace(token, params.user);
                     break;
-                case '{project}': {
-                    const projectName = path.parse(params.workdir).name;
-                    out = out.replace(token, projectName);
+                case '{project}':
+                    {
+                        const projectName = path.parse(params.workdir).name;
+                        out = out.replace(token, projectName);
+                    }
                     break;
-                }
+                case '{projectName}':
+                    {
+                        const projectName = path.parse(params.workdir).name;
+                        out = out.replace(token, projectName);
+                    }
+                    break;
                 case '{solver}':
                     out = out.replace(token, params.solverName);
                     break;
@@ -77,6 +84,7 @@ export function macroInterpolation(input: string, params: SettingsType): string 
                     break;
                 }
                 default:
+                    out = out.replace(token, '__tokennotfound__');
                     // se aparecer outra macro, deixamos ela lá ou jogamos erro
                     break;
             }

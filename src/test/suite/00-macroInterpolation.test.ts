@@ -1,10 +1,19 @@
 // test/suite/macroInterpolation.test.ts
 import * as assert from 'assert';
 import { macroInterpolation } from '../../path';
-import { baseSettings } from './test-data.nocommit';
+import { baseLinuxSettings, baseWindowsSettings } from './test-data.nocommit';
 import path from 'path';
+import { SettingsType } from '../../types';
 
-suite('function macroInterpolation()', () => {
+suite('00 - Iterpolação de macros', () => {
+    let baseSettings: SettingsType;
+    suiteSetup(function () {
+        baseSettings = baseWindowsSettings;
+        if (process.platform === 'linux') {
+            baseSettings = baseLinuxSettings;
+        }
+    });
+
     test('substitui {user} e {project}', () => {
         const result = macroInterpolation('Usuário: {user} — Projeto: {project}', baseSettings);
         assert.strictEqual(

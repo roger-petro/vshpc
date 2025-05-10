@@ -67,10 +67,10 @@ export async function activate(context: vscode.ExtensionContext) {
     loadSettings(context).then(val => {
         settings = val;
         PubSub.publish(LogOpt.vshpc, '> activate: Novas configurações carregadas');
-        //vscode.workspace.onDidChangeConfiguration(() => {
-        //    loadSettings(context);
-        //    //PubSub.publish(LogOpt.toast,"Configurações recarregadas");
-        //});
+        vscode.workspace.onDidChangeConfiguration(() => {
+            loadSettings(context, true);
+            //PubSub.publish(LogOpt.toast,"Configurações recarregadas");
+        });
     });
 
     vscode.workspace.onDidOpenTextDocument(e => {
