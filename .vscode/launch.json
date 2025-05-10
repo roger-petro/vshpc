@@ -46,7 +46,7 @@
 
             "args": [
                 // 1) abre esse diretório como workspace
-                "L:\\res\\usuarios\\x0gd\\simuls\\caso_punq",
+                "",
                 "--extensionDevelopmentPath=${workspaceFolder}",
                 "--extensionTestsPath=${workspaceFolder}/out/test/suite/index.js"
             ],

@@ -32,7 +32,7 @@ export async function sendSSHcommand(
         host: cluster,
         port: 22,
         username: user,
-        password: decrypt(passwd) as string,
+        password: (decrypt(passwd) as string) || '',
     } as ConnectConfig;
 
     const sshKeyConfig = {
@@ -101,7 +101,7 @@ export async function sendSSHcommand(
                 announced = true;
             }
         } else {
-            if (sshUserConfig.password === null) {
+            if (sshUserConfig.password && sshUserConfig.password === '') {
                 PubSub.publish(
                     LogOpt.vshpc,
                     '> ssh2: Nao é possível conectar sem senha ou erro ao decifrar',

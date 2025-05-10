@@ -29,7 +29,7 @@ const checks = {
     //gitEmail: ' - Git email: desconhecido'
 };
 
-export let formattedSettings: string;
+export let formattedSettings: string = '';
 
 export function precheck() {
     formattedSettings = '';
@@ -123,15 +123,18 @@ async function checkAsyncs() {
 
     if (metaData[0].code === 0 || metaData[1].code === 0) {
         const gitserver = await getGitServer(settings.workdir);
+        const cmd = 'git ls-remote -h ' + gitserver + ' 1>/dev/null  2>/dev/null && echo $?';
+
         const testRemote = await sendSSHcommand(
-            'git ls-remote --exit-code -h ' + gitserver,
+            cmd,
             [],
             settings.cluster,
             settings.user,
             settings.passwd,
             settings.privRsaKey,
         );
-        if (testRemote.code === 0) {
+
+        if (testRemote.stdout === '0') {
             checks.checkRemoteAccess = `- Acesso ao GitLab pelo cluster: OK!`;
         } else {
             checks.checkRemoteAccess =

@@ -69,7 +69,7 @@ export async function activate(context: vscode.ExtensionContext) {
         PubSub.publish(LogOpt.vshpc, '> activate: Novas configurações carregadas');
         vscode.workspace.onDidChangeConfiguration(() => {
             loadSettings(context, true);
-            PubSub.publish(LogOpt.vshpc,"Configurações recarregadas");
+            PubSub.publish(LogOpt.vshpc, 'Configurações recarregadas');
         });
     });
 
@@ -332,6 +332,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 }
                 return;
             }
+            setWorkDir(files[0]);
             vscode.commands.executeCommand('workbench.action.splitEditorRight').then(() => {
                 vscode.commands
                     .executeCommand('workbench.action.focusRightGroup')

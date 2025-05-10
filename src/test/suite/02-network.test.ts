@@ -26,12 +26,13 @@ import { submit } from '../../submit';
 import { SettingsType, SubmitOption } from '../../types';
 import { Repository } from '../../repository';
 
-suite('05 - Network related tests', async function (this: Suite) {
+suite('02 - Network related tests', async function (this: Suite) {
     this.timeout(100_000);
     let ctx: vscode.ExtensionContext;
     let modelUri: vscode.Uri;
     let tests: typeof linuxTests | typeof winTests;
     let baseSettings: SettingsType;
+    let settings: SettingsType;
 
     suiteSetup(async function () {
         tests = winTests;
@@ -63,7 +64,7 @@ suite('05 - Network related tests', async function (this: Suite) {
         // grava no storage da extensão, sobrescrevendo se já existir
         await vscode.workspace.fs.writeFile(destUri, content);
 
-        const settings = await loadSettings(ctx);
+        settings = await loadSettings(ctx);
 
         /** essa variáveis eu quero sobrescrever em relaçao ao vshpc.json */
         settings.user = baseSettings.user;
@@ -74,28 +75,12 @@ suite('05 - Network related tests', async function (this: Suite) {
     });
 
     test('Password Connection test', async () => {
-        const settings = await loadSettings(ctx);
-
-        /** essa variáveis eu quero sobrescrever em relaçao ao vshpc.json */
-        settings.user = baseSettings.user;
-        settings.cluster = baseSettings.cluster;
-        settings.privRsaKey = baseSettings.privRsaKey;
-        settings.passwd = encrypt(process.env.PASSWORD || '');
-        settings.account = baseSettings.account;
         settings.usePassword = true;
         const ret = await vscode.commands.executeCommand<string>('rogerio-cunha.vshpc.jobCheckSSH');
         assert.strictEqual(ret, '200');
     });
 
     test('SSH Connection test', async () => {
-        const settings = await loadSettings(ctx);
-
-        /** essa variáveis eu quero sobrescrever em relaçao ao vshpc.json */
-        settings.user = baseSettings.user;
-        settings.cluster = baseSettings.cluster;
-        settings.privRsaKey = baseSettings.privRsaKey;
-        settings.passwd = encrypt(process.env.PASSWORD || '');
-        settings.account = baseSettings.account;
         settings.usePassword = false;
         const ret = await vscode.commands.executeCommand<string>('rogerio-cunha.vshpc.jobCheckSSH');
         assert.strictEqual(ret, '200');
