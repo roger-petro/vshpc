@@ -13,7 +13,7 @@ import { evaluatePath } from './path';
  * 						no formato vscode para o uri.file
  * @returns
  */
-export async function getModelName(clickedFile: vscode.Uri | null) {
+export async function getModelName(clickedFile: vscode.Uri | undefined) {
     const settings = getSettings();
     const VSHPC = settings.customConfig as CustomConfig;
     let model = '';

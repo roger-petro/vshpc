@@ -186,3 +186,11 @@ export const FolderFormats = {
     'projectName_YYYY.MM.DD_hash_tag': '%(projectName)s_%(yyyymmdd)s_%(hash)s_%(tag)s',
     'projectName_YYYY.MM.DD_tag_hash': '%(projectName)s_%(yyyymmdd)s_%(tag)s_%(hash)s',
 };
+
+
+export type SingleJobProgress = {
+    jobid: string;
+    progress: number;
+}
+
+

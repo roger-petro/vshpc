@@ -14,7 +14,14 @@ import {
 } from './settings';
 import { createMessageHub } from './messagehub';
 import { jobQueueArray, formatJobs, Consumer } from './jobs';
-import { pickSiblingModels, getModelName, checkOptions, askCommitHash } from './utils';
+import {
+    pickSiblingModels,
+    getModelName,
+    checkOptions,
+    askCommitHash,
+    getOpenedModelName,
+    pickModel,
+} from './utils';
 import { precheck, check, formattedSettings } from './settingscheck';
 import { JobsPanel } from './panels/jobsPanel';
 
@@ -24,11 +31,14 @@ import { getCurrentHash } from './git';
 import { setCustomConfigLoadCmds } from './customconfig';
 import { setWalkthroughsCmds } from './walkthrought';
 import { setJobTestCmd } from './testjob';
+import path from 'path';
 
 let currentJobs: JobArrayType[] = [];
 
 /** retornar o contexto para uso nos testes unitários */
 let extensionContext: vscode.ExtensionContext;
+
+const SUPPORTED = ['.dat', '.gdt', '.geo', '.DATA', '.xml'];
 
 export async function activate(context: vscode.ExtensionContext) {
     extensionContext = context;
@@ -129,19 +139,47 @@ export async function activate(context: vscode.ExtensionContext) {
         ),
     );
 
+    async function getFileList(
+        uri: vscode.Uri | undefined,
+        filesOrContext: any,
+    ): Promise<Array<vscode.Uri | undefined> | undefined> {
+        const isMenuContext =
+            filesOrContext && typeof filesOrContext === 'object' && 'groupId' in filesOrContext;
+
+        //se a posiçao no array for undefined, caberá ao pickModel uma seleção
+        let files: Array<vscode.Uri | undefined> = isMenuContext
+            ? []
+            : filesOrContext
+            ? filesOrContext
+            : [];
+
+        /** o pedido veio do botão */
+        if (!uri && files.length === 0 && isMenuContext) {
+            //com o menu de botões no editor, deve-se buscar o arquivo aberto no editor
+            const editor = vscode.window.activeTextEditor;
+            if (editor) {
+                const candidate = editor.document.uri;
+                const ext = path.extname(candidate.fsPath);
+                if (SUPPORTED.includes(ext)) {
+                    files.push(candidate);
+                    return files;
+                }
+            }
+        }
+        files.push(uri);
+        return files;
+    }
+
     /**
      * submeter um job diretamente sem fazer clone, nem mesmo precisando de git
      */
+
     let jobSubmitDirect = vscode.commands.registerCommand(
         'rogerio-cunha.vshpc.jobSubmitDirect',
-        async function (uri: vscode.Uri, files: any[]) {
-            if (uri && files === undefined) {
-                files = [];
-                files.push(uri);
-            }
-            if (uri === undefined) {
-                files = [];
-                files.push(undefined);
+        async function (uri: vscode.Uri | undefined, filesOrContext?: any) {
+            const files = await getFileList(uri, filesOrContext);
+            if (!files || files.length === 0) {
+                return '404';
             }
             for (let file of files) {
                 setWorkDir(file);
@@ -164,19 +202,15 @@ export async function activate(context: vscode.ExtensionContext) {
      */
     let jobSubmitHash = vscode.commands.registerCommand(
         'rogerio-cunha.vshpc.jobSubmitHash',
-        async function (uri: vscode.Uri, files: any[]) {
+        async function (uri: vscode.Uri | undefined, filesOrContext?: any) {
             const hash = await askCommitHash();
             if (!hash) {
                 PubSub.publish(LogOpt.toast, 'Hash inválido');
                 return;
             }
-            if (uri && files === undefined) {
-                files = [];
-                files.push(uri);
-            }
-            if (uri === undefined) {
-                files = [];
-                files.push(undefined);
+            const files = await getFileList(uri, filesOrContext);
+            if (!files || files.length === 0) {
+                return '404';
             }
             for (let file of files) {
                 setWorkDir(file);
@@ -200,14 +234,10 @@ export async function activate(context: vscode.ExtensionContext) {
      */
     let jobSubmit = vscode.commands.registerCommand(
         'rogerio-cunha.vshpc.jobSubmit',
-        async function (uri: vscode.Uri, files: any[]) {
-            if (uri && files === undefined) {
-                files = [];
-                files.push(uri);
-            }
-            if (uri === undefined) {
-                files = [];
-                files.push(undefined);
+        async function (uri: vscode.Uri | undefined, filesOrContext?: any) {
+            const files = await getFileList(uri, filesOrContext);
+            if (!files || files.length === 0) {
+                return '404';
             }
             for (let file of files) {
                 setWorkDir(file);
@@ -255,14 +285,10 @@ export async function activate(context: vscode.ExtensionContext) {
      */
     let jobSubmitDirectOneStep = vscode.commands.registerCommand(
         'rogerio-cunha.vshpc.jobSubmitDirectOneStep',
-        async function (uri: vscode.Uri, files: any[]) {
-            if (uri && files === undefined) {
-                files = [];
-                files.push(uri);
-            }
-            if (uri === undefined) {
-                files = [];
-                files.push(undefined);
+        async function (uri: vscode.Uri | undefined, filesOrContext?: any) {
+            const files = await getFileList(uri, filesOrContext);
+            if (!files || files.length === 0) {
+                return '404';
             }
             for (let file of files) {
                 setWorkDir(file);
@@ -285,14 +311,10 @@ export async function activate(context: vscode.ExtensionContext) {
      */
     let jobSubmitDirectCheck = vscode.commands.registerCommand(
         'rogerio-cunha.vshpc.jobSubmitDirectCheck',
-        async function (uri: vscode.Uri, files: any[]) {
-            if (uri && files === undefined) {
-                files = [];
-                files.push(uri);
-            }
-            if (uri === undefined) {
-                files = [];
-                files.push(undefined);
+        async function (uri: vscode.Uri | undefined,  filesOrContext?: any) {
+            const files = await getFileList(uri, filesOrContext);
+            if (!files || files.length === 0) {
+                return '404';
             }
             for (let file of files) {
                 setWorkDir(file);
@@ -424,6 +446,7 @@ export async function activate(context: vscode.ExtensionContext) {
     let curVersion = vscode.commands.registerCommand('rogerio-cunha.vshpc.version', function () {
         if ('version' in PKG) {
             PubSub.publish(LogOpt.toast, `Versão: ${PKG.version}`);
+            return PKG.version;
         }
     });
 

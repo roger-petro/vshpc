@@ -11,8 +11,13 @@
     "engines": {
         "vscode": "^1.75.0"
     },
-    "categories": ["Other"],
-    "activationEvents": ["workspaceContains:**/(.dat|.gdt|.geo|.DATA|.xml)", "onStartupFinished"],
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "workspaceContains:**/(.dat|.gdt|.geo|.DATA|.xml)",
+        "onStartupFinished"
+    ],
     "icon": "images/icon.png",
     "main": "./out/extension.js",
     "contributes": {
@@ -95,33 +100,39 @@
             },
             {
                 "command": "rogerio-cunha.vshpc.OpenConfig",
-                "title": "Abrir a Configuração",
-                "category": "vsHPC"
+                "title": "⚙️ Abrir a Configuração",
+                "category": "vsHPC",
+                 "icon": "$(gear)"
             },
             {
                 "command": "rogerio-cunha.vshpc.jobSubmit",
-                "title": "Submeter Job com Git",
-                "category": "vsHPC"
+                "title": "▶ Submeter Job com Git",
+                "category": "vsHPC",
+                "icon": "$(play)"
             },
             {
                 "command": "rogerio-cunha.vshpc.jobSubmitHash",
                 "title": "Submeter Job com Git informando o hash",
-                "category": "vsHPC"
+                "category": "vsHPC",
+                "icon": "$(git-commit)"
             },
             {
                 "command": "rogerio-cunha.vshpc.jobSubmitAll",
                 "title": "Submeter Jobs com Git (todos os modelos na pasta atual)",
-                "category": "vsHPC"
+                "category": "vsHPC",
+                "icon": "$(run-all)"
             },
             {
                 "command": "rogerio-cunha.vshpc.jobSubmitDirect",
-                "title": "Submeter Job (sem git)",
-                "category": "vsHPC"
+                "title": "▶ Submeter Job (sem git)",
+                "category": "vsHPC",
+                "icon": "$(play)"
             },
             {
                 "command": "rogerio-cunha.vshpc.jobSubmitDirectCheck",
                 "title": "Verificar sintaxe (checkonly)",
-                "category": "vsHPC"
+                "category": "vsHPC",
+                "icon": "$(check)"
             },
             {
                 "command": "rogerio-cunha.vshpc.jobSubmitDirectOneStep",
@@ -130,7 +141,7 @@
             },
             {
                 "command": "rogerio-cunha.vshpc.jobsMgmt",
-                "title": "Gerenciar Jobs",
+                "title": "🛠️ Gerenciar Jobs",
                 "category": "vsHPC"
             },
             {
@@ -182,7 +193,7 @@
         "submenus": [
             {
                 "id": "rogerio-cunha.vshpc.submenu",
-                "label": "vsHPC comandos"
+                "label": "⌘ vsHPC comandos"
             }
         ],
         "menus": {
@@ -238,6 +249,18 @@
                     "group": "navigation"
                 }
             ],
+            "editor/title": [
+                {
+                    "command": "rogerio-cunha.vshpc.jobSubmitDirect",
+                    "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
+                    "group": "navigation"
+                },
+                {
+                    "command": "rogerio-cunha.vshpc.jobSubmit",
+                    "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
+                    "group": "navigation"
+                }
+            ],
             "editor/title/context": [
                 {
                     "submenu": "rogerio-cunha.vshpc.submenu",
@@ -259,27 +282,27 @@
                 {
                     "command": "rogerio-cunha.vshpc.jobSubmitHash",
                     "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
-                    "group": "0_vshpc@2"
+                    "group": "0_vshpc@1"
                 },
                 {
                     "command": "rogerio-cunha.vshpc.jobSubmitDirect",
                     "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
-                    "group": "0_vshpc@3"
+                    "group": "0_vshpc@1"
                 },
                 {
                     "command": "rogerio-cunha.vshpc.jobSubmitAll",
                     "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
-                    "group": "0_vshpc@4"
+                    "group": "0_vshpc@1"
                 },
                 {
                     "command": "rogerio-cunha.vshpc.jobSubmitDirectCheck",
                     "when": "resourceExtname =~ /.dat/i",
-                    "group": "0_vshpc@5"
+                    "group": "0_vshpc@1"
                 },
                 {
                     "command": "rogerio-cunha.vshpc.jobSubmitDirectOneStep",
                     "when": "resourceExtname =~ /.dat/i",
-                    "group": "0_vshpc@6"
+                    "group": "0_vshpc@1"
                 },
                 {
                     "command": "rogerio-cunha.vshpc.jobsMgmt",
@@ -287,7 +310,7 @@
                 },
                 {
                     "command": "rogerio-cunha.vshpc.OpenConfig",
-                    "group": "0_vshpc@12"
+                    "group": "0_vshpc@11"
                 }
             ]
         },
