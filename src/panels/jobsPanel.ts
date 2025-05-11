@@ -20,6 +20,7 @@ import * as PubSub from 'pubsub-js';
 import { expressServer } from '../utilities/proxy';
 import { openLog, evaluatePathReverse } from '../utilities/openLog';
 import { sendSSHcommand } from '../ssh2';
+import { getJobProgress } from '../utilities/getJobProgress';
 
 function generateCommitUrl(hash: string, uri: string): string {
     // Valida se a URI é http/https ou git (SSH)
@@ -359,39 +360,7 @@ export class JobsPanel {
             console.log('Sem argumentos');
             return;
         }
-
-        const settings = getSettings();
-        let script = settings.customConfig.simulators.find(
-            e => e.name.toLowerCase() === 'cmg',
-        )?.progressScript;
-        if ('simulatorName' in payload) {
-            script = settings.customConfig.simulators.find(
-                e => e.name.toLowerCase() === payload.simulatorName,
-            )?.progressScript;
-        }
-        let cmd = `${script} -j ${payload.jobs} ${payload.sameDate ? '--same' : ''}`;
-        console.log(`comando enviado para pegar o progresso: ${cmd}`);
-        try {
-            let ret = await sendSSHcommand(
-                cmd,
-                [],
-                settings.cluster,
-                settings.user,
-                settings.passwd,
-                settings.privRsaKey,
-            );
-            if (ret.code === 0) {
-                const retmsg = JSON.parse(ret.stdout);
-                this.sendMessage2View({ message: 'cmgprogress', payload: retmsg });
-                //console.log('Chegou do SSH:' + JSON.stringify(ret));
-            } else {
-                console.log('Erro de geração do progress. Comando enviado: ', cmd);
-                console.log(JSON.stringify(ret));
-            }
-            this.sendMessage2View({ message: 'cmgprogress', payload: [] });
-        } catch (e) {
-            console.log('Catch', e);
-            this.sendMessage2View({ message: 'cmgprogress', payload: [] });
-        }
+        const retmsg = await getJobProgress(payload);
+        this.sendMessage2View({ message: 'cmgprogress', payload: retmsg ? retmsg: []});
     }
 }

@@ -446,7 +446,7 @@
                     <div class="grid1-column">
                         <div class="progress-cell">
                             <div class="progress-bar" style="width: {job.id in progress? (Number(progress[job.id]) >= 0 && Number(progress[job.id]) <= 100? progress[job.id]: 0) : 0}%;">
-                                <span class="progress-text">{job.id in progress? (Number(progress[job.id]) >= 0 && Number(progress[job.id]) <= 100? progress[job.id]+'%': 'ERR') : 'WAIT'}</span>
+                                <span class="progress-text">{job.id in progress? (Number(progress[job.id]) >= 0 && Number(progress[job.id]) <= 100? progress[job.id]+'%': 'ERR') : 'trying...'}</span>
                             </div>
                         </div>
 
