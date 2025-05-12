@@ -489,11 +489,32 @@ export async function gitActions(
                 cloneURI = repo.getGitServer();
             }
 
-            cmd =
-                `[ ! -d ${remotePath} ] && mkdir -p ${remotePath} && ` +
-                ` cd ${remotePath} && ` +
-                ` ${evalGitPath()} clone ${cloneURI} ${remotePath} && ` +
-                ` ${evalGitPath()} checkout --detach ${hash}`; //-b ${branch}
+            // `[ ! -d ${remotePath} ] && mkdir -p ${remotePath} && ` +
+            // ` cd ${remotePath} && ` +
+            // ` ${evalGitPath()} clone ${cloneURI} ${remotePath} && ` +
+            // ` ${evalGitPath()} checkout --detach ${hash}`; //-b ${branch}
+
+            cmd = `if [ -d "${remotePath}" ]; then
+                        echo "Erro: o diretório ${remotePath} já existe."
+                        exit 1
+                    fi
+                    mkdir -p "${remotePath}" || {
+                        echo "Erro: falha ao criar o diretório ${remotePath}."
+                        exit 2
+                    }
+                    cd "${remotePath}" || {
+                        echo "Erro: não foi possível acessar ${remotePath}."
+                        exit 3
+                    }
+                    ${evalGitPath()} clone "${cloneURI}" . || {
+                        echo "Erro: falha ao clonar ${cloneURI} em ${remotePath}."
+                        exit 4
+                    }
+                    ${evalGitPath()} checkout --detach "${hash}" || {
+                        echo "Erro: falha ao dar checkout do hash ${hash}."
+                        exit 5
+                    }
+                    `;
         }
 
         PubSub.publish(LogOpt.vshpc, `> gitActions: ${cmd}`);
@@ -509,7 +530,7 @@ export async function gitActions(
 
         if (ret && ret.code === 0) {
             //apaguei o sufixo .git aqui para verificar o caminho
-            let created = await checkRemoteFolder(settings, `${repo.getRemoteClonePath()}`);
+            let created = await checkRemoteFolder(settings, `${repo.getRemoteClonePath()}/.git`);
 
             if (created === true) {
                 if (option === SubmitOption.git) {
@@ -536,10 +557,29 @@ export async function gitActions(
             }
         }
         if (ret && ret.code > 0) {
-            PubSub.publish(LogOpt.vshpc, `> gitActions: Erro! código: ${ret.code}`);
+            let message = '';
+            switch (ret.code) {
+                case 1:
+                    message = 'Pasta de destino do clone já existe, favor remover.';
+                    break;
+                case 2:
+                    message = `Erro: falha ao criar o diretório para o git (falta permissão?)`;
+                    break;
+                case 3:
+                    message = `O diretório remote não me concedeu permissão`;
+                    break;
+                case 4:
+                    message = `Falha ao executar o clone`;
+                    break;
+                case 5:
+                    message = `Falha ao dar checkout no commit`;
+            }
+            PubSub.publish(
+                LogOpt.vshpc,
+                `> gitActions: Erro! código: ${ret.code}, message: ${message}`,
+            );
             PubSub.publish(LogOpt.vshpc, `> gitActions: Mensagens extras:\n${ret.stderr}`);
-            PubSub.publish(LogOpt.progress, `Erro na operação git. Faltou um push ou um push tag?`);
-            return { success: false, message: ret.stderr };
+            return { success: false, message: message };
         }
         PubSub.publish(
             LogOpt.vshpc,

@@ -20,6 +20,7 @@ import {
     checkRemoteFolder,
     getLocalReferences,
     getCommitLog,
+    checkRemoteFile,
 } from './git';
 
 export class Repository {
@@ -149,8 +150,13 @@ export class Repository {
         this.isRemoteProjectPath = await checkRemoteFolder(this.settings, this.remoteProjectPath);
         //this.isRemotePathRepo = await checkRemoteFolder(this.settings, `${this.remotePath}/.git`);
 
-        //só pode ser chamado depois que determinar o caminho final
-        this.isRemoteClonePath = await checkRemoteFolder(this.settings, this.remoteClonePath);
+        //só pode ser chamado depois que determinar o caminho final e o path existir
+        let commit_json = { success: false, message: ''};
+        const remote_exists = await checkRemoteFolder(this.settings, this.remoteClonePath);
+        if (remote_exists) {
+            commit_json = await checkRemoteFile(this.settings, path.posix.join(this.remoteClonePath, 'commit.json'));
+        }
+        this.isRemoteClonePath = remote_exists === true && commit_json.success===true;
 
         PubSub.publish(LogOpt.vshpc, '> getRemoteMetaData: Executado');
         return this.isRemoteProjectPath;

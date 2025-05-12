@@ -2,12 +2,63 @@ import * as vscode from 'vscode';
 import * as PubSub from 'pubsub-js';
 import path from 'path';
 import { LogOpt, WorkspaceModelFolder, Simulator, CustomConfig } from './types';
-import { checkAccountSettings, getSettings, checkSubmitSettings, setWorkDir } from './settings';
+import { checkAccountSettings, getSettings, checkSubmitSettings } from './settings';
 import { evaluatePath } from './path';
 
+const SUPPORTED = ['.dat', '.gdt', '.geo', '.DATA', '.xml'];
+
 /**
- * Retorna o modelo a ser simulado caso o usuário opte pelo menu ou por escolher o dat pela
- * paleta da comandos
+ * Retorna uma lista de vscode.uri abertos no editor caso multiplas simulações, ou
+ * a lista de arquivos selecionados no explorer, ou
+ * ou arquivo no editor uma vez que se clique no ícone do context/menu, ou
+ * o prórpio arquivo aberto quando usando o menu
+ * @param uri
+ * @param filesOrContext
+ * @returns
+ */
+export async function getFileList(
+    uri: vscode.Uri | undefined,
+    filesOrContext: any,
+): Promise<Array<vscode.Uri>> {
+    const isMenuContext =
+        filesOrContext && typeof filesOrContext === 'object' && 'groupId' in filesOrContext;
+
+    //se a posiçao no array for undefined, caberá ao pickModel uma seleção
+    let files: Array<vscode.Uri> = isMenuContext ? [] : filesOrContext ? filesOrContext : [];
+
+    /** o pedido veio do botão */
+    if (!uri && files.length === 0 && isMenuContext) {
+        //com o menu de botões no editor, deve-se buscar o arquivo aberto no editor
+        const editor = vscode.window.activeTextEditor;
+        if (editor) {
+            const candidate = editor.document.uri;
+            const ext = path.extname(candidate.fsPath);
+            if (SUPPORTED.includes(ext)) {
+                files.push(candidate);
+                return files;
+            }
+        }
+    }
+    /** quando o comando vem do menu de contexto do explorer o arquivo aparence
+     * tanto indicado na uri quanto no files.
+     */
+    if (uri && !files.find(e => e?.fsPath === uri.fsPath)) {
+        files.push(uri);
+    }
+
+    if (files.length === 0) {
+        const ret = await pickModel();
+        if (ret) {
+            files.push(ret.uri);
+        }
+    }
+
+    return files;
+}
+
+/**
+ * Retorna o nome do modelo a ser simulado com base na seleção feita pelo
+ * usuário na interface
  * @param option
  * @param clickedFile: nome do arquivo que foi clicado sobre para abrir o menu de contexto
  * 						no formato vscode para o uri.file
@@ -26,11 +77,12 @@ export async function getModelName(clickedFile: vscode.Uri | undefined) {
             //vscode.workspace.workspaceFolders !== undefined) {
             const folder = settings.workdir; //vscode.workspace.workspaceFolders[0].uri.path ;
             //const modfile2 = vscode.workspace.asRelativePath(clickedFile)
-            const modfile = clickedFile.fsPath.substring(folder.length + 1).replaceAll('\\', '/');
-            if (
-                path.extname(modfile) === '.' + simulator.ext ||
-                path.extname(modfile) === '.' + simulator.ext.toUpperCase()
-            ) {
+            //const modfile = clickedFile.fsPath.substring(folder.length + 1).replaceAll('\\', '/');
+            let modfile = path.relative(folder, clickedFile.fsPath);
+            modfile = modfile.replace(/\\/g, '/');
+
+            const ext = path.extname(modfile).toLowerCase();
+            if (ext === `.${simulator.ext.toLowerCase()}`) {
                 //console.log('Modelo que foi selecionado ao clicar :' + modfile + " para o solver:" + settings.solverName);
                 model = modfile;
             } else {
@@ -41,20 +93,6 @@ export async function getModelName(clickedFile: vscode.Uri | undefined) {
             }
         } else {
             console.log('Não havia um workspace folder aberto?');
-        }
-    }
-
-    if (!model) {
-        model = getOpenedModelName();
-        if (!model) {
-            const ret = await pickModel();
-            if (ret) {
-                if (settings.workdir !== vscode.Uri.parse(ret.path).fsPath) {
-                    setWorkDir(vscode.Uri.parse(ret.path));
-                    return ret.model;
-                }
-            }
-            return ret ? ret.model : '';
         }
     }
     return model;
@@ -151,6 +189,14 @@ export async function pickSiblingModels(uri: vscode.Uri): Promise<string[]> {
     return [];
 }
 
+/**
+ * Apresenta uma seleção de modelos num pick, especialmente
+ * se a simulação for demandada pelo command palete,
+ * considerando a possibilidade de um workspace com multiplas
+ * pastas abertas (vários modelos abertos ao mesmo tempo, cada
+ * qual controlado por git ou não)
+ * @returns 
+ */
 export async function pickModel(): Promise<WorkspaceModelFolder | undefined> {
     const settings = getSettings();
     const simulDefs = settings.customConfig.simulators;
@@ -170,10 +216,6 @@ export async function pickModel(): Promise<WorkspaceModelFolder | undefined> {
         return undefined;
     }
 
-    // let curEdit = undefined;
-    // if (vscode.window.activeTextEditor)
-    // 	curEdit = vscode.window.activeTextEditor.document.uri.path; //captura o arquivo aberto e com foco no editor
-
     let visibleEdits: string[] = []; //captura os arquivos abertos no editor
     if (vscode.workspace.textDocuments) {
         for (let i in vscode.workspace.textDocuments) {
@@ -186,9 +228,6 @@ export async function pickModel(): Promise<WorkspaceModelFolder | undefined> {
             }
         }
     }
-
-    //console.debug( `Arquivo com foco: ${curEdit}`);
-    //console.debug( `Arquivos abertos: ${visibleEdits}`);
 
     let datFiles: vscode.Uri[] = [];
     const glob = `**/*.{${simulator.ext},${simulator.ext.toUpperCase()}}` as vscode.GlobPattern;
@@ -226,14 +265,12 @@ export async function pickModel(): Promise<WorkspaceModelFolder | undefined> {
                 model: model,
                 path: folderPath,
                 workspaceindex: workspaceNumber,
+                uri: datFile,
             });
         }
     } else {
         return;
     }
-    // for (const i in ar) {
-    // 	if (ar[i][0] === '/') {	ar[i] = ar[i].substring(1);} //retira o primeiro "/"
-    // }
 
     const selection = await vscode.window.showQuickPick(ar, {
         title: 'Modelos (selecione para simular):',

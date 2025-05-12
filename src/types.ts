@@ -1,3 +1,7 @@
+
+
+import * as vscode from 'vscode';
+
 export class CustomError extends Error {
     constructor(message: string) {
         super(message);
@@ -126,6 +130,7 @@ export type WorkspaceModelFolder = {
     model: string;
     path: string;
     workspaceindex: number;
+    uri: vscode.Uri
 };
 
 /**
@@ -169,6 +174,7 @@ export type CustomConfig = {
         elasticSearchAPI: string;
         graphanaAPI: string;
         userSearchSite: string;
+        externalBrowser?: string;
     };
     ux: Record<string, any>;
     simulators: Simulator[];

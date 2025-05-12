@@ -66,7 +66,8 @@ async function exportRepoInfo(settings: SettingsType, location: string, repo: Re
         day: repo.getCommitData(),
         hour: repo.getCommitHour(),
     };
-    const commentFile = location + '/commit.json';
+    let commentFile = path.posix.join(location + '/commit.json');
+
     await scpWrite(
         JSON.stringify(cloneInfo, null, 2),
         commentFile,
@@ -115,7 +116,10 @@ export async function tryClone(
 
             let ret = await gitActions(settings, option, repo);
             //em tese não preciso esperar o comando abaixo terminar
-            removeDotGit(settings, repo);
+            if (ret.success) {
+                await removeDotGit(settings, repo);
+                await exportRepoInfo(settings,repo.getRemoteClonePath(),repo);
+            }
             return ret;
         }
     } catch (error) {
@@ -285,11 +289,11 @@ export async function submit(
 
         PubSub.publish(
             LogOpt.vshpc,
-            `> submit: Resultado do tryClone: ${ret.success ? 'Sucesso' : 'Erro'}`,
+            `> submit: Resultado do tryClone: ${ret.success ? 'Sucesso' : 'Falha'}`,
         );
         PubSub.publish(LogOpt.vshpc, `> submit: Mensagem de retorno: ${ret.message}`);
         if (ret.success === false) {
-            return { success: false, message: 'tryClone:' + ret.message };
+            return { success: false, message:  ret.message };
         }
 
         remotePath = repo.getRemoteClonePath();

@@ -21,6 +21,7 @@ import {
     askCommitHash,
     getOpenedModelName,
     pickModel,
+    getFileList,
 } from './utils';
 import { precheck, check, formattedSettings } from './settingscheck';
 import { JobsPanel } from './panels/jobsPanel';
@@ -37,8 +38,6 @@ let currentJobs: JobArrayType[] = [];
 
 /** retornar o contexto para uso nos testes unitários */
 let extensionContext: vscode.ExtensionContext;
-
-const SUPPORTED = ['.dat', '.gdt', '.geo', '.DATA', '.xml'];
 
 export async function activate(context: vscode.ExtensionContext) {
     extensionContext = context;
@@ -139,36 +138,21 @@ export async function activate(context: vscode.ExtensionContext) {
         ),
     );
 
-    async function getFileList(
-        uri: vscode.Uri | undefined,
-        filesOrContext: any,
-    ): Promise<Array<vscode.Uri | undefined> | undefined> {
-        const isMenuContext =
-            filesOrContext && typeof filesOrContext === 'object' && 'groupId' in filesOrContext;
+    const openConfig = vscode.commands.registerCommand(
+        'rogerio-cunha.vshpc.openAdvancedConfig',
+        async () => {
+            const uri = context.globalStorageUri.with({
+                path: context.globalStorageUri.path + '/vshpc.json',
+            });
+            try {
+                // tenta abrir se já existir
+                const doc = await vscode.workspace.openTextDocument(uri);
+                await vscode.window.showTextDocument(doc, { preview: false });
+            } catch {
 
-        //se a posiçao no array for undefined, caberá ao pickModel uma seleção
-        let files: Array<vscode.Uri | undefined> = isMenuContext
-            ? []
-            : filesOrContext
-            ? filesOrContext
-            : [];
-
-        /** o pedido veio do botão */
-        if (!uri && files.length === 0 && isMenuContext) {
-            //com o menu de botões no editor, deve-se buscar o arquivo aberto no editor
-            const editor = vscode.window.activeTextEditor;
-            if (editor) {
-                const candidate = editor.document.uri;
-                const ext = path.extname(candidate.fsPath);
-                if (SUPPORTED.includes(ext)) {
-                    files.push(candidate);
-                    return files;
-                }
             }
-        }
-        files.push(uri);
-        return files;
-    }
+        },
+    );
 
     /**
      * submeter um job diretamente sem fazer clone, nem mesmo precisando de git
@@ -311,7 +295,7 @@ export async function activate(context: vscode.ExtensionContext) {
      */
     let jobSubmitDirectCheck = vscode.commands.registerCommand(
         'rogerio-cunha.vshpc.jobSubmitDirectCheck',
-        async function (uri: vscode.Uri | undefined,  filesOrContext?: any) {
+        async function (uri: vscode.Uri | undefined, filesOrContext?: any) {
             const files = await getFileList(uri, filesOrContext);
             if (!files || files.length === 0) {
                 return '404';
@@ -473,6 +457,7 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(jobEnterPassword);
     context.subscriptions.push(curVersion);
     context.subscriptions.push(selectSimulVersion);
+    context.subscriptions.push(openConfig);
 }
 
 export function deactivate() {}

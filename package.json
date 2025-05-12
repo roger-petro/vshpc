@@ -102,7 +102,7 @@
                 "command": "rogerio-cunha.vshpc.OpenConfig",
                 "title": "⚙️ Abrir a Configuração",
                 "category": "vsHPC",
-                 "icon": "$(gear)"
+                "icon": "$(gear)"
             },
             {
                 "command": "rogerio-cunha.vshpc.jobSubmit",
@@ -188,6 +188,11 @@
                 "command": "rogerio-cunha.vshpc.selectSimulVersion",
                 "title": "Selecionar Versão do Simulador",
                 "category": "vsHPC"
+            },
+            {
+                "command": "rogerio-cunha.vshpc.openAdvancedConfig",
+                "title": "Abrir configurações avançadas",
+                "category": "vsHPC"
             }
         ],
         "submenus": [
@@ -241,6 +246,9 @@
                 {
                     "command": "rogerio-cunha.vshpc.selectSimulVersion",
                     "when": "false"
+                },
+                {
+                    "command": "rogerio-cunha.vshpc.openAdvancedConfig"
                 }
             ],
             "editor/context": [

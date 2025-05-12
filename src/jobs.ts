@@ -121,8 +121,8 @@ async function sendJob(model: string, option: SubmitOption, specificHash: string
         //setTimeout(() => {console.log('Esperando a mensagem com o numero do job');},4000); //para dar tempo de ler a mensagem
     }
     if (ret && !ret.success) {
-        PubSub.publish(LogOpt.progress, `Falha ao submeter: ${ret.message}`);
-        PubSub.publish(LogOpt.vshpc, `> sendJob: Falha ao submeter: ${ret.message}`);
+        PubSub.publish(LogOpt.progress, ` ${ret.message}`);
+        PubSub.publish(LogOpt.vshpc, `> sendJob: ${ret.message}`);
     }
 
     return false;

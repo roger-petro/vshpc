@@ -62,7 +62,7 @@ export async function showProgress() {
     vscode.window.withProgress(
         {
             location: vscode.ProgressLocation.Notification,
-            title: 'Submissão, aguarde',
+            title: 'Envio',
             cancellable: false,
         },
         (progress, token) => {
