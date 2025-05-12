@@ -20,6 +20,15 @@
     ],
     "icon": "images/icon.png",
     "main": "./out/extension.js",
+    "files": [
+        "out/extension.js",
+        "media/**",
+        "images/**",
+        "package.json",
+        "readme.md",
+        "changelog.md",
+        "LICENSE.md"
+    ],
     "contributes": {
         "walkthroughs": [
             {
@@ -463,20 +472,21 @@
         ]
     },
     "scripts": {
-        "vscode:prepublish": "npm run build:web && npm run esbuild-base -- --minify",
-        "build:all": "npm run build:web && npm run esbuild-base -- --minify",
+        "vscode:prepublish": "npm run check-types && npm run build:web && npm run esbuild-base -- --minify",
+        "build:all": "check-types && npm run build:web && npm run esbuild-base -- --minify",
         "build:web": "cd webview && npm run build",
         "server": "cd webview && npm run dev",
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
+        "check-types": "tsc --noEmit",
         "pretest": "npm run compile && npm run lint",
         "lint": "eslint src",
         "testOld": "vscode-test",
         "test": "npm run compile && node ./out/test/runTest.js",
-        "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=./out/extension.js --external:vscode  --external:cpu-features --external:ssh2 --format=cjs --platform=node",
+        "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=./out/extension.js --external:vscode  --external:cpu-features  --format=cjs --platform=node",
         "esbuild": "npm run esbuild-base -- --sourcemap",
         "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
-        "package": "npm run build:all && vsce package"
+        "package": "npm run check-types && npm run build:all && vsce package"
     },
     "devDependencies": {
         "@types/chai": "^5.2.2",

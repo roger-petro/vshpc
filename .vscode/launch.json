@@ -28,8 +28,10 @@
             "skipFiles": ["<node_internals>/**"]
         },
         // ================================
-        // 1) Debug Extension Tests
-        //    roda a sua extensão + tests dentro do VS Code
+        // Debug Extension Tests
+        // roda os testes dentro do VS Code
+        //  podendo marcar um breakpoint no código 
+        // NAO ESQUEÇA DE AJUSTAR A PASTA
         // ================================
         {
             "name": "Debug Extension Tests",
@@ -45,8 +47,11 @@
             "envFile": "${workspaceFolder}/.env.test",
 
             "args": [
-                // 1) abre esse diretório como workspace
-                "",
+                // =====================================
+                // coloque aqui a pasta que deve ser aberta no workspace
+                // para o electrom abrir a pasta primeiro, com os modelos
+                // que serão usados no teste
+                "**** COLOQUE AQUI O FOLDER ****",
                 "--extensionDevelopmentPath=${workspaceFolder}",
                 "--extensionTestsPath=${workspaceFolder}/out/test/suite/index.js"
             ],
