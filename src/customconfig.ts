@@ -246,8 +246,8 @@ export async function getCustomConfig(
             'version' in customConfig.settings &&
             customConfig.settings.version !== CUSTOM_VERSION
         ) {
-            vscode.window.showWarningMessage(
-                `Carregue a versão ${CUSTOM_VERSION} das configurações customizadas. Fale com o administrador.`,
+            vscode.window.showInformationMessage(
+                `Carregue a versão ${CUSTOM_VERSION} das configurações customizadas. Fale com o administrador do vsHPC.`,
             );
         }
         return customConfig;
