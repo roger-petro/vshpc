@@ -4,14 +4,19 @@ All notable changes to the "vshpc" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [ 0.0.9]
+## [ 1.1.1 ]
 
-- Correção do fuso horário para hora de início de job, conforme apresentado no gerenciador de jobs
+- Documentation
 
-## [ 0.0.8 ]
+## [ 1.1.0 ]
 
-- Primeiro release compatível com a loja
+- Linux compatibility
+- Play button
+- Some decoration
 
-## [Unreleased]
 
-- Initial release
+## [ 1.0.0 ]
+
+First version released after publishing to the VS Code Marketplace
+
+

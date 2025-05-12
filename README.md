@@ -8,7 +8,7 @@ An example of a configuration file is in the file vshpc.demo.json (available on 
 
 ## Extension Usage
 
-### Configuração básica
+### Basic Configuration
 
-Você deve configurar o acesso SSH ao cluster. Um valor de hostname pode ter sido já carregado via arquivo de configuração fornecido pelo seu administrador.
-Todavia, esta configuração pode ser alterada a qualquer tempo via settings do VSCODE, filtrando pelo nome da extensão.
+You should set up SSH access to the cluster. A hostname may already have been loaded from a configuration file provided by your administrator.
+However, this setting can be changed at any time in VS Code’s settings by filtering for the extension’s name.

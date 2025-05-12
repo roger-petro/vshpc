@@ -46,7 +46,7 @@ export function setWalkthroughsCmds(context: vscode.ExtensionContext) {
         vscode.commands.registerCommand('rogerio-cunha.vshpc.walkOpenReadme', () => {
             // vscode.commands.executeCommand('workbench.action.splitEditorRight').then(() => {
             // 	vscode.commands.executeCommand('workbench.action.focusRightGroup').then(() => {
-            const rdm = vscode.Uri.joinPath(context.extensionUri, 'README.md');
+            const rdm = vscode.Uri.joinPath(context.extensionUri, 'readme.md');
             vscode.commands.executeCommand('markdown.showPreview', rdm);
             // 	});
             // });
@@ -55,7 +55,7 @@ export function setWalkthroughsCmds(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.commands.registerCommand('rogerio-cunha.vshpc.OpenReadme', () => {
-            const rdm = vscode.Uri.joinPath(context.extensionUri, 'README.md');
+            const rdm = vscode.Uri.joinPath(context.extensionUri, 'readme.md');
             vscode.commands.executeCommand('markdown.showPreview', rdm);
         }),
     );

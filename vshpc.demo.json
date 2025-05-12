@@ -1,21 +1,30 @@
 {
     "settings": {
-        "version": "1",
+        "version": "2",
         "specHash": "",
         "dryMode": false,
         "remoteGitPath": "/usr/bin/git",
         "defaultFolderFormat": "projectName_hash",
         "defaultCluster": "<HPC_MASTER_NODE_DOMAIN_NAME>",
         "defaultPrivRSAKey": "C:\\Users\\{user}\\.ssh\\id_rsa",
+        "defaultLinuxPrivRSAKey": "/home/{user}/.ssh/id_rsa",
         "defaultSlurmAccount": "",
         "defaultWindowsUnix": {
-            "<WINDOWS_DRIVE_LETTER>:\\": "/<unix_prefix>",
-            "\\\\dfs\\models": "/<unix_prefix>"
+            "<WINDOWS_DRIVE_LETTER>:\\": "/hpc_mount",
+            "\\\\dfs\\dir": "/hpc_mount/dir"
         },
         "defaultUnixWindows": {
-            "/dfs_geral_ep/res/": "L:\\res\\",
-            "/res/": "L:\\res\\",
-            "/u": "N:\\"
+            "/mount_dir/base_dir/": "L:\\base_dir\\",
+            "/base_dir": "L:\\base_dir\\",
+            "/home": "H:\\"
+        },
+        "defaultUnixMapping": {
+            "/local_mount": "/hpc_mount/base_dir",
+            "/home": "/home"
+        },
+        "defaultUnixReverseMapping": {
+            "/hpc_mount/base_dir": "/base_dir",
+            "/home": "/home"
         },
         "solverNames": {
             "GEM": "gem",
@@ -25,9 +34,11 @@
             "OPM": "opm",
             "GEOSX": "geosx"
         },
+
         "elasticSearchAPI": "http://elastic-hpc:9200/ - to fetch job history",
         "graphanaAPI": "https://<<GRAFANA_HOSTANME>/ - to fetch",
-        "userSearchSite": "https://USER_SEARCH_PROFILE?map=1&user="
+        "userSearchSite": "https://USER_SEARCH_PROFILE?map=1&user=",
+        "externalBrowser": "optional_external_url_portal_with_more_jobid_info"
     },
     "interface": {
         "jobsSize": 20,

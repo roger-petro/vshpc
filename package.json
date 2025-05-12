@@ -7,7 +7,7 @@
         "type": "git",
         "url": "https://github.com/roger-petro/vshpc.git"
     },
-    "version": "1.1.0",
+    "version": "1.1.1",
     "engines": {
         "vscode": "^1.75.0"
     },
@@ -92,7 +92,7 @@
                     {
                         "id": "rogerio-cunha.vshpc.read_manual",
                         "title": "Leia a documentação",
-                        "description": "Leia o README detalhado da extensão para maiores detalhes\n[Acesse a documentação](command:rogerio-cunha.vshpc.walkOpenReadme)",
+                        "description": "Leia o `readme` detalhado da extensão para maiores detalhes\n[Acesse a documentação](command:rogerio-cunha.vshpc.walkOpenReadme)",
                         "media": {
                             "image": "images/icon.png",
                             "altText": "Read Manual"
@@ -383,7 +383,7 @@
                     },
                     "vshpc.path.destination": {
                         "type": "string",
-                        "markdownDescription": "Pasta absoluta ou relativa, no formato Windows, indicando o destino para onde serão realizados os clones e as simulações quando usando simulações com clone. Veja o README.md para exemplos. Qualquer valor diferente de ..\\ e .\\ (nível da pasta pai e nível atual) implicará em não poder haver um mesmo job rodando para o modelo. Prefira configurar este item na `TAB` workspace.",
+                        "markdownDescription": "Pasta absoluta ou relativa, no formato Windows, indicando o destino para onde serão realizados os clones e as simulações quando usando simulações com clone. Veja o `readme.md` para exemplos. Qualquer valor diferente de ..\\ e .\\ (nível da pasta pai e nível atual) implicará em não poder haver um mesmo job rodando para o modelo. Prefira configurar este item na `TAB` workspace.",
                         "default": "..",
                         "order": 6
                     },
@@ -458,7 +458,7 @@
                     },
                     "vshpc.solver.version": {
                         "type": "string",
-                        "markdownDescription": "Versão do solver de simulação a depender do simulador escolhido (p. ex.: 2019.12, 2018.11, v6.0, etc). Veja exemplos no README. Prefira configurar este item na `TAB` Workspace.",
+                        "markdownDescription": "Versão do solver de simulação a depender do simulador escolhido (p. ex.: 2019.12, 2018.11, v6.0, etc). Veja exemplos no `readme`. Prefira configurar este item na `TAB` Workspace.",
                         "order": 10
                     },
                     "vshpc.solver.ExtraParams": {
