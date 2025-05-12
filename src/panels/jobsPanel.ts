@@ -299,6 +299,15 @@ export class JobsPanel {
                         );
                         env.openExternal(Uri.parse(message.args));
                         break;
+                    case 'openExternalBrowser':
+                        console.log('Vou tentar abrir o VAI');
+                        // console.log(this.settings.customConfig.settings.externalBrowser + message.args);
+                        commands.executeCommand(
+                            'vscode.open',
+                            Uri.parse(this.settings.customConfig.settings.externalBrowser + message.args),
+                        );
+                        env.openExternal(Uri.parse(message.args));
+                        break;
                     case 'openGitServer':
                         console.log(
                             'Vou tentar achar o git server com estes dados' +
@@ -361,6 +370,6 @@ export class JobsPanel {
             return;
         }
         const retmsg = await getJobProgress(payload);
-        this.sendMessage2View({ message: 'cmgprogress', payload: retmsg ? retmsg: []});
+        this.sendMessage2View({ message: 'cmgprogress', payload: retmsg ? retmsg : [] });
     }
 }
