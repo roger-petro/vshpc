@@ -22,7 +22,12 @@ export async function adjustSettings(context: vscode.ExtensionContext) {
         if (settings.privRsaKey === '') {
             let rsafile = customConfig.settings.defaultPrivRSAKey;
             if (process.platform === 'linux') {
-                rsafile = customConfig.settings.defaultLinuxPrivRSAKey;
+                if ('defaultLinuxPrivRSAKey' in customConfig.settings) {
+                    rsafile = customConfig.settings.defaultLinuxPrivRSAKey;
+                } else {
+                    PubSub.publish(LogOpt.toast_error,'Você deve carregar a versão ${} das configurações customizadas. ' + 
+                        'Fale com o administrado do vsHPC.');
+                }
             }
             settings.privRsaKey = rsafile.replace('{user}', settings.user);
             vscode.workspace
@@ -38,7 +43,12 @@ export async function adjustSettings(context: vscode.ExtensionContext) {
         if (Object.keys(settings.pathMapping).length === 0) {
             settings.pathMapping = customConfig.settings.defaultWindowsUnix;
             if (process.platform === 'linux') {
-                settings.pathMapping = customConfig.settings.defaultUnixMapping;
+                if ('defaultUnixMapping' in customConfig.settings) {
+                    settings.pathMapping = customConfig.settings.defaultUnixMapping;
+                }else {
+                    PubSub.publish(LogOpt.toast_error,'Você deve carregar a versão ${} das configurações customizadas. ' + 
+                        'Fale com o administrado do vsHPC.');
+                }
             }
             vscode.workspace
                 .getConfiguration(APP_NAME)

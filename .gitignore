@@ -10,3 +10,4 @@ media
 **/*.nocommit.*
 .env
 .env.*
+**/vshpc*.json

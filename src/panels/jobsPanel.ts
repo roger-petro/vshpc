@@ -300,13 +300,16 @@ export class JobsPanel {
                         env.openExternal(Uri.parse(message.args));
                         break;
                     case 'openExternalBrowser':
-                        console.log('Vou tentar abrir o VAI');
+                        console.log('Vou tentar abrir a URL externa');
                         // console.log(this.settings.customConfig.settings.externalBrowser + message.args);
-                        commands.executeCommand(
-                            'vscode.open',
-                            Uri.parse(this.settings.customConfig.settings.externalBrowser + message.args),
-                        );
-                        env.openExternal(Uri.parse(message.args));
+                        if ('externalBrowser' in this.settings.customConfig.settings) {
+
+                            commands.executeCommand(
+                                'vscode.open',
+                                Uri.parse(this.settings.customConfig.settings.externalBrowser + message.args),
+                            );
+                            env.openExternal(Uri.parse(message.args));
+                        }
                         break;
                     case 'openGitServer':
                         console.log(

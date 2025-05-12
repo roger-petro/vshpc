@@ -38,7 +38,7 @@ export function evaluatePathReverse(path: string) {
                 rev = path;
             }
         } else {
-            console.log('O Reverse mapping para o linux não existe. Problema?');
+            console.log('O Reverse mapping para o linux não existe. Carregou a versão customizada correta?');
             rev = path;
         }
     }
