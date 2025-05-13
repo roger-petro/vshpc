@@ -7,7 +7,7 @@
         "type": "git",
         "url": "https://github.com/roger-petro/vshpc.git"
     },
-    "version": "1.1.1",
+    "version": "1.1.2",
     "engines": {
         "vscode": "^1.75.0"
     },
@@ -117,7 +117,7 @@
                 "command": "rogerio-cunha.vshpc.jobSubmit",
                 "title": "▶ Submeter Job com Git",
                 "category": "vsHPC",
-                "icon": "$(play)"
+                "icon": "$(run-coverage)"
             },
             {
                 "command": "rogerio-cunha.vshpc.jobSubmitHash",
@@ -151,7 +151,8 @@
             {
                 "command": "rogerio-cunha.vshpc.jobsMgmt",
                 "title": "🛠️ Gerenciar Jobs",
-                "category": "vsHPC"
+                "category": "vsHPC",
+                "icon": "$(checklist)"
             },
             {
                 "command": "rogerio-cunha.vshpc.jobCheckSSH",
@@ -275,6 +276,10 @@
                 {
                     "command": "rogerio-cunha.vshpc.jobSubmit",
                     "when": "resourceExtname =~ /(.dat|.gdt|.geo|.DATA|.xml)/i",
+                    "group": "navigation"
+                },
+                                {
+                    "command": "rogerio-cunha.vshpc.jobsMgmt",
                     "group": "navigation"
                 }
             ],
@@ -486,7 +491,7 @@
         "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=./out/extension.js --external:vscode  --external:cpu-features  --format=cjs --platform=node",
         "esbuild": "npm run esbuild-base -- --sourcemap",
         "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
-        "package": "npm run check-types && npm run build:all && vsce package"
+        "package": "vsce package"
     },
     "devDependencies": {
         "@types/chai": "^5.2.2",

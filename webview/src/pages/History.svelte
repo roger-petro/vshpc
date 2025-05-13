@@ -3,7 +3,9 @@
     import { onMount, onDestroy } from 'svelte';
     import Sep from '../lib/Separator.svelte';
     import Toasts from '../lib/Toasts.svelte';
-    import { addToast } from '../lib/ToastStore';
+
+    import { addToast,clearToasts } from "../lib/ToastStore";
+
     import { ticktac } from '../utilities/clockStore';
 
     import {
@@ -18,6 +20,8 @@
     import { KibanaDataSource } from '../utilities/kibanaPaged';
     import Modal from '../lib/Modal.svelte';
     import SideBarDetails from '../lib/SidebarDetails.svelte';
+    import { debounce, debounceAsync } from '../utilities/debounce';
+    import Toast from '../lib/Toast.svelte';
 
     let modal_show = false;
     let modal_question = 'Confirma matar os jobs selecionados?';
@@ -37,9 +41,11 @@
     let total_hits = 0;
     let localTickTack = '';
     const unsubTickTack = ticktac.subscribe(value => (localTickTack = value));
+
+    let selected_enabled: number[] = [];
     let loading = false;
 
-    let selected = new Set<number>();
+    export let selected: Set<number>;
 
     let proxyPort = getMeta('proxyPort');
     if (!proxyPort) {
@@ -52,6 +58,8 @@
             page = 0;
         }
     });
+
+    $: get_jobsOnPortal_debounced(rows);
 
     function removeDuplicates(data: any) {
         const uniqueJobs: any[] = [];
@@ -66,6 +74,19 @@
 
         return uniqueJobs;
     }
+
+    const get_jobsOnPortal = (rows: KibanaPaged.Hit[]) => {
+        let jobids = rows.map(e => e._source.jobid);
+        if (jobids && jobids.length > 0) {
+            vscode.postMessage({
+                command: 'jobsonportal',
+                payload: { jobs: jobids },
+            });
+        }
+    };
+
+    const get_jobsOnPortal_debounced = debounce(get_jobsOnPortal, 700);
+
     const get_kibana = async (
         user: string | null,
         accounting: string,
@@ -122,6 +143,19 @@
                     case 'openLogRet':
                         if (data.retcode !== 200) showMessage(data.extra, 4000);
                         break;
+                    case 'jobsonportal_ret':
+                        if (data?.extra && data.extra!=='') {
+                            showMessage('A configuração customizada está defasada e a integração com o V.A.I não vai funcionar. fale com o adm.',8000)
+                        }
+                        if (data.payload.length > 0) {
+                            console.log('Retorno do jobsonportal_ret', data.payload);
+                            for (const job of data.payload) {
+                                if (!selected_enabled.includes(job)) {
+                                    selected_enabled.push(job);
+                                }
+                            }
+                            selected_enabled = selected_enabled;
+                        }
                 }
             }
         };
@@ -192,9 +226,6 @@
         vscode.postMessage({ command: 'openUrlLink', args: user });
     }
 
-    function openExternalBrowser(user: string) {
-        vscode.postMessage({ command: 'openExternalBrowser', args: user });
-    }
     function openSystemFolder(folder: string) {
         if (folder) {
             vscode.postMessage({
@@ -228,17 +259,11 @@
         selected = new Set(selected);
         console.log('Selecionados agora:', Array.from(selected));
     }
-
-    function handleOpenExternal(jobid: number) {
-        selected.add(jobid);
-        openExternalBrowser(
-            `reports/wells/line?template=auto&jobids=${Array.from(selected).join(',')}&variableList=Np`,
-        );
-    }
 </script>
 
 <main>
     <Modal text={modal_question} bind:show={modal_show} on:remove={() => {}} />
+
     <div class="wrapper">
         <SideBarDetails bind:show={sidebar_show} {selection}>
             <h4>Detalhes</h4>
@@ -314,7 +339,7 @@
         <div class="third-line">
             <Toasts />
             <div class="grid2">
-                <div class="grid1-header">Sel</div>
+                <div class="grid1-header">V.A.I</div>
                 <div class="grid1-header">Id</div>
                 <div class="grid1-header">User</div>
                 <div class="grid1-header">Account</div>
@@ -327,6 +352,8 @@
                     <div class="grid1-column">
                         <input
                             type="checkbox"
+                            disabled={!selected_enabled.includes(job._source.jobid)}
+                            checked={selected.has(job._source.jobid)}
                             on:change={e =>
                                 changeSelection(job._source.jobid, e.currentTarget.checked)}
                         />
@@ -377,11 +404,6 @@
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
                         <!-- svelte-ignore a11y-no-static-element-interactions -->
                         <a on:click={() => openVScodeFolder(job._source.work_dir)}>VSCode</a>
-                        <Sep w={1} />|<Sep w={1} />
-                        <!-- svelte-ignore a11y-missing-attribute -->
-                        <!-- svelte-ignore a11y-click-events-have-key-events -->
-                        <!-- svelte-ignore a11y-no-static-element-interactions -->
-                        <a on:click={() => handleOpenExternal(job._source.jobid)}>VAI</a>
                     </div>
                 {/each}
             </div>

@@ -21,6 +21,7 @@ import { expressServer } from '../utilities/proxy';
 import { openLog, evaluatePathReverse } from '../utilities/openLog';
 import { sendSSHcommand } from '../ssh2';
 import { getJobProgress } from '../utilities/getJobProgress';
+import { getJobsOnPortal } from '../utilities/getJobsOnPortal';
 
 function generateCommitUrl(hash: string, uri: string): string {
     // Valida se a URI é http/https ou git (SSH)
@@ -301,12 +302,12 @@ export class JobsPanel {
                         break;
                     case 'openExternalBrowser':
                         console.log('Vou tentar abrir a URL externa');
-                        // console.log(this.settings.customConfig.settings.externalBrowser + message.args);
-                        if ('externalBrowser' in this.settings.customConfig.settings) {
+                        // console.log(this.settings.customConfig.settings.externalPortal + message.args);
+                        if ('externalPortal' in this.settings.customConfig.settings) {
 
                             commands.executeCommand(
                                 'vscode.open',
-                                Uri.parse(this.settings.customConfig.settings.externalBrowser + message.args),
+                                Uri.parse(this.settings.customConfig.settings.externalPortal + message.args),
                             );
                             env.openExternal(Uri.parse(message.args));
                         }
@@ -336,6 +337,11 @@ export class JobsPanel {
                     case 'cmgprogress': {
                         console.log('Informações enviadas o askjobs');
                         this._askForProgress(payload);
+                        break;
+                    }
+                    case 'jobsonportal': {
+                        console.log('Informações enviadas o askjobs');
+                        this._askForjobsOnPortal(payload);
                         break;
                     }
                 }
@@ -374,5 +380,17 @@ export class JobsPanel {
         }
         const retmsg = await getJobProgress(payload);
         this.sendMessage2View({ message: 'cmgprogress', payload: retmsg ? retmsg : [] });
+    }
+
+    
+        private async _askForjobsOnPortal(payload: any) {
+        if (!payload) {
+            console.log('Sem argumentos');
+            return;
+        }
+        const retmsg = await getJobsOnPortal(payload);
+        let extra = '';
+        if (retmsg===null) {extra = 'erro: configuração não econtrada';}
+        this.sendMessage2View({ message: 'jobsonportal_ret', payload: retmsg ? retmsg : [],  extra});
     }
 }

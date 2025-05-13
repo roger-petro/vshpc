@@ -174,7 +174,9 @@ export type CustomConfig = {
         elasticSearchAPI: string;
         graphanaAPI: string;
         userSearchSite: string;
-        externalBrowser?: string;
+        externalPortal?: string;
+        remoteBaseScriptDir?: string;
+        mongoServer?: string
     };
     ux: Record<string, any>;
     simulators: Simulator[];

@@ -19,7 +19,7 @@ main {
 
 .grid2 {
     display: grid;
-    grid-template-columns: 40px 80px 60px 100px 100px 80px 150px 1fr 200px ;
+    grid-template-columns: 40px 80px 60px 100px 100px 80px 150px 1fr 160px ;
 
 }
 

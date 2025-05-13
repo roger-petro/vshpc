@@ -36,9 +36,12 @@
         },
 
         "elasticSearchAPI": "http://elastic-hpc:9200/ - to fetch job history",
-        "graphanaAPI": "https://<<GRAFANA_HOSTANME>/ - to fetch",
-        "userSearchSite": "https://USER_SEARCH_PROFILE?map=1&user=",
-        "externalBrowser": "optional_external_url_portal_with_more_jobid_info"
+        "graphanaAPI": "https://<<GRAFANA_HOSTANME>/ -, if you have one",
+        "userSearchSite": "https://USER_SEARCH_PROFILE?map=1&user=, if you have one",
+        "externalPortal": "optional_external_url_portal_with_more_jobid_info, if you have one",
+        "mongoServer": "mongodb://user:pass@domain:27017/db_name?authSource=xxxxxxxx, if you have one"
+
+
     },
     "interface": {
         "jobsSize": 20,
