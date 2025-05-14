@@ -13,7 +13,7 @@
 
     function handleOpenExternal(source: string) {
         if (selected.size > 0) {
-            let url = `reports/${source}/line?template=auto&jobids=${Array.from(selected).join(',')}&variableList=Np`;
+            let url = `reports/${source}/line?template=auto&jobids=${Array.from(selected).join(',')}&requestFrom=vshpc&variableList=Np`;
             vscode.postMessage({ command: 'openExternalBrowser', args: url });
         }
     }
