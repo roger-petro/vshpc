@@ -11,9 +11,9 @@ async function main() {
         // 2) aponta o projeto de testes
         const extensionTestsPath = path.resolve(__dirname, './suite/index');
 
-        const simFolder = process.env.TEST_SIM_FOLDER || '';
+        const simFolder = process.env.MODEL_1_FOLDER || '';
         if (!simFolder) {
-            console.error('❌ TEST_SIM_FOLDER não definido — configure seu .env.test');
+            console.error('❌ Env não definido — configure seu .env.test');
             process.exit(1);
         }
         await runTests({

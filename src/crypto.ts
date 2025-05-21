@@ -7,7 +7,7 @@ import { LogOpt } from './types';
 function evalKey() {
     let specHash: string | null = null;
     const VSHPC = getSettings().customConfig;
-    if (VSHPC && VSHPC.settings.specHash) {
+    if (VSHPC && VSHPC.settings?.specHash) {
         specHash = VSHPC.settings.specHash;
     }
     let keystr = 'sRfsmrWW';

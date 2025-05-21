@@ -110,11 +110,11 @@ suite('07 - Git commands', async function (this: Suite) {
     test('Verifica o nome do diretorio do projeto remoto', async () => {
         let p = await repo.getRemotePath();
         //console.log(p);
-        assert.equal(p, process.env.REMOTE_PROJECT_FOLDER);
+        assert.equal(p, process.env.MODEL_1_REMOTE_PROJECT_FOLDER);
     });
     test('Verifica o diretorio remoto via API do Repository', async () => {
         let p = await repo.getRemotePath();
-        assert.equal(p, process.env.REMOTE_PROJECT_FOLDER);
+        assert.equal(p, process.env.MODEL_1_REMOTE_PROJECT_FOLDER);
     });
     test('Verifica o nome do projeto por uma url HTTPS', async () => {
         let p = await getGitProjectName('https://user:passas@site.com:/proj/dir/projeto.git');

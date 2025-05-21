@@ -118,7 +118,7 @@ export async function tryClone(
             //em tese não preciso esperar o comando abaixo terminar
             if (ret.success) {
                 await removeDotGit(settings, repo);
-                await exportRepoInfo(settings,repo.getRemoteClonePath(),repo);
+                await exportRepoInfo(settings, repo.getRemoteClonePath(), repo);
             }
             return ret;
         }
@@ -177,8 +177,9 @@ export async function submit(
     let remotePath = '';
 
     const params = {
-        jobComment: '',
+        account: settings.account,
         chdir: '',
+        jobComment: '',
         jobName: '',
         jobStdOut: '',
         jobStdErr: '',
@@ -190,7 +191,6 @@ export async function submit(
         ntasksPerNode: settings.ntasksPerNode,
         mpiExtras: settings.mpiExtras,
         mpiNp: '-np ' + String(settings.solverNodes * settings.ntasksPerNode),
-        account: settings.account,
         slurm: settings.slurm,
         sbatch: settings.sbatch,
         solverName: settings.solverName,
@@ -293,7 +293,7 @@ export async function submit(
         );
         PubSub.publish(LogOpt.vshpc, `> submit: Mensagem de retorno: ${ret.message}`);
         if (ret.success === false) {
-            return { success: false, message:  ret.message };
+            return { success: false, message: ret.message };
         }
 
         remotePath = repo.getRemoteClonePath();
@@ -344,18 +344,17 @@ export async function submit(
         }
     }
 
-    //agora account pode ser vazio, em função da nuvem
-    if (settings.account !== '') {
-        switch (simulator.name) {
-            case 'igeo':
-                params.account = '--projeto ' + '"' + settings.account + '"';
-                break;
-            case 'geomec':
-                params.account = '--projeto ' + '"' + settings.account + '"';
-                if (settings.solverExtras) {
-                    params.solverExtras = '--extra_args ' + '"' + settings.solverExtras + '"';
-                }
-                break;
+    if (['geomec', 'igeo'].includes(simulator.name)) {
+        //injeta no slurm paramentros necessarios para estes solvers que não
+        //estava no template
+        const queue = settings.partition? `--queue ${settings.partition} `: '';
+        params.slurm = `${queue}`;
+        params.account = '--projeto ' + '"' + settings.account + '"';
+        params.solverExtras = settings.solverExtras;
+        let idx = simulator.script.findIndex(e=>e.includes('%(sbatch)s'));
+        if (idx > -1) {
+            // esta troca é para pode corrigir o template até uma versão nova
+            simulator.script[idx] = simulator.script[idx].replace('%(sbatch)s','/usr/bin/sbatch');
         }
     }
 

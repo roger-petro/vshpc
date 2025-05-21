@@ -63,3 +63,62 @@ export async function scpWrite(
             .connect(sshConfig);
     });
 }
+
+export async function scpRead(
+    content: string,
+    cluster: string,
+    user: string,
+    passwd: string,
+    privRsaKey: string,
+): Promise<string> {
+    let key: Buffer = Buffer.from('');
+    if (privRsaKey !== '') {
+        try {
+            key = readFileSync(privRsaKey);
+        } catch (error) {
+            const msg = error instanceof Error ? error.message : String(error);
+            PubSub.publish(LogOpt.vshpc, `> scp2Read: ${msg}`);
+        }
+    }
+
+    const sshConfig = {
+        host: cluster,
+        port: 22,
+        username: user,
+    } as ConnectConfig;
+
+    if (privRsaKey !== '' && key) {
+        sshConfig.privateKey = key;
+    } else {
+        sshConfig.password = decrypt(passwd) || '';
+    }
+
+    return new Promise((resolve, reject) => {
+        const con = new Client();
+        con.on('ready', () => {
+            PubSub.publish(LogOpt.vshpc, '> scp2Read: ' + 'Client::ready');
+            con.sftp((err, sftp) => {
+                if (err) {
+                    PubSub.publish(LogOpt.vshpc, '> scp2Read: ' + err.message);
+                    reject('');
+                }
+
+                const stream = sftp.createReadStream(content, {});
+                stream.setEncoding('utf8');
+                let data = '';
+                stream.on('readable', () => {
+                    let chunck: string = '';
+                    while (null !== (chunck = stream.read())) {
+                        data += chunck;
+                    }
+                    resolve(data);
+                });
+            });
+        })
+            .on('error', err => {
+                PubSub.publish(LogOpt.vshpc, '> scp2Read: ' + err.message);
+                resolve('');
+            })
+            .connect(sshConfig);
+    });
+}

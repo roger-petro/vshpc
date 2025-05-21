@@ -19,6 +19,7 @@ let settings: SettingsType = {
     solverVersion: '',
     account: '',
     slurm: '',
+    partition: '',
     sbatch: '/usr/bin/sbatch',
     solverExtras: '',
     solverCores: 1,
@@ -32,18 +33,37 @@ let settings: SettingsType = {
 };
 
 function getAccount(input: string): string {
-    const regexShort = /-A\s+(\S+)/;
-    const regexLong = /--account=(\S+)/;
-    let match = input.match(regexShort);
+    let match = input.match(/-A\s+(\S+)/);
     if (match && match[1]) {
         return match[1];
     }
-    match = input.match(regexLong);
+    match = input.match(/--account=(\S+)/);
+    if (match && match[1]) {
+        return match[1];
+    }
+    match = input.match(/--account\s+(\S+)/);
     if (match && match[1]) {
         return match[1];
     }
     return '';
 }
+
+function getPartition(input: string): string {
+    let match = input.match(/-p\s+(\S+)/);
+    if (match && match[1]) {
+        return match[1];
+    }
+    match = input.match(/--partition=(\S+)/);
+    if (match && match[1]) {
+        return match[1];
+    }
+    match = input.match(/--partition\s+(\S+)/);
+    if (match && match[1]) {
+        return match[1];
+    }
+    return '';
+}
+
 
 function removeAccountParameter(input: string): string {
     const regexShort = /-A\s+\S+/g;
@@ -202,7 +222,7 @@ export async function loadSettings(
                 item.solvers.find(sol => sol === settings.solverName),
             ) as Simulator;
 
-            settings.sbatch = simulator.sbatch.trim() || '/usr/bin/sbatch';
+            settings.sbatch = simulator?.sbatch.trim() || '/usr/bin/sbatch';
 
             settings.solverExtras = vscode.workspace
                 .getConfiguration(APP_NAME)
@@ -213,6 +233,7 @@ export async function loadSettings(
                 .get('scheduler.slurm', '')
                 .trim();
             settings.account = getAccount(settings.slurm);
+            settings.partition = getPartition(settings.slurm);
             settings.solverCores = vscode.workspace
                 .getConfiguration(APP_NAME)
                 .get('scheduler.cores', 1);
@@ -316,6 +337,7 @@ export function checkSubmitSettings(): boolean {
         return false;
     }
 
+    
     if (settings.solverName.length < 2) {
         PubSub.publish(LogOpt.toast, 'Nome do solver incorreto ou não configurado. Configure');
         return false;

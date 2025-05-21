@@ -20,7 +20,7 @@ import {
 import { getExtensionContext } from '../../extension';
 import { check, precheck } from '../../settingscheck';
 import { encrypt } from '../../crypto';
-import { adjustSettings } from '../../customconfig';
+import { adjustSettings, getCustomConfig } from '../../customconfig';
 import { jobQueueArray } from '../../jobs';
 import { submit } from '../../submit';
 import { SettingsType, SubmitOption } from '../../types';
@@ -113,5 +113,10 @@ suite('03 - Settings and vhspc.json', async function (this: Suite) {
         }
         assert.equal(m1, null, 'Retornou falha, nok ou erro');
         assert.equal(m2, null, 'Retornou falhou, nok ou erro');
+    });
+        test('Carregar o setup via getConfiguration', async () => {
+        const conf = await getCustomConfig(ctx);
+        console.log('       > Versão retornada:', conf ? 'settings' in conf && 'version' in conf.settings? conf['settings']['version']: 'Voltou algo errado': 'Conf pode ser null');
+        assert.ok(conf && 'settings' in conf && 'version' in conf.settings);
     });
 });

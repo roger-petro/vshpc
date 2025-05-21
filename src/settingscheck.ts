@@ -197,7 +197,7 @@ function print(key: string, value: any, settings: SettingsType): string {
         case 'workdir':
             newKey = 'Pasta de trabalho atual (workdir)';
         case 'customConfig':
-            if (Object.keys(settings.customConfig.settings).length > 0) {
+            if (settings.customConfig?.settings && Object.keys(settings.customConfig.settings).length > 0) {
                 return `customConfig: versão do json carregado: ${settings.customConfig.settings.version}. Versão desejada: ${CUSTOM_VERSION}`;
             }
             return 'customConfig: custom config não foi carregado';

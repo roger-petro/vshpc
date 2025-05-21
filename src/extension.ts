@@ -33,14 +33,20 @@ import { setCustomConfigLoadCmds } from './customconfig';
 import { setWalkthroughsCmds } from './walkthrought';
 import { setJobTestCmd } from './testjob';
 import path from 'path';
+import { ExtensionContext } from 'vscode';
 
 let currentJobs: JobArrayType[] = [];
 
 /** retornar o contexto para uso nos testes unitários */
 let extensionContext: vscode.ExtensionContext;
 
+export interface ExtensionAPI {
+  readonly context: ExtensionContext;
+}
+
 export async function activate(context: vscode.ExtensionContext) {
     extensionContext = context;
+
     const vshpcLog = vscode.window.createOutputChannel('vsHPC Log');
 
     createMessageHub(vshpcLog);

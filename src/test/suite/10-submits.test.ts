@@ -73,24 +73,25 @@ suite('10 - submit jobs', async function (this: Suite) {
         settings.privRsaKey = baseSettings.privRsaKey;
         settings.passwd = encrypt(process.env.PASSWORD || '');
         settings.account = baseSettings.account;
-        settings.solverName = baseSettings.solverName;
-        settings.solverVersion = baseSettings.solverVersion;
-        settings.solverCores = baseSettings.solverCores;
+        settings.solverName = process.env.MODEL_1_SOLVERNAME || '';
+        settings.solverVersion = process.env.MODEL_1_SOLVERVERSION || '';
+        settings.solverCores = parseInt(process.env.MODEL_1_SOLVERCORES || '1');
         settings.solverNodes = baseSettings.solverNodes;
         settings.solverExtras = baseSettings.solverExtras;
     });
 
     test('Job de teste', async () => {
+        const simRootUri = vscode.workspace.workspaceFolders![0].uri;
+        settings.workdir = simRootUri.fsPath;
         const ret = await vscode.commands.executeCommand<string>('rogerio-cunha.vshpc.jobMock');
         assert.strictEqual(ret, '200');
     });
 
     test('Envio de um model sem git', async () => {
         const simRootUri = vscode.workspace.workspaceFolders![0].uri;
-        modelUri = vscode.Uri.joinPath(simRootUri, process.env.MODEL_NAME || 'bogus.file');
-
+        settings.workdir = simRootUri.fsPath;
         const ret = await submit(
-            process.env.MODEL_NAME || 'bogus.file',
+            process.env.MODEL_1_NAME || 'bogus.file',
             settings,
             SubmitOption.direct,
             false,
@@ -104,13 +105,12 @@ suite('10 - submit jobs', async function (this: Suite) {
 
     test('Envio de um model com git', async () => {
         const simRootUri = vscode.workspace.workspaceFolders![0].uri;
-        modelUri = vscode.Uri.joinPath(simRootUri, process.env.MODEL_NAME || 'bogus.file');
-        settings.solverExtras = baseSettings.solverExtras;
+        settings.workdir = simRootUri.fsPath;
         const repo = new Repository(settings, '');
         await repo.getLocalMetaData(null);
         await repo.getRemoteMetaData();
         const ret = await submit(
-            process.env.MODEL_NAME || 'bogus.file',
+            process.env.MODEL_1_NAME || 'bogus.file',
             settings,
             SubmitOption.git,
             false,
@@ -123,11 +123,34 @@ suite('10 - submit jobs', async function (this: Suite) {
 
     test('Check only com caminho relativo', async () => {
         const simRootUri = vscode.workspace.workspaceFolders![0].uri;
-        modelUri = vscode.Uri.joinPath(simRootUri, process.env.MODEL_NAME || 'bogus.file');
+        settings.workdir = simRootUri.fsPath;
         const ret = await submit(
-            path.join('pess', process.env.MODEL_NAME || 'bogus.file'),
+            path.join('pess', process.env.MODEL_1_NAME || 'bogus.file'),
             settings,
             SubmitOption.check,
+            false,
+            null,
+        );
+
+        assert.equal(ret.success, true);
+        assert.match(ret.message, /[0-9]{6,}/);
+        console.log('     ›', 'Retorno do submit:', ret);
+    });
+
+
+
+    test('Envio  sem git para o modelo 2', async () => {
+        const simRootUri = vscode.workspace.workspaceFolders![0].uri;
+        settings.workdir = simRootUri.fsPath;
+        console.log(`       > workdir foi ajustado para ${settings.workdir}`);
+
+        settings.solverName = process.env.MODEL_2_SOLVERNAME || '';
+        settings.solverVersion = process.env.MODEL_2_SOLVERVERSION || '';
+        settings.solverCores = parseInt(process.env.MODEL_2_SOLVERCORES || '1');
+        const ret = await submit(
+            process.env.MODEL_2_NAME || 'bogus.file',
+            settings,
+            SubmitOption.direct,
             false,
             null,
         );

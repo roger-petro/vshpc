@@ -1,6 +1,10 @@
 # Todo
 
+- tirar o tryng se não for cmg
+- Corrigir a versão do template para tirar aquelas dissincrazias do geomec, agora que a versão já consegue baixar via ssh
 - tentar instalar o json de uma url no servidor git ou outro.
+- desligar a medição de andamento do job se não for cmg
+- buscar o customizado via https em um arquivo
 
 ok - colocar hash no histórico do vshpc
 ok - integração básica com o vai

@@ -195,7 +195,7 @@ export async function pickSiblingModels(uri: vscode.Uri): Promise<string[]> {
  * considerando a possibilidade de um workspace com multiplas
  * pastas abertas (vários modelos abertos ao mesmo tempo, cada
  * qual controlado por git ou não)
- * @returns 
+ * @returns
  */
 export async function pickModel(): Promise<WorkspaceModelFolder | undefined> {
     const settings = getSettings();
@@ -317,14 +317,33 @@ export function checkOptions(params: { models: string[]; hash?: string }) {
         item.solvers.find(sol => sol === settings.solverName),
     ) as Simulator;
 
-    if (!settings.account || settings.account.length === 0) {
-        PubSub.publish(
-            LogOpt.toast_error,
-            `Account precisar ser ajustado na caixa de texto 'project' da configuração do vshpc`,
-        );
-        vscode.commands.executeCommand(`workbench.action.openSettings`, `vshpc.scheduler.slurm`);
-        return false;
+    if (!['geomec', 'igeo', 'test'].includes(simulator.name)) {
+        if (!settings.account || settings.account.length === 0) {
+            PubSub.publish(
+                LogOpt.toast_error,
+                `Account precisar ser ajustado na caixa de texto 'project' da configuração do vshpc`,
+            );
+            vscode.commands.executeCommand(
+                `workbench.action.openSettings`,
+                `vshpc.scheduler.slurm`,
+            );
+            return false;
+        }
     }
+
+    // if (['geomec', 'igeo'].includes(simulator.name)) {
+    //     if (settings.partition === '') {
+    //         PubSub.publish(
+    //             LogOpt.toast_error,
+    //             `A partição precisa ser ajusta com -p <nome_partição_cluter>`,
+    //         );
+    //         vscode.commands.executeCommand(
+    //             `workbench.action.openSettings`,
+    //             `vshpc.scheduler.slurm`,
+    //         );
+    //         return false;
+    //     }
+    // }
     if (!settings.solverName || settings.solverName.length === 0) {
         PubSub.publish(LogOpt.toast_error, `Deve ser especificado o solver para rodar a simulação`);
         vscode.commands.executeCommand(`workbench.action.openSettings`, `vshpc.solver.name`);

@@ -28,6 +28,7 @@ export type SettingsType = {
     solverName: string;
     solverVersion: string;
     account: string;
+    partition: string;
     slurm: string;
     solverExtras: string;
     solverCores: number;

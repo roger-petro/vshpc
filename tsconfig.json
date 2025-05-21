@@ -12,10 +12,11 @@
         "strict": true /* enable all strict type-checking options */,
         "allowJs": true,
         "skipLibCheck": true
+
         /* Additional Checks */
         // "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
         // "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
         // "noUnusedParameters": true,  /* Report errors on unused parameters. */
     },
-    "exclude": ["out", "media", "node_modules", ".vscode-test", "eslint.config.mjs", "webview"]
+    "exclude": ["test", "out", "media", "node_modules", ".vscode-test", "eslint.config.mjs", "webview"]
 }
