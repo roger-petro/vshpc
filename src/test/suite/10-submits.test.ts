@@ -144,6 +144,9 @@ suite('10 - submit jobs', async function (this: Suite) {
         settings.workdir = simRootUri.fsPath;
         console.log(`       > workdir foi ajustado para ${settings.workdir}`);
 
+        settings.sbatch = 'sh';
+        settings.account = 'homologa';
+        settings.partition = 'pre';
         settings.solverName = process.env.MODEL_2_SOLVERNAME || '';
         settings.solverVersion = process.env.MODEL_2_SOLVERVERSION || '';
         settings.solverCores = parseInt(process.env.MODEL_2_SOLVERCORES || '1');

@@ -474,7 +474,7 @@ export async function submit(
             settings.privRsaKey,
         );
         if (simulResult && simulResult.code === 0) {
-            let jobid = simulResult.stdout.match(/batch job ([0-9]{1,9})/);
+            let jobid = simulResult.stdout.match(/batch job ([0-9]{1,12})/);
             if (jobid && jobid.length > 0) {
                 PubSub.publish(LogOpt.vshpc, `> submit: Job id: ${jobid[1]}`);
                 PubSub.publish(LogOpt.vshpc, `> submit: Mensagens extras:\n${simulResult.stderr}`);
