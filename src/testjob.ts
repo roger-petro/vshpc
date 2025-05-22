@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as PubSub from 'pubsub-js';
 
-import { checkAccountSettings, getSettings } from './settings';
+import { checkAccountSettings, getBasicSettings, getSettings } from './settings';
 import { LogOpt } from './types';
 import { sprintf } from 'sprintf-js';
 import { scpWrite } from './scp2';
@@ -12,7 +12,7 @@ export function setJobTestCmd(context: vscode.ExtensionContext) {
     const jobMock = vscode.commands.registerCommand(
         'rogerio-cunha.vshpc.jobMock',
         async function () {
-            const settings = getSettings();
+            const settings = getBasicSettings();
             if (!checkAccountSettings()) {
                 return '403';
             }

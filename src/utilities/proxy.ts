@@ -1,11 +1,11 @@
-import { getSettings } from '../settings';
+import { getBasicSettings, getSettings } from '../settings';
 const express = require('express');
 const cors = require('cors');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const morgan = require('morgan');
 
 export function expressServer(port: string) {
-    const config = getSettings();
+    const config = getBasicSettings();
     // Creating express server
     const app = express();
     app.use(cors());

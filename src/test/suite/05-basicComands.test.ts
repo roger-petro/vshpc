@@ -20,13 +20,12 @@ import {
 import { getExtensionContext } from '../../extension';
 import { check, precheck } from '../../settingscheck';
 import { encrypt } from '../../crypto';
-import { adjustSettings } from '../../customconfig';
 import { jobQueueArray } from '../../jobs';
 import { submit } from '../../submit';
 import { SettingsType, SubmitOption } from '../../types';
 import { Repository } from '../../repository';
 
-suite('04 - Basic commands', async function (this: Suite) {
+suite('05 - Basic commands', async function (this: Suite) {
     this.timeout(100_000);
     let ctx: vscode.ExtensionContext;
     let modelUri: vscode.Uri;
@@ -66,7 +65,7 @@ suite('04 - Basic commands', async function (this: Suite) {
         await vscode.workspace.fs.writeFile(destUri, content);
 
         settings = await loadSettings(ctx);
-        await adjustSettings(ctx);
+
         /** essa variáveis eu quero sobrescrever em relaçao ao vshpc.json */
         settings.user = baseSettings.user;
         settings.cluster = baseSettings.cluster;

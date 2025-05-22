@@ -6,7 +6,7 @@ import path from 'path';
 import { evaluatePathReverse } from '../../utilities/openLog';
 import { SettingsType } from '../../types';
 
-suite('01 - Determinação dos paths', () => {
+suite('03 - Determinação dos paths', () => {
     let tests: typeof linuxTests | typeof winTests;
     let baseSettings: SettingsType;
     suiteSetup(function () {

@@ -10,20 +10,22 @@ import * as PubSub from 'pubsub-js';
 // import axios from 'axios';
 // import * as https from 'https';
 
-import { LogOpt, CustomConfig, CustomError, Simulator, APP_NAME } from './types';
+import { LogOpt, CustomConfig, CustomError, Simulator, APP_NAME, SettingsType } from './types';
 import { getSettings } from './settings';
 import { scpRead } from './scp2';
 
 export const CUSTOM_CONFIG_NAME = 'vshpc.json';
-export const CUSTOM_VERSION = '2';
+export const CUSTOM_VERSION = '3';
 
-// const unsafeAgent = new https.Agent({ rejectUnauthorized: false });
-
-export async function adjustSettings(context: vscode.ExtensionContext) {
-    const settings = getSettings();
-    const customConfig = await getCustomConfig(context);
-
-    if (customConfig) {
+/**
+ * Ajusta alguns settings da extensão no vscode, caso elas não tenham sido
+ * ainda ajustados, com base no que foi carregado do customconfig
+ * de tal modo que estes valores apareçam na interface
+ */
+async function adjustSettings(settings: SettingsType) {
+    if (Object.keys(settings.customConfig).length > 0) {
+        const customConfig = settings.customConfig;
+        //privKey uri
         if (settings.privRsaKey === '') {
             let rsafile = customConfig.settings.defaultPrivRSAKey;
             if (process.platform === 'linux') {
@@ -42,12 +44,16 @@ export async function adjustSettings(context: vscode.ExtensionContext) {
                 .getConfiguration(APP_NAME)
                 .update('connection.privRsaKey', settings.privRsaKey, true);
         }
+
+        //cluster fqdn
         if (!settings.cluster || settings.cluster === '') {
             settings.cluster = customConfig.settings.defaultCluster;
             vscode.workspace
                 .getConfiguration(APP_NAME)
                 .update('connection.cluster', settings.cluster, true);
         }
+
+        //folder mappings
         if (Object.keys(settings.pathMapping).length === 0) {
             settings.pathMapping = customConfig.settings.defaultWindowsUnix;
             if (process.platform === 'linux') {
@@ -65,6 +71,8 @@ export async function adjustSettings(context: vscode.ExtensionContext) {
                 .getConfiguration(APP_NAME)
                 .update('path.WindowsUnix', settings.pathMapping, true);
         }
+
+        //folder format
         if (settings.folderFormat === '') {
             settings.folderFormat = customConfig.settings.defaultFolderFormat;
             vscode.workspace
@@ -75,9 +83,9 @@ export async function adjustSettings(context: vscode.ExtensionContext) {
 }
 
 /**
- * Cria o comando que irá carregar o customconfig e salvar
+ * Cria o comando que irá carregar o customconfig do disco e salvar
  * no globalstorage do usuário. Usualmente em:
- * C:\Users\XXXX\AppData\Roaming\Code\User\globalStorage\rogerio-cunha.vshpc
+ * C:\Users\XXXX\AppData\Roaming\Code\User\globalStorage\<ext-id>
  * @param context
  */
 export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
@@ -120,22 +128,27 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
                 // Armazenar o último caminho usado
                 await context.globalState.update('lastConfigUri', fileUri.toString());
 
-                PubSub.publish(LogOpt.toast, 'Configurações carregadas com sucesso!');
+                //importante esta carga ao carregar o config pois assim os valores fundamentais são
+                //ajustados para poder ter o cluster configurado
+                const settings = await getSettings();
+                settings.customConfig = customConfig;
+                await adjustSettings(settings);
 
-                adjustSettings(context);
+                PubSub.publish(LogOpt.toast, 'Configurações carregadas com sucesso!');
             } catch (error: any) {
                 PubSub.publish(LogOpt.toast, 'Erro ao carregar as configurações: ' + error.message);
             }
         },
     );
 
-    // Comando para selecionar o simulador
+    /** Comando para selecionar o simulador via input do VSCODE
+     */
     const selectSimulNameDisposable = vscode.commands.registerCommand(
         'rogerio-cunha.vshpc.selectSimulName',
         async () => {
             try {
                 // Carregar o customConfig
-                const customConfig = (await getCustomConfig(context)) as CustomConfig;
+                const customConfig = (await getSettings()).customConfig;
                 if (!customConfig) {
                     PubSub.publish(
                         LogOpt.toast_error,
@@ -243,104 +256,84 @@ export function setCustomConfigLoadCmds(context: vscode.ExtensionContext) {
     context.subscriptions.push(loadCustomConfig);
 }
 
-// async function getFromUrl(url: string) {
-//     const response = await axios({
-//         method: 'GET',
-//         url: url,
-//         httpsAgent: unsafeAgent
-//     });
-//     if (response && response.status === 200 && response.statusText === 'OK') {
-//         const respJson = (await response.data) as CustomConfig;
-//         return respJson;
-//     }
-// }
-
+/**
+ * Lê a configuração customizada ou do globalStorage ou
+ * via scp da pasta de bootstrap caso a versão requerida seja
+ * maior em relação à presente no globalStorage
+ */
 export async function getCustomConfig(
     context: vscode.ExtensionContext,
+    settings: SettingsType,
     reconf = false,
-): Promise<CustomConfig | null> {
+): Promise<SettingsType> {
     const configFileUri = vscode.Uri.joinPath(context.globalStorageUri, CUSTOM_CONFIG_NAME);
 
-    const settings = getSettings();
+    settings.customConfig = {} as CustomConfig;
+    let customConfig = {} as CustomConfig;
+
     try {
         PubSub.publish(LogOpt.vshpc, `> O customconfig será lido de ${configFileUri}`);
         const fileContent = await vscode.workspace.fs.readFile(configFileUri);
-        let customConfig: CustomConfig = JSON.parse(Buffer.from(fileContent).toString('utf-8'));
-        if (
-            customConfig &&
-            customConfig?.settings &&
-            'version' in customConfig.settings &&
-            customConfig.settings.version !== CUSTOM_VERSION &&
-            customConfig.settings.remoteBaseScriptDir
-        ) {
-            const fname = path.parse(CUSTOM_CONFIG_NAME).name;
-            const fext = path.parse(CUSTOM_CONFIG_NAME).ext;
-            const streamUTF8 = await scpRead(`${customConfig.settings.remoteBaseScriptDir}/bootstrap/${fname}-${CUSTOM_VERSION}.${fext}`,
-                settings.cluster,
-                settings.user,
-                settings.passwd,
-                settings.privRsaKey
-                
-            ) as string;
-            const configFromSCP = JSON.parse(streamUTF8.split('\n').join('')) as CustomConfig;
-
-            if (configFromSCP && 'settings' in configFromSCP && 'version' in configFromSCP.settings) {
-                customConfig = configFromSCP;
-            } else {
-
-                vscode.window.showInformationMessage(
-                    `Carregue a versão ${CUSTOM_VERSION} das configurações customizadas. Fale com o administrador do vsHPC.`,
-                );
-            }
-        }
-        if (customConfig && 'settings' in customConfig && 'version' in customConfig.settings) {
-            PubSub.publish(LogOpt.vshpc, `> O customconfig lido está na versão ${customConfig.settings.version}`);
-        }
-        return customConfig;
-    } catch (error) {
-        if (error instanceof vscode.FileSystemError && error.code === 'FileNotFound') {
-            // o arquivo não existe
-            PubSub.publish(LogOpt.vshpc, `> O customconfig não foi encontrado em ${configFileUri}`);
-        }
-        const msg = error instanceof Error ? error.message : String(error);
-        if (!reconf) {
+        customConfig = JSON.parse(Buffer.from(fileContent).toString('utf-8'));
+    } catch (e) {
+        if (!reconf && Object.keys(settings.customConfig).length === 0) {
             PubSub.publish(
                 LogOpt.toast,
                 `VSHPC: Carregue as configurações da sua empresa. Fale com o administrador/mantendor para obter o arquivo JSON na versão ${CUSTOM_VERSION} e [carregá-las neste comando](command:rogerio-cunha.vshpc.loadCustomConfiguration).`,
             );
         }
-        return null;
+        return settings;
     }
-}
 
-/**
- * Carrega do arquivo de descrito em CUSTOM_CONFIG_NAME, caso futuramente queira ler direto
- * do arquivo ao invés de salvar no globalStorage
- * @returns CustomConfig
- */
-export function getCustomConfigDirect(context: vscode.ExtensionContext) {
-    let uri = vscode.workspace
-        .getConfiguration(APP_NAME)
-        .get('configuration.customConfigURI', '')
-        .trim();
+    //retorna se a versão lida do arquivo está correta
+    if (customConfig && customConfig?.settings && 'version' in customConfig.settings) {
+        settings.customConfig = customConfig;
+        PubSub.publish(
+            LogOpt.vshpc,
+            `> O customconfig local está na versão ${customConfig.settings.version}. Desejada:${CUSTOM_VERSION}`,
+        );
+        if (customConfig.settings.version === CUSTOM_VERSION) {
+            await adjustSettings(settings);
+            return settings;
+        }
 
-    if (!uri || !fs.existsSync(uri)) {
-        uri = path.join(require('os').homedir(), CUSTOM_CONFIG_NAME);
-        if (!fs.existsSync(uri)) {
-            uri = path.join(context.extensionPath, CUSTOM_CONFIG_NAME);
-            if (!fs.existsSync(uri)) {
-                PubSub.publish(LogOpt.toast, `${CUSTOM_CONFIG_NAME} não encontrado.`);
-                throw new CustomError('Custom config não foi econtrado nos locais de procura');
+        PubSub.publish(LogOpt.vshpc, `> O customconfig será lido via SCP, se existir`);
+        const fname = path.parse(CUSTOM_CONFIG_NAME).name;
+        const fext = path.parse(CUSTOM_CONFIG_NAME).ext;
+        const remote = `${customConfig.settings.remoteBaseScriptDir}/bootstrap/${fname}-${CUSTOM_VERSION}${fext}`;
+        PubSub.publish(
+            LogOpt.vshpc,
+            `> Local remoto: ${remote}`,
+        );
+        try {
+            const streamUTF8 = (await scpRead(
+                remote,
+                settings.cluster,
+                settings.user,
+                settings.passwd,
+                settings.privRsaKey,
+            )) as string;
+            const configFromSCP = JSON.parse(streamUTF8.split('\n').join('')) as CustomConfig;
+
+            if (
+                configFromSCP &&
+                'settings' in configFromSCP &&
+                'version' in configFromSCP.settings
+            ) {
+                settings.customConfig = configFromSCP;
+                await adjustSettings(settings);
+                const encoder = new TextEncoder();
+                await vscode.workspace.fs.writeFile(configFileUri, encoder.encode(JSON.stringify(configFromSCP, null, 2)));
+                return settings;
+            }
+        } catch (error) {
+            if (error instanceof vscode.FileSystemError && error.code === 'FileNotFound') {
+                PubSub.publish(
+                    LogOpt.vshpc,
+                    `> O customconfig não foi encontrado em ${configFileUri}`,
+                );
             }
         }
     }
-    let rawData = '';
-    try {
-        rawData = fs.readFileSync(uri, 'utf-8');
-        PubSub.publish(LogOpt.vshpc, `> ${CUSTOM_CONFIG_NAME} carregado da origem ${uri}`);
-    } catch (error: any) {
-        PubSub.publish(LogOpt.toast, `Erro ao carregar ${uri}: ` + error.message);
-        throw new CustomError('Custom config não foi econtrado');
-    }
-    return JSON.parse(rawData) as CustomConfig;
+    return settings;
 }

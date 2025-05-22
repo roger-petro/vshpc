@@ -20,13 +20,13 @@ import {
 import { getExtensionContext } from '../../extension';
 import { check, precheck } from '../../settingscheck';
 import { encrypt } from '../../crypto';
-import { adjustSettings, getCustomConfig } from '../../customconfig';
 import { jobQueueArray } from '../../jobs';
 import { submit } from '../../submit';
 import { SettingsType, SubmitOption } from '../../types';
 import { Repository } from '../../repository';
+import { getCustomConfig } from '../../customconfig';
 
-suite('03 - Settings and vhspc.json', async function (this: Suite) {
+suite('01 - Settings and vhspc.json', async function (this: Suite) {
     this.timeout(100_000);
     let ctx: vscode.ExtensionContext;
     let modelUri: vscode.Uri;
@@ -66,7 +66,6 @@ suite('03 - Settings and vhspc.json', async function (this: Suite) {
         await vscode.workspace.fs.writeFile(destUri, content);
 
         settings = await loadSettings(ctx);
-        await adjustSettings(ctx);
         /** essa variáveis eu quero sobrescrever em relaçao ao vshpc.json */
         settings.user = baseSettings.user;
         settings.cluster = baseSettings.cluster;
@@ -74,7 +73,11 @@ suite('03 - Settings and vhspc.json', async function (this: Suite) {
         settings.passwd = encrypt(process.env.PASSWORD || '');
         settings.account = baseSettings.account;
         settings.workdir = vscode.workspace?.workspaceFolders?.[0].uri.fsPath || '';
+
+        await vscode.commands.executeCommand<string>('rogerio-cunha.vshpc.logs');
+
     });
+
 
     test('pasta de simulações aberta como workspace', async () => {
         // workspaceFolders[0] é o simFolder que abrimos lá no runTests
@@ -88,11 +91,37 @@ suite('03 - Settings and vhspc.json', async function (this: Suite) {
 
     test('posso obter o globalStorageUri e montar o configFileUri', () => {
         const uri = vscode.Uri.joinPath(ctx.globalStorageUri, 'vshpc.json');
-        //console.log('configFileUri =', uri.toString());
+        console.log('       > configFileUri: ', uri.toString());
         assert.ok(uri.path.endsWith('/vshpc.json'));
     });
 
-    test('vshpc.json foi copiado', async () => {
+    // test('vshpc.json vai ser removido', async () => {
+    //     await vscode.workspace.fs.delete(vscode.Uri.joinPath(ctx.globalStorageUri, 'vshpc.json'));
+    //     try {
+    //         const stat = await vscode.workspace.fs.stat(
+    //             vscode.Uri.joinPath(ctx.globalStorageUri, 'vshpc.json'),
+    //         );
+    //         console.log('         > stat:', stat);
+    //     } catch (e) {
+    //         console.log('       > vshpc.json não existe mais');
+    //     }
+    // });
+
+    // test('Load custom config by user', async () => {
+    //     settings.usePassword = true;
+    //     const ret = await vscode.commands.executeCommand<string>(
+    //         'rogerio-cunha.vshpc.loadCustomConfiguration',
+    //     );
+    // });
+
+    test('Confirmação de que vshpc.json existe', async () => {
+        const data = await vscode.workspace.fs.readFile(
+            vscode.Uri.joinPath(ctx.globalStorageUri, 'vshpc.json'),
+        );
+        assert.ok(data.length > 0);
+    });
+
+    test('O vshpc.json pode ser lido', async () => {
         const data = await vscode.workspace.fs.readFile(
             vscode.Uri.joinPath(ctx.globalStorageUri, 'vshpc.json'),
         );
@@ -114,9 +143,18 @@ suite('03 - Settings and vhspc.json', async function (this: Suite) {
         assert.equal(m1, null, 'Retornou falha, nok ou erro');
         assert.equal(m2, null, 'Retornou falhou, nok ou erro');
     });
-        test('Carregar o setup via getConfiguration', async () => {
-        const conf = await getCustomConfig(ctx);
-        console.log('       > Versão retornada:', conf ? 'settings' in conf && 'version' in conf.settings? conf['settings']['version']: 'Voltou algo errado': 'Conf pode ser null');
-        assert.ok(conf && 'settings' in conf && 'version' in conf.settings);
+
+    test('Carregar o setup via getConfiguration', async () => {
+        const ret_settings = await getCustomConfig(ctx, settings);
+        const customConfig = ret_settings.customConfig;
+        console.log(
+            '       > Versão retornada:',
+            customConfig
+                ? 'settings' in customConfig && 'version' in customConfig.settings
+                    ? customConfig['settings']['version']
+                    : 'Voltou algo errado'
+                : 'customConfig pode ser null',
+        );
+        assert.ok(customConfig && 'settings' in customConfig && 'version' in customConfig.settings);
     });
 });

@@ -12,10 +12,10 @@ import {
 } from './types';
 import { Repository } from './repository';
 
-import { getSettings } from './settings';
+import { getBasicSettings, getSettings } from './settings';
 
 function evalGitPath() {
-    const VSHPC = getSettings().customConfig;
+    const VSHPC = getBasicSettings().customConfig;
     return VSHPC['settings']['remoteGitPath'];
 }
 

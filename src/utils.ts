@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as PubSub from 'pubsub-js';
 import path from 'path';
 import { LogOpt, WorkspaceModelFolder, Simulator, CustomConfig } from './types';
-import { checkAccountSettings, getSettings, checkSubmitSettings } from './settings';
+import { checkAccountSettings, checkSubmitSettings, getBasicSettings } from './settings';
 import { evaluatePath } from './path';
 
 const SUPPORTED = ['.dat', '.gdt', '.geo', '.DATA', '.xml'];
@@ -65,7 +65,7 @@ export async function getFileList(
  * @returns
  */
 export async function getModelName(clickedFile: vscode.Uri | undefined) {
-    const settings = getSettings();
+    const settings = getBasicSettings();
     const VSHPC = settings.customConfig as CustomConfig;
     let model = '';
     if (clickedFile) {
@@ -104,7 +104,7 @@ export async function getModelName(clickedFile: vscode.Uri | undefined) {
  *          relativa (sem a primeira '/')
  */
 export function getOpenedModelName() {
-    const settings = getSettings();
+    const settings = getBasicSettings();
     const simulDefs = settings.customConfig.simulators;
 
     const simulator = simulDefs.find((item: Simulator) =>
@@ -142,7 +142,7 @@ export function getOpenedModelName() {
  * @returns Array com todos os modelos nas pastas corrente
  */
 export async function pickSiblingModels(uri: vscode.Uri): Promise<string[]> {
-    const settings = getSettings();
+    const settings = getBasicSettings();
     const simulDefs = settings.customConfig.simulators;
 
     if (!checkAccountSettings() || !checkSubmitSettings()) {
@@ -198,7 +198,7 @@ export async function pickSiblingModels(uri: vscode.Uri): Promise<string[]> {
  * @returns
  */
 export async function pickModel(): Promise<WorkspaceModelFolder | undefined> {
-    const settings = getSettings();
+    const settings = getBasicSettings();
     const simulDefs = settings.customConfig.simulators;
 
     if (!checkAccountSettings() || !checkSubmitSettings()) {
@@ -311,7 +311,7 @@ export async function askCommitHash(): Promise<string> {
  * @returns
  */
 export function checkOptions(params: { models: string[]; hash?: string }) {
-    const settings = getSettings();
+    const settings = getBasicSettings();
     const simulDefs = settings.customConfig.simulators;
     let simulator = simulDefs.find((item: Simulator) =>
         item.solvers.find(sol => sol === settings.solverName),

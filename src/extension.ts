@@ -11,6 +11,7 @@ import {
     getSettings,
     setWorkDir,
     loadSettings,
+    getBasicSettings,
 } from './settings';
 import { createMessageHub } from './messagehub';
 import { jobQueueArray, formatJobs, Consumer } from './jobs';
@@ -41,7 +42,7 @@ let currentJobs: JobArrayType[] = [];
 let extensionContext: vscode.ExtensionContext;
 
 export interface ExtensionAPI {
-  readonly context: ExtensionContext;
+    readonly context: ExtensionContext;
 }
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -79,13 +80,20 @@ export async function activate(context: vscode.ExtensionContext) {
     setJobTestCmd(context);
 
     let settings: SettingsType;
-    loadSettings(context).then(val => {
-        settings = val;
-        PubSub.publish(LogOpt.vshpc, '> activate: Novas configurações carregadas');
-        vscode.workspace.onDidChangeConfiguration(() => {
-            loadSettings(context, true);
-            PubSub.publish(LogOpt.vshpc, 'Configurações recarregadas');
-        });
+    settings = await loadSettings(context, false);
+
+    PubSub.publish(
+        LogOpt.vshpc,
+        `> activate: Novas configurações carregadas e custom config está na versão ${
+            Object.keys(settings.customConfig).length > 0 ? settings.customConfig.settings.version : '????'
+        }`,
+    );
+    vscode.workspace.onDidChangeConfiguration(async () => {
+        settings = await loadSettings(context, true);
+        PubSub.publish(LogOpt.vshpc, 'Configurações recarregadas e ' + 
+            `custom config está na versão ${
+            Object.keys(settings.customConfig).length > 0 ? settings.customConfig.settings.version : '????' }`
+        );
     });
 
     vscode.workspace.onDidOpenTextDocument(e => {
@@ -112,7 +120,7 @@ export async function activate(context: vscode.ExtensionContext) {
         onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
         onDidChange = this.onDidChangeEmitter.event;
         provideTextDocumentContent(uri: vscode.Uri): string {
-            const settings = getSettings();
+            const settings = getBasicSettings();
             //PubSub.publish(LogOpt.toast,`URI recebida ${uri} vai ser comparada com ${vscode.Uri.parse('jobsSchema:Jobs' )}`);
             if (uri.path === vscode.Uri.parse('jobsSchema:Jobs').path) {
                 return formatJobs(currentJobs);
@@ -126,7 +134,7 @@ export async function activate(context: vscode.ExtensionContext) {
         onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
         onDidChange = this.onDidChangeEmitter.event;
         provideTextDocumentContent(uri: vscode.Uri): string {
-            const settings = getSettings();
+            const settings = getBasicSettings();
             if (uri.path === vscode.Uri.parse('settingsSchema:Configurações').path) {
                 return formattedSettings;
             }
@@ -154,9 +162,7 @@ export async function activate(context: vscode.ExtensionContext) {
                 // tenta abrir se já existir
                 const doc = await vscode.workspace.openTextDocument(uri);
                 await vscode.window.showTextDocument(doc, { preview: false });
-            } catch {
-
-            }
+            } catch {}
         },
     );
 
@@ -365,7 +371,7 @@ export async function activate(context: vscode.ExtensionContext) {
     let jobCheckSSH = vscode.commands.registerCommand(
         'rogerio-cunha.vshpc.jobCheckSSH',
         async function () {
-            const settings = getSettings();
+            const settings = getBasicSettings();
             if (!checkAccountSettings()) {
                 return;
             }
@@ -413,7 +419,7 @@ export async function activate(context: vscode.ExtensionContext) {
     let jobEnterPassword = vscode.commands.registerCommand(
         'rogerio-cunha.vshpc.jobEnterPassword',
         async function () {
-            const settings = getSettings();
+            const settings = getBasicSettings();
             vscode.window
                 .showInputBox({
                     title: 'Password',

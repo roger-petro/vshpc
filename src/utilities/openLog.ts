@@ -3,7 +3,7 @@
 
 import { window, Uri } from 'vscode';
 import { LogOpt } from '../types';
-import { getSettings } from '../settings';
+import { getBasicSettings, getSettings } from '../settings';
 import { macroInterpolation } from '../path';
 
 type PayLoad = {
@@ -21,7 +21,7 @@ type PayLoad = {
  */
 export function evaluatePathReverse(path: string) {
     let rev = '';
-    let settings = getSettings();
+    let settings = getBasicSettings();
 
     let reverseMapping = {};
 
@@ -84,7 +84,7 @@ export async function openLog(payload: PayLoad) {
     } else {
         unixUri = payload.chdir + '/' + payload.name + '.log';
     }
-    let winUri = evaluatePathReverse(unixUri);
+    let winUri = await evaluatePathReverse(unixUri);
 
     try {
         let ret = await window.showTextDocument(Uri.parse(winUri));

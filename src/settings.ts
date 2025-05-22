@@ -6,6 +6,8 @@ import { SettingsType, LogOpt, Simulator, CustomConfig, FolderFormats, APP_NAME 
 import { decrypt } from './crypto';
 import { getCustomConfig } from './customconfig';
 
+let context : vscode.ExtensionContext;
+
 let settings: SettingsType = {
     user: '',
     passwd: '',
@@ -111,14 +113,26 @@ export function setWorkDir(_uri: vscode.Uri | undefined) {
     PubSub.publish(LogOpt.vshpc, `> getSettings: Workdir foi definido para ${settings.workdir}`);
 }
 
-export function getSettings(): SettingsType {
+/** quando o interesse é apenas em dados básicos que estão no settings
+ * do usuário e a princípio estão já configurados.
+ */
+export function getBasicSettings() {
+    return settings;
+}
+
+export async function getSettings(): Promise<SettingsType> {
+    if (Object.keys(settings.customConfig).length===0) {
+        return (await getCustomConfig(context,settings));
+    }
     return settings;
 }
 
 export async function loadSettings(
-    context: vscode.ExtensionContext,
+    ctx: vscode.ExtensionContext,
     reconf = false,
 ): Promise<SettingsType> {
+    context = ctx;
+
     let ret: string | undefined;
 
     try {
@@ -207,7 +221,11 @@ export async function loadSettings(
             .get('solver.name', '')
             .trim();
 
-        settings.customConfig = ((await getCustomConfig(context, reconf)) as CustomConfig) || {};
+        //importante carregar as configurações customizadas depois
+        //que o settings serem lidos do settings da extensão.
+        //pois os críticos como cluster etc serão sobrescritos se estiverem
+        await getCustomConfig(context, settings, reconf);
+
         if (Object.keys(settings.customConfig).length > 0) {
             if (
                 Object.keys(settings.customConfig.settings.solverNames).includes(

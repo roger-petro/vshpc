@@ -19,7 +19,6 @@ import {
 import { getExtensionContext } from '../../extension';
 import { check, precheck } from '../../settingscheck';
 import { encrypt } from '../../crypto';
-import { adjustSettings } from '../../customconfig';
 import { jobQueueArray } from '../../jobs';
 import { submit } from '../../submit';
 import { FolderFormats, SettingsType, SubmitOption } from '../../types';

@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as PubSub from 'pubsub-js';
 import { JobArrayType, RetMsg, SettingsType, LogOpt, SubmitOption, JobQueueElement } from './types';
-import { checkAccountSettings, getSettings, checkSubmitSettings } from './settings';
+import { checkAccountSettings, getSettings, checkSubmitSettings, getBasicSettings } from './settings';
 import { submit } from './submit';
 import { sendSSHcommand } from './ssh2';
 import { getCurrentHash } from './git';
@@ -64,7 +64,7 @@ export class Consumer {
  */
 async function sendJob(model: string, option: SubmitOption, specificHash: string | null) {
     //submissão!
-    const settings = getSettings();
+    const settings = getBasicSettings();
     let jobName = '';
 
     if (option === SubmitOption.git) {
@@ -104,7 +104,7 @@ async function sendJob(model: string, option: SubmitOption, specificHash: string
         repository = null;
     }
 
-    const VSHPC = getSettings().customConfig;
+    const VSHPC = getBasicSettings().customConfig;
     let isDry =
         (VSHPC.settings.dryMode as boolean) ||
         vscode.workspace.getConfiguration('petro.vshpc').get('debug.drymode', false);
@@ -129,7 +129,7 @@ async function sendJob(model: string, option: SubmitOption, specificHash: string
 }
 
 export function showJob2Kill(jobAr: JobArrayType): boolean {
-    const settings = getSettings();
+    const settings = getBasicSettings();
     if (!checkAccountSettings()) {
         return false;
     }

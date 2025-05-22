@@ -2,7 +2,7 @@ import { evaluatePath } from './path';
 import { getGitServer, getBranchesTips, checkRemoteFolder, getRemoteReferences } from './git';
 import { Repository } from './repository';
 import { sendSSHcommand } from './ssh2';
-import { getSettings } from './settings';
+import { getBasicSettings, getSettings } from './settings';
 import * as PubSub from 'pubsub-js';
 import { SettingsType } from './types';
 import { CUSTOM_VERSION } from './customconfig';
@@ -33,7 +33,7 @@ export let formattedSettings: string = '';
 
 export function precheck() {
     formattedSettings = '';
-    const settings = getSettings();
+    const settings = getBasicSettings();
     for (let item in settings) {
         const value = print(item, (settings as any)[item], settings);
         formattedSettings = formattedSettings + value + '\n';
@@ -53,7 +53,7 @@ export async function check() {
 }
 
 async function checkAsyncs() {
-    const settings = getSettings();
+    const settings = getBasicSettings();
     const repo = new Repository(settings, '');
     const metaData = await Promise.all([
         sendSSHcommand('pwd', [], settings.cluster, settings.user, settings.passwd, ''),

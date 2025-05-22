@@ -1,9 +1,9 @@
-import { getSettings } from '../settings';
+import { getBasicSettings, getSettings } from '../settings';
 import { sendSSHcommand } from '../ssh2';
 import { SingleJobProgress } from '../types';
 
 export async function getJobsOnPortal(payload: any) {
-    const settings = getSettings();
+    const settings = getBasicSettings();
     let baseScriptDir = settings.customConfig.settings?.remoteBaseScriptDir;
 
     if (!baseScriptDir) {

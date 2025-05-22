@@ -20,7 +20,6 @@ import {
 import { getExtensionContext } from '../../extension';
 import { check, precheck } from '../../settingscheck';
 import { encrypt } from '../../crypto';
-import { adjustSettings } from '../../customconfig';
 import { jobQueueArray } from '../../jobs';
 import { submit } from '../../submit';
 import { SettingsType, SubmitOption } from '../../types';
@@ -65,7 +64,6 @@ suite('10 - submit jobs', async function (this: Suite) {
         await vscode.workspace.fs.writeFile(destUri, content);
 
         settings = await loadSettings(ctx);
-        await adjustSettings(ctx);
 
         /** essa variáveis eu quero sobrescrever em relaçao ao vshpc.json */
         settings.user = baseSettings.user;
@@ -144,7 +142,7 @@ suite('10 - submit jobs', async function (this: Suite) {
         settings.workdir = simRootUri.fsPath;
         console.log(`       > workdir foi ajustado para ${settings.workdir}`);
 
-        settings.sbatch = 'sh';
+        settings.sbatch = '/usr/bin/sbatch';
         settings.account = 'homologa';
         settings.partition = 'pre';
         settings.solverName = process.env.MODEL_2_SOLVERNAME || '';

@@ -1,9 +1,9 @@
-import { getSettings } from '../settings';
+import { getBasicSettings, getSettings } from '../settings';
 import { sendSSHcommand } from '../ssh2';
 import { SingleJobProgress } from '../types';
 
 export async function getJobProgress(payload: any) {
-    const settings = getSettings();
+    const settings = getBasicSettings();
     let script = settings.customConfig.simulators.find(
         e => e.name.toLowerCase() === 'cmg',
     )?.progressScript;

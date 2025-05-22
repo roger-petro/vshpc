@@ -166,6 +166,7 @@ export async function submit(
     const simulator = settings.customConfig.simulators.find(item =>
         item.solvers.find(sol => sol === settings.solverName),
     ) as Simulator;
+
     if (!simulator) {
         PubSub.publish(LogOpt.vshpc, `> jobSubmit: Especificação para o simulador não encontrada`);
         return {
@@ -192,6 +193,7 @@ export async function submit(
         mpiExtras: settings.mpiExtras,
         mpiNp: '-np ' + String(settings.solverNodes * settings.ntasksPerNode),
         slurm: settings.slurm,
+        queue: '',
         sbatch: settings.sbatch,
         solverName: settings.solverName,
         solverVersion: settings.solverVersion,
@@ -344,19 +346,8 @@ export async function submit(
         }
     }
 
-    if (['geomec', 'igeo'].includes(simulator.name)) {
-        //injeta no slurm paramentros necessarios para estes solvers que não
-        //estava no template
-        const queue = settings.partition? `--queue ${settings.partition} `: '';
-        params.slurm = `${queue}`;
-        params.account = '--projeto ' + '"' + settings.account + '"';
-        params.solverExtras = settings.solverExtras;
-        let idx = simulator.script.findIndex(e=>e.includes('%(sbatch)s'));
-        if (idx > -1) {
-            // esta troca é para pode corrigir o template até uma versão nova
-            simulator.script[idx] = simulator.script[idx].replace('%(sbatch)s','/usr/bin/sbatch');
-        }
-    }
+    //alguns solvers precisam do parametro queue
+    params.queue = settings.partition? settings.partition : simulator.defaultPartition ? simulator.defaultPartition:'';
 
     let script = '';
     let command = '';

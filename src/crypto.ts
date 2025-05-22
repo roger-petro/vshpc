@@ -1,13 +1,13 @@
 import * as crypto from 'crypto';
 const algorithm = 'aes-256-cbc';
 import * as PubSub from 'pubsub-js';
-import { getSettings } from './settings';
+import { getBasicSettings } from './settings';
 import { LogOpt } from './types';
 
 function evalKey() {
     let specHash: string | null = null;
-    const VSHPC = getSettings().customConfig;
-    if (VSHPC && VSHPC.settings?.specHash) {
+    const VSHPC =  getBasicSettings().customConfig;
+    if (VSHPC && 'settings' in VSHPC && VSHPC.settings?.specHash) {
         specHash = VSHPC.settings.specHash;
     }
     let keystr = 'sRfsmrWW';

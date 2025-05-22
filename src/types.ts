@@ -144,6 +144,7 @@ export type Simulator = {
     defaultSolverVersion: string;
     verRegexpClass?: string;
     defaultSlurm: string;
+    defaultPartition?: string;
     solvers: string[];
     ext: string;
     progressScript: string;

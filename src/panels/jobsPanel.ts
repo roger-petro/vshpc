@@ -14,7 +14,7 @@ import {
 import { getUri } from '../utilities/getURI';
 import { getNonce } from '../utilities/getNonce';
 import { getJobs, killJob, getUserJobUpdates } from '../jobs';
-import { getSettings } from '../settings';
+import { getBasicSettings, getSettings } from '../settings';
 import { JobArrayType, LogOpt, SettingsType } from '../types';
 import * as PubSub from 'pubsub-js';
 import { expressServer } from '../utilities/proxy';
@@ -107,7 +107,7 @@ export class JobsPanel {
         private context: ExtensionContext,
     ) {
         this._panel = panel;
-        this.settings = getSettings();
+        this.settings = getBasicSettings();
         this.isProduction = this.context.extensionMode === ExtensionMode.Production;
         // Set an event listener to listen for when the panel is disposed (i.e. when the user closes
         // the panel or when the panel is closed programmatically)
@@ -265,7 +265,7 @@ export class JobsPanel {
                         break;
                     case 'killJobs':
                         if (Array.isArray(message.payload)) {
-                            const settings = getSettings();
+                            const settings = getBasicSettings();
                             //console.log('Enviando kill para ' + message.payload.join(' '));
                             let ret = await killJob(settings, message.payload.join(' '));
                         }
