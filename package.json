@@ -20,15 +20,7 @@
     ],
     "icon": "images/icon.png",
     "main": "./out/extension.js",
-    "files": [
-        "out/extension.js",
-        "media/**",
-        "images/**",
-        "package.json",
-        "readme.md",
-        "changelog.md",
-        "LICENSE.md"
-    ],
+
     "contributes": {
         "walkthroughs": [
             {
